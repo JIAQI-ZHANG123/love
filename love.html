@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>❤️ 我们的时光之旅 ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+            background: #2c241a;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #2c241a 0%, #4a3728 100%);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 1000;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hero h1 {
+            font-size: 52px;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 40px;
+        }
+
+        .enter-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            padding: 14px 36px;
+            font-size: 18px;
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .enter-btn:hover {
+            background: rgba(255,255,255,0.35);
+            transform: scale(1.05);
+        }
+
+        .main-content {
+            background: #fef8f2;
+            padding: 20px 20px 60px;
+            min-height: 100vh;
+        }
+
+        .calendar-section {
+            background: white;
+            border-radius: 36px;
+            padding: 30px 24px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .days-label {
+            font-size: 16px;
+            color: #b88b6f;
+        }
+
+        .days-number {
+            font-size: 72px;
+            font-weight: bold;
+            color: #e85d5d;
+            background: #fff0ea;
+            display: inline-block;
+            padding: 10px 32px;
+            border-radius: 80px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        .progress-to-target {
+            background: #fffaf5;
+            border-radius: 28px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .target-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #b88b6f;
+            margin-bottom: 12px;
+        }
+
+        .target-bar-bg {
+            background: #ffe0cc;
+            border-radius: 20px;
+            height: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .target-bar-fill {
+            background: #e85d5d;
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 1.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .target-status {
+            font-size: 13px;
+            color: #a07054;
+            margin-top: 8px;
+        }
+
+        .timeline-events {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .event-item {
+            display: flex;
+            gap: 20px;
+            background: white;
+            border-radius: 32px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+            transition: opacity 0.6s ease, transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: 1px solid #ffefe3;
+            cursor: pointer;
+        }
+
+        .event-item.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .event-item:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 15px 30px rgba(229, 93, 93, 0.12);
+        }
+
+        .event-date {
+            min-width: 90px;
+            font-weight: bold;
+            color: #e85d5d;
+            font-size: 16px;
+        }
+
+        .event-content {
+            flex: 1;
+        }
+
+        .event-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a3728;
+        }
+
+        .event-desc {
+            font-size: 14px;
+            color: #6b4e37;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .event-img img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #c99c7e;
+            font-size: 13px;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-container {
+            max-width: 90%;
+            max-height: 90%;
+            width: 550px;
+            background: #fff8f2;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .swiper-container {
+            position: relative;
+            width: 100%;
+            background: #1a1a1a;
+        }
+
+        .swiper-images {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+        }
+
+        .swiper-track {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .swiper-slide {
+            flex-shrink: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .swiper-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+
+        .swiper-btn:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .swiper-btn-prev {
+            left: 12px;
+        }
+
+        .swiper-btn-next {
+            right: 12px;
+        }
+
+        .swiper-dots {
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .swiper-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .swiper-dot.active {
+            width: 20px;
+            background: #e85d5d;
+            border-radius: 10px;
+        }
+
+        .modal-text {
+            padding: 24px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #e85d5d;
+            margin-bottom: 12px;
+        }
+
+        .modal-desc {
+            font-size: 15px;
+            color: #4a3b2c;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-size: 32px;
+            color: white;
+            cursor: pointer;
+            z-index: 15;
+            background: rgba(0,0,0,0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        /* 图片预览放大样式 */
+        .image-preview {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 3000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .image-preview.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .image-preview img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 36px; }
+            .event-item { flex-direction: column; }
+            .event-date { margin-bottom: 6px; }
+            .days-number { font-size: 48px; }
+            .modal-container { width: 95%; }
+            .modal-text { max-height: 300px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- 封面 -->
+<div class="hero" id="hero">
+    <h1>❤️ 我们的时光之旅 ❤️</h1>
+    <p>从初见到未来的每一步 · 都值得纪念</p>
+    <div class="enter-btn" id="enterBtn">✨ 开启回忆 ✨</div>
+</div>
+
+<!-- 主内容 -->
+<div class="main-content" id="mainContent" style="display: none;">
+    <div class="calendar-section">
+        <div class="days-label">💕 我们已经在一起</div>
+        <div class="days-number" id="daysTogether">0</div>
+        <div class="days-label">天 💕</div>
+        <div class="progress-to-target">
+            <div class="target-info">
+                <span>✧ 从2025.11.13开始</span>
+                <span id="targetDateDisplay">🎯 一周年 · 2026年11月13日</span>
+            </div>
+            <div class="target-bar-bg">
+                <div class="target-bar-fill" id="targetBarFill"></div>
+            </div>
+            <div class="target-status" id="targetStatus">⏳ 正在计算...</div>
+        </div>
+    </div>
+
+    <!-- 时间线事件 -->
+    <div class="timeline-events" id="timelineEvents">
+        <div class="event-item" data-event-index="0">
+            <div class="event-date">2025.11.11</div>
+            <div class="event-content">
+                <div class="event-title">🌟 冲动的表白</div>
+                <div class="event-desc">“那你和我相亲好咯~”(,,-ω-,,)<br>“张璐……其实……我喜欢你！”(⁄ ⁄•⁄ω⁄•⁄ ⁄)<br>“啊？……我同意了~”✧(≖ ◡ ≖✿)</div>
+                <div class="event-img"><img src="images/photo1.jpg" alt="表白！"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="1">
+            <div class="event-date">2025.11.13</div>
+            <div class="event-content">
+                <div class="event-title">❤️ 正式在一起！</div>
+                <div class="event-desc">“张璐，我真的很喜欢你，和我在一起吧！”<br>“好，同意了~”</div>
+                <div class="event-img"><img src="images/photo0.jpg" alt="在一起！"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="2">
+            <div class="event-date">2025.11.17</div>
+            <div class="event-content">
+                <div class="event-title">✨ 第一份礼物</div>
+                <div class="event-desc">宝宝送我的第一份礼物~雪吻巧克力！甜蜜如你(♡˙︶˙♡)</div>
+                <div class="event-img"><img src="images/photo2.jpg" alt="雪吻"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="3">
+            <div class="event-date">2025.12.24</div>
+            <div class="event-content">
+                <div class="event-title">平安夜</div>
+                <div class="event-desc">平安夜，宝宝吃了苹果，就会平平安安~</div>
+                <div class="event-img"><img src="images/photo3.jpg" alt="平安夜的苹果"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="4">
+            <div class="event-date">2025.12.25</div>
+            <div class="event-content">
+                <div class="event-title">第一份圣诞礼物！</div>
+                <div class="event-desc">好多好多的礼物~零食、小狗、雪花挂件，悠哈和荷氏，还有宝宝的真心！(⁄ ⁄>⁄ ▽ ⁄<⁄ ⁄)</div>
+                <div class="event-img"><img src="images/photo4.jpg" alt="圣诞礼物"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="5">
+            <div class="event-date">2025.12.31</div>
+            <div class="event-content">
+                <div class="event-title">第一次见面！</div>
+                <div class="event-desc">第一次见面我们都好紧张！<br>第一次和宝宝抱抱、牵手、亲亲，还有跨年！</div>
+                <div class="event-img"><img src="images/photo5.jpg" alt="见面"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="6">
+            <div class="event-date">2026.1.1</div>
+            <div class="event-content">
+                <div class="event-title">跨年</div>
+                <div class="event-desc">同淋今朝雪，从此共白头</div>
+                <div class="event-img"><img src="images/photo6.jpg" alt="雪和我们"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="7">
+            <div class="event-date">2026.1.14</div>
+            <div class="event-content">
+                <div class="event-title">璐璐的十八岁生日！</div>
+                <div class="event-desc">小宝宝成年啦！<br>宝宝的十八岁、十九岁、二十岁……<br>还有以后以后的生日，都有我在的窝！(♡˙︶˙♡)</div>
+                <div class="event-img"><img src="images/photo7.jpg" alt="宝宝的十八岁生日~"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="8">
+            <div class="event-date">2026.1.22</div>
+            <div class="event-content">
+                <div class="event-title">宝宝第一次来杭州！</div>
+                <div class="event-desc">坏蛋宝宝一直骗我去扬州玩，还四处打探小狗的安排！<br>等到我发现宜兴位置不对有猫腻，宝宝又哄着我……<br>哼！坏蛋宝宝变着法子给我惊喜！还陪我熬夜、游西湖……<br>宝宝最好最好啦！</div>
+                <div class="event-img"><img src="images/photo8.jpg" alt="寒假见面"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="9">
+            <div class="event-date">2026.2.14</div>
+            <div class="event-content">
+                <div class="event-title">情人节！</div>
+                <div class="event-desc">在一起的第一个情人节窝！</div>
+                <div class="event-img"><img src="images/photo10.jpg" alt="情人节快乐！"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="10">
+            <div class="event-date">2026.2.22-2026.2.24</div>
+            <div class="event-content">
+                <div class="event-title">南昌之行！</div>
+                <div class="event-desc">和宝宝一起去南昌玩！</div>
+                <div class="event-img"><img src="images/photo9.jpg" alt="南昌"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="11">
+            <div class="event-date">2026.3</div>
+            <div class="event-content">
+                <div class="event-title">三月见面~</div>
+                <div class="event-desc">三月份和宝宝见了三次！</div>
+                <div class="event-img"><img src="images/photo11.jpg" alt="三月"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="12">
+            <div class="event-date">2026.3.6</div>
+            <div class="event-content">
+                <div class="event-title">西湖灵隐</div>
+                <div class="event-desc">和宝宝去灵隐寺玩~还有夜骑西湖！</div>
+                <div class="event-img"><img src="images/photo12.jpg" alt="西湖灵隐"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="13">
+            <div class="event-date">2026.3.20-2026.3.22</div>
+            <div class="event-content">
+                <div class="event-title">太子湾~西溪且留下</div>
+                <div class="event-desc">太子湾看花……好多好看的郁金香！还去了西溪玩~</div>
+                <div class="event-img"><img src="images/photo13.jpg" alt="太子湾和西溪"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="14">
+            <div class="event-date">2026.4.18</div>
+            <div class="event-content">
+                <div class="event-title">小狗生日！</div>
+                <div class="event-desc">小狗的十九岁生日！好多好多礼物~<br>其实小狗从小到大过生日都没有收到过这么多这么多的礼物……<br>呜呜呜宝宝是世界上最好最好的女朋友！！!<br></div>
+                <div class="event-img"><img src="images/photo14.jpg" alt="小狗生日"></div>
+            </div>
+        </div>
+
+        <div class="event-item" data-event-index="15">
+            <div class="event-date">FOREVER</div>
+            <div class="event-content">
+                <div class="event-title">永远永远！</div>
+                <div class="event-desc">我和小宝宝的路还很长很长……<br>小宝宝我爱你！我想要和你一直一直在一起<br>我发誓我要和宝宝一直走下去，直到永远永远！<br></div>
+                <div class="event-img"><img src="images/photo13-2.jpg" alt="以后的以后"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <small>❤️ 致我们永不褪色的时光 ❤️</small>
+        <small>触碰NFC · 重温每一帧心动</small>
+    </div>
+</div>
+
+<!-- 背景音乐 -->
+<audio id="bgMusic" loop preload="auto">
+    <source src="images/music.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 模态框（弹窗） -->
+<div class="modal" id="eventModal">
+    <div class="modal-close" id="modalClose">&times;</div>
+    <div class="modal-container">
+        <div class="swiper-container">
+            <div class="swiper-images">
+                <div class="swiper-track" id="modalSwiperTrack"></div>
+            </div>
+            <div class="swiper-btn swiper-btn-prev" id="swiperPrev">‹</div>
+            <div class="swiper-btn swiper-btn-next" id="swiperNext">›</div>
+            <div class="swiper-dots" id="swiperDots"></div>
+        </div>
+        <div class="modal-text">
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-desc" id="modalDesc"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 图片预览放大弹窗 -->
+<div class="image-preview" id="imagePreview">
+    <img id="previewImage" src="" alt="预览">
+</div>
+
+<script>
+    // ========== 1. 音乐播放 ==========
+    let musicStarted = false;
+    const music = document.getElementById('bgMusic');
+
+    function startMusic() {
+        if (!musicStarted) {
+            music.play().then(() => musicStarted = true).catch(e => console.log("需要用户交互"));
+        }
+    }
+
+    // ========== 2. 封面跳转 ==========
+    const hero = document.getElementById('hero');
+    const mainContent = document.getElementById('mainContent');
+    const enterBtn = document.getElementById('enterBtn');
+
+    enterBtn.addEventListener('click', () => {
+        startMusic();
+        hero.style.transform = 'translateY(-100%)';
+        setTimeout(() => {
+            hero.style.display = 'none';
+            mainContent.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            startCounterAnimation();
+            startProgressAnimation();
+            observeEvents();
+        }, 800);
+    });
+
+    document.body.addEventListener('click', function initMusic() {
+        startMusic();
+        document.body.removeEventListener('click', initMusic);
+    });
+
+    // ========== 3. 天数累加动画 ==========
+    function startCounterAnimation() {
+        const START_DATE = new Date(2025, 10, 13);
+        const today = new Date();
+        const targetDays = Math.max(0, Math.ceil((today - START_DATE) / (1000 * 60 * 60 * 24)));
+        
+        const daysElement = document.getElementById('daysTogether');
+        let current = 0;
+        const duration = 2000;
+        const stepTime = 20;
+        const steps = duration / stepTime;
+        const increment = targetDays / steps;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= targetDays) {
+                daysElement.innerText = targetDays;
+                clearInterval(timer);
+            } else {
+                daysElement.innerText = Math.floor(current);
+            }
+        }, stepTime);
+    }
+
+    // ========== 4. 进度条动画 ==========
+    function startProgressAnimation() {
+        const START_DATE = new Date(2025, 10, 13);
+        const TARGET_DATE = new Date(2026, 10, 13);
+        const today = new Date();
+        
+        const totalDays = Math.ceil((TARGET_DATE - START_DATE) / (1000 * 60 * 60 * 24));
+        let daysPassed = Math.ceil((today - START_DATE) / (1000 * 60 * 60 * 24));
+        daysPassed = Math.min(daysPassed, totalDays);
+        daysPassed = Math.max(daysPassed, 0);
+        
+        let percent = (daysPassed / totalDays) * 100;
+        percent = Math.min(100, Math.max(0, percent));
+        
+        const barFill = document.getElementById('targetBarFill');
+        const statusText = document.getElementById('targetStatus');
+        const leftDays = totalDays - daysPassed;
+        const targetDateStr = `${TARGET_DATE.getFullYear()}年${TARGET_DATE.getMonth()+1}月${TARGET_DATE.getDate()}日`;
+        
+        const targetInfoElements = document.querySelectorAll('.target-info span:last-child');
+        if (targetInfoElements.length > 0) {
+            targetInfoElements.forEach(el => {
+                el.innerText = `🎯 一周年 · ${targetDateStr}`;
+            });
+        }
+        
+        setTimeout(() => {
+            if (barFill) barFill.style.width = percent + '%';
+            if (today >= TARGET_DATE) {
+                statusText.innerText = `🎉 我们已经在一起一周年啦！ 🎉`;
+            } else {
+                statusText.innerText = `📅 距离一周年还有 ${leftDays} 天 · 已完成 ${Math.floor(percent)}% ❤️`;
+            }
+        }, 300);
+    }
+
+    // ========== 5. 事件卡片滚动出现 ==========
+    function observeEvents() {
+        const items = document.querySelectorAll('.event-item');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, entry.target.dataset.delay || 0);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        
+        items.forEach((item, idx) => {
+            item.dataset.delay = idx * 100;
+            observer.observe(item);
+        });
+    }
+
+    window.addEventListener('resize', () => {
+        if (mainContent.style.display !== 'none') {
+            document.querySelectorAll('.event-item:not(.visible)').forEach(item => {
+                if (item.getBoundingClientRect().top < window.innerHeight - 80)
+                    item.classList.add('visible');
+            });
+        }
+    });
+
+    // ========== 6. 事件数据配置 ==========
+    const eventsData = [
+        { title: "冲动的表白", desc: "“那你和我相亲好咯~”(,,-ω-,,)\n\n“张璐……其实……我喜欢你！”(⁄ ⁄•⁄ω⁄•⁄ ⁄)\n\n“啊？……我同意了~”✧(≖ ◡ ≖✿)\n\n那天的紧张和心动，我永远不会忘记。", images: ["images/photo1.jpg"] },
+        { title: "正式在一起！", desc: "“张璐，我真的很喜欢你，和我在一起吧！”\n\n“好，同意了~”\n\n这是我们的恋爱纪念日，从这天开始，我的世界多了一个最重要的人。", images: ["images/photo0.jpg"] },
+        { title: "第一份礼物", desc: "宝宝送我的第一份礼物~雪吻巧克力！甜蜜如你(♡˙︶˙♡)", images: ["images/photo2.jpg"] },
+        { title: "平安夜", desc: "平安夜，宝宝吃了苹果，就会平平安安~", images: ["images/photo3.jpg"] },
+        { title: "第一份圣诞礼物！", desc: "好多好多的礼物~零食、小狗、雪花挂件，悠哈和荷氏，还有宝宝的真心！(⁄ ⁄>⁄ ▽ ⁄<⁄ ⁄)", images: ["images/photo4.jpg", "images/photo4-1.jpg", "images/photo4-2.jpg", "images/photo4-3.jpg", "images/photo4-4.jpg", "images/photo4-5.jpg"] },
+        { title: "第一次见面！", desc: "第一次见面我们都好紧张！第一次和宝宝抱抱、牵手、亲亲，还有跨年！", images: ["images/photo5.jpg", "images/photo5-1.jpg", "images/photo5-2.jpg"] },
+        { title: "跨年", desc: "同淋今朝雪，从此共白头。那天的雪和你，我都会记住一辈子。", images: ["images/photo6.jpg", "images/photo6-1.jpg", "images/photo6-2.jpg", "images/photo6-3.jpg", "images/photo6-4.jpg", "images/photo6-5.jpg", "images/photo6-6.jpg"] },
+        { title: "璐璐的十八岁生日！", desc: "小宝宝成年啦！宝宝的十八岁、十九岁、二十岁……还有以后以后的生日，都有我在的窝！(♡˙︶˙♡)\n\n那天我们一起吃了蛋糕，你许愿的时候我偷偷看了你，真的好可爱。以后每一个生日，我都会陪在你身边。", images: ["images/photo7.jpg", "images/photo7-1.jpg", "images/photo7-2.jpg", "images/photo7-3.jpg", "images/photo7-4.jpg", "images/photo7-5.jpg", "images/photo7-6.jpg", "images/photo7-7.jpg", "images/photo7-8.jpg", "images/photo7-9.jpg", "images/photo7-10.jpg", "images/photo7-11.jpg", "images/photo7-12.jpg", "images/photo7-13.jpg"] },
+        { title: "宝宝第一次来杭州！", desc: "坏蛋宝宝一直骗我去扬州玩，还四处打探小狗的安排！等到我发现宜兴位置不对有猫腻，宝宝又哄着我……哼！坏蛋宝宝变着法子给我惊喜！还陪我熬夜、游西湖……宝宝最好最好啦！", images: ["images/photo8.jpg", "images/photo8-1.jpg", "images/photo8-2.jpg", "images/photo8-3.jpg", "images/photo8-4.jpg", "images/photo8-5.jpg", "images/photo8-6.jpg", "images/photo8-7.jpg", "images/photo8-8.jpg", "images/photo8-9.jpg", "images/photo8-10.jpg", "images/photo8-11.jpg"] },
+        { title: "情人节！", desc: "在一起的第一个情人节窝！", images: ["images/photo10.jpg"] },
+        { title: "南昌之行！", desc: "和宝宝一起去南昌玩！留下了很多美好的回忆~", images: ["images/photo9.jpg", "images/photo9-1.jpg", "images/photo9-2.jpg", "images/photo9-3.jpg", "images/photo9-4.jpg", "images/photo9-5.jpg", "images/photo9-6.jpg", "images/photo9-7.jpg", "images/photo9-8.jpg", "images/photo9-9.jpg", "images/photo9-10.jpg", "images/photo9-11.jpg", "images/photo9-12.jpg", "images/photo9-13.jpg", "images/photo9-14.jpg", "images/photo9-15.jpg", "images/photo9-16.jpg", "images/photo9-17.jpg", "images/photo9-18.jpg", "images/photo9-19.jpg", "images/photo9-20.jpg", "images/photo9-21.jpg", "images/photo9-22.jpg"] },
+        { title: "三月之行", desc: "见面了三次！笨蛋小狗明明说好要省钱，可是一直忍不住~", images: ["images/photo11.jpg", "images/photo11-1.jpg", "images/photo11-2.jpg", "images/photo11-3.jpg", "images/photo11-4.jpg"] },
+        { title: "西湖灵隐", desc: "和宝宝去灵隐寺玩~还有夜骑西湖！", images: ["images/photo12.jpg", "images/photo12-1.jpg", "images/photo12-2.jpg", "images/photo12-3.jpg", "images/photo12-4.jpg", "images/photo12-5.jpg", "images/photo12-6.jpg", "images/photo12-7.jpg", "images/photo12-8.jpg", "images/photo12-9.jpg", "images/photo12-10.jpg", "images/photo12-11.jpg", "images/photo12-12.jpg"] },
+        { title: "太子湾和西溪", desc: "太子湾看花……好多好看的郁金香！和宝宝一起拍了好多照片\n\n还去西溪了！看了热气球，还试吃了好多好多", images: ["images/photo13.jpg", "images/photo13-1.jpg", "images/photo13-2.jpg", "images/photo13-3.jpg", "images/photo13-4.jpg", "images/photo13-5.jpg", "images/photo13-6.jpg"] },
+        { title: "十九生日", desc: "小狗的十九岁生日！宝宝给我准备了好多好多礼物！！！谢谢小宝宝~", images: ["images/photo14.jpg", "images/photo14-1.jpg", "images/photo14-2.jpg", "images/photo14-3.jpg", "images/photo14-4.jpg", "images/photo14-5.jpg", "images/photo14-6.jpg", "images/photo14-7.jpg", "images/photo14-8.jpg", "images/photo14-9.jpg", "images/photo14-10.jpg", "images/photo14-11.jpg", "images/photo14-12.jpg", "images/photo14-13.jpg", "images/photo14-14.jpg", "images/photo14-15.jpg", "images/photo14-16.jpg", "images/photo14-17.jpg"] },
+        { title: "永远永远！", desc: "我和小宝宝的路还很长很长……\n\n小宝宝我爱你！我想要和你一直一直在一起\n\n我发誓我要和宝宝一直走下去，直到永远永远！", images: ["images/photo13-2.jpg"] }
+    ];
+
+    // ========== 7. 轮播图逻辑（自动播放 + 点击放大） ==========
+    let currentSwiperIndex = 0;
+    let currentImages = [];
+    let autoPlayTimer = null;
+    let isAutoPlaying = true;
+    const AUTO_PLAY_INTERVAL = 3000;
+
+    const modalEl = document.getElementById('eventModal');
+    const modalTitleEl = document.getElementById('modalTitle');
+    const modalDescEl = document.getElementById('modalDesc');
+    const swiperTrack = document.getElementById('modalSwiperTrack');
+    const swiperPrev = document.getElementById('swiperPrev');
+    const swiperNext = document.getElementById('swiperNext');
+    const swiperDots = document.getElementById('swiperDots');
+    const modalCloseBtn = document.getElementById('modalClose');
+
+    function stopAutoPlay() {
+        if (autoPlayTimer) {
+            clearInterval(autoPlayTimer);
+            autoPlayTimer = null;
+        }
+        isAutoPlaying = false;
+    }
+
+    function startAutoPlay() {
+        if (autoPlayTimer) stopAutoPlay();
+        if (currentImages.length <= 1) return;
+        autoPlayTimer = setInterval(() => {
+            if (isAutoPlaying && currentImages.length > 1) {
+                let nextIndex = currentSwiperIndex + 1;
+                if (nextIndex >= currentImages.length) nextIndex = 0;
+                goToSlide(nextIndex);
+            }
+        }, AUTO_PLAY_INTERVAL);
+        isAutoPlaying = true;
+    }
+
+    function userInteract() {
+        if (isAutoPlaying) stopAutoPlay();
+    }
+
+    function openModal(eventIndex) {
+        const data = eventsData[eventIndex];
+        if (!data) return;
+        modalTitleEl.innerText = data.title;
+        modalDescEl.innerText = data.desc;
+        currentImages = data.images || [];
+        currentSwiperIndex = 0;
+        renderSwiper();
+        modalEl.classList.add('active');
+        startAutoPlay();
+    }
+
+    function renderSwiper() {
+        swiperTrack.innerHTML = '';
+        swiperDots.innerHTML = '';
+        if (currentImages.length === 0) {
+            swiperTrack.innerHTML = '<div class="swiper-slide"><div style="width:100%;height:100%;background:#ddd;display:flex;align-items:center;justify-content:center;">暂无图片</div></div>';
+            return;
+        }
+        currentImages.forEach((imgSrc, idx) => {
+            const slide = document.createElement('div');
+            slide.className = 'swiper-slide';
+            slide.innerHTML = `<img src="${imgSrc}" alt="图片${idx+1}" style="cursor: pointer;">`;
+            swiperTrack.appendChild(slide);
+            const dot = document.createElement('div');
+            dot.className = 'swiper-dot';
+            if (idx === currentSwiperIndex) dot.classList.add('active');
+            dot.onclick = () => { userInteract(); goToSlide(idx); };
+            swiperDots.appendChild(dot);
+        });
+        updateSwiperPosition();
+        
+        // 绑定图片点击放大
+        setTimeout(() => {
+            document.querySelectorAll('.swiper-slide img').forEach(img => {
+                img.onclick = (e) => {
+                    e.stopPropagation();
+                    userInteract();
+                    const preview = document.getElementById('imagePreview');
+                    const previewImg = document.getElementById('previewImage');
+                    if (preview && previewImg) {
+                        previewImg.src = img.src;
+                        preview.classList.add('active');
+                    }
+                };
+            });
+        }, 50);
+    }
+
+    function updateSwiperPosition() {
+        const container = document.querySelector('.swiper-images');
+        const slideWidth = container ? container.clientWidth : 500;
+        swiperTrack.style.transform = `translateX(-${currentSwiperIndex * slideWidth}px)`;
+        document.querySelectorAll('.swiper-dot').forEach((dot, idx) => {
+            if (idx === currentSwiperIndex) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+    }
+
+    function goToSlide(index) {
+        if (index < 0) index = 0;
+        if (index >= currentImages.length) index = currentImages.length - 1;
+        currentSwiperIndex = index;
+        updateSwiperPosition();
+    }
+
+    function nextSlide() { userInteract(); if (currentSwiperIndex < currentImages.length - 1) { currentSwiperIndex++; updateSwiperPosition(); } else if (currentImages.length > 1) { currentSwiperIndex = 0; updateSwiperPosition(); } }
+    function prevSlide() { userInteract(); if (currentSwiperIndex > 0) { currentSwiperIndex--; updateSwiperPosition(); } else if (currentImages.length > 1) { currentSwiperIndex = currentImages.length - 1; updateSwiperPosition(); } }
+
+    if (swiperPrev) swiperPrev.onclick = prevSlide;
+    if (swiperNext) swiperNext.onclick = nextSlide;
+    if (modalCloseBtn) modalCloseBtn.onclick = () => { stopAutoPlay(); modalEl.classList.remove('active'); };
+    if (modalEl) modalEl.onclick = (e) => { if (e.target === modalEl) { stopAutoPlay(); modalEl.classList.remove('active'); } };
+
+    document.querySelectorAll('.event-item').forEach((card, idx) => {
+        card.onclick = (e) => { e.stopPropagation(); openModal(idx); };
+    });
+
+    window.addEventListener('resize', () => { if (modalEl.classList.contains('active')) updateSwiperPosition(); });
+
+    // 关闭图片预览
+    const imagePreview = document.getElementById('imagePreview');
+    if (imagePreview) {
+        imagePreview.onclick = () => { imagePreview.classList.remove('active'); };
+    }
+</script>
+</body>
+</html>
