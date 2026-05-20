@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>❤️ 我们的时光之旅 ❤️</title>
+    <title>❤️ 一封给你的信 · 520特别版 ❤️</title>
     <style>
         * {
             margin: 0;
@@ -12,60 +12,191 @@
         }
 
         body {
-            font-family: 'Segoe UI', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
-            background: #2c241a;
+            font-family: 'Segoe UI', 'Helvetica Neue', 'Noto Sans', system-ui, -apple-system, sans-serif;
+            background: #f5efe7;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        .hero {
+        /* ========== 信封页面 ========== */
+        .envelope-page {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100vh;
-            background: linear-gradient(135deg, #2c241a 0%, #4a3728 100%);
-            background-size: cover;
-            background-position: center;
+            background: linear-gradient(145deg, #fdf5e6 0%, #f5e6d0 100%);
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
             z-index: 1000;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.5s ease;
         }
 
-        .hero h1 {
-            font-size: 52px;
-            color: white;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            letter-spacing: 6px;
-            margin-bottom: 20px;
+        .envelope-page.hide {
+            opacity: 0;
+            visibility: hidden;
         }
 
-        .hero p {
+        .envelope-container {
+            text-align: center;
+            cursor: pointer;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .envelope {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background: #fff8f0;
+            border-radius: 12px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.15);
+            margin: 0 auto 30px;
+            border: 1px solid #e8d5b5;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 100px solid #f5e6d3;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+            transform-origin: top;
+        }
+
+        .envelope-line {
+            position: absolute;
+            bottom: 35px;
+            left: 25px;
+            right: 25px;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, #e8ba76, #e8ba76 10px, transparent 10px, transparent 20px);
+        }
+
+        .recipient {
+            position: absolute;
+            bottom: 55px;
+            left: 0;
+            right: 0;
+            text-align: center;
             font-size: 18px;
-            color: rgba(255,255,255,0.85);
-            margin-bottom: 40px;
+            font-weight: 500;
+            color: #b4823a;
+            font-family: 'Georgia', cursive;
         }
 
-        .enter-btn {
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.5);
-            padding: 14px 36px;
-            font-size: 18px;
+        .hint-text {
+            margin-top: 20px;
+            color: #b88b6f;
+            font-size: 14px;
+            letter-spacing: 2px;
+        }
+
+        /* ========== 信纸页面 ========== */
+        .letter-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #fef7e8;
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .letter-page.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .letter-card {
+            max-width: 550px;
+            width: 100%;
+            background: #fffdf9;
+            border-radius: 28px;
+            padding: 40px 35px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.1);
+            border: 1px solid #f0e0cc;
+            position: relative;
+        }
+
+        .letter-card::before {
+            content: "";
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            right: 30px;
+            height: 2px;
+            background: repeating-linear-gradient(90deg, #e8d5bc, #e8d5bc 15px, transparent 15px, transparent 30px);
+        }
+
+        .letter-salute {
+            font-size: 24px;
+            font-family: 'Georgia', cursive;
+            color: #c2854b;
+            margin-top: 20px;
+            margin-bottom: 25px;
+        }
+
+        .letter-body {
+            font-size: 17px;
+            line-height: 1.9;
+            color: #5c4733;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            text-align: justify;
+            margin-bottom: 30px;
+        }
+
+        .letter-signature {
+            text-align: right;
+            font-size: 16px;
+            color: #b88b6f;
+            font-style: italic;
+            border-top: 1px dashed #eeddc8;
+            padding-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* 进入时光之旅的按钮 */
+        .enter-journey-btn {
+            display: block;
+            width: 100%;
+            background: #e85d5d;
             color: white;
+            border: none;
+            padding: 14px 20px;
+            font-size: 16px;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-weight: 500;
+            text-align: center;
+            margin-top: 10px;
         }
 
-        .enter-btn:hover {
-            background: rgba(255,255,255,0.35);
-            transform: scale(1.05);
+        .enter-journey-btn:hover {
+            background: #d44a4a;
+            transform: scale(1.02);
         }
 
+        /* ========== 年度报告主内容 ========== */
         .main-content {
             background: #fef8f2;
             padding: 20px 20px 60px;
@@ -235,14 +366,8 @@
         }
 
         @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .swiper-container {
@@ -301,13 +426,8 @@
             background: rgba(0,0,0,0.8);
         }
 
-        .swiper-btn-prev {
-            left: 12px;
-        }
-
-        .swiper-btn-next {
-            right: 12px;
-        }
+        .swiper-btn-prev { left: 12px; }
+        .swiper-btn-next { right: 12px; }
 
         .swiper-dots {
             position: absolute;
@@ -326,7 +446,6 @@
             background: rgba(255,255,255,0.5);
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .swiper-dot.active {
@@ -372,11 +491,6 @@
             justify-content: center;
         }
 
-        .modal-close:hover {
-            background: rgba(0,0,0,0.8);
-        }
-
-        /* 图片预览放大样式 */
         .image-preview {
             position: fixed;
             top: 0;
@@ -407,26 +521,53 @@
         }
 
         @media (max-width: 600px) {
-            .hero h1 { font-size: 36px; }
+            .envelope { width: 240px; height: 160px; }
+            .envelope-flap { border-left: 120px solid transparent; border-right: 120px solid transparent; border-top: 80px solid #f5e6d3; }
+            .days-number { font-size: 48px; }
             .event-item { flex-direction: column; }
             .event-date { margin-bottom: 6px; }
-            .days-number { font-size: 48px; }
-            .modal-container { width: 95%; }
-            .modal-text { max-height: 300px; }
+            .letter-card { padding: 30px 20px; }
+            .letter-body { font-size: 15px; }
         }
     </style>
 </head>
-
 <body>
 
-<!-- 封面 -->
-<div class="hero" id="hero">
-    <h1>❤️ 我们的时光之旅 ❤️</h1>
-    <p>从初见到未来的每一步 · 都值得纪念</p>
-    <div class="enter-btn" id="enterBtn">✨ 开启回忆 ✨</div>
+<!-- 信封页面 -->
+<div class="envelope-page" id="envelopePage">
+    <div class="envelope-container">
+        <div class="envelope">
+            <div class="envelope-flap" id="envelopeFlap"></div>
+            <div class="envelope-line"></div>
+            <div class="recipient">💌 张璐 收 💌</div>
+        </div>
+        <div class="hint-text">✧ 轻触信封，开启心意 ✧</div>
+    </div>
 </div>
 
-<!-- 主内容 -->
+<!-- 信纸页面 -->
+<div class="letter-page" id="letterPage">
+    <div class="letter-card">
+        <div class="letter-salute">致 我最亲爱的璐璐：</div>
+        <div class="letter-body">
+            明天就是520了，这是我们在一起后第一个特别的日子。<br>
+            从2025年11月13日到现在，每一天都因为有你而变得闪闪发光。<br>
+            你像一束温柔的光，照进了我的世界。<br>
+            谢谢你来到我的生命里，让我知道原来被爱是这样美好的事。
+            <br><br>
+            我想和你一起走过很多很多个春夏秋冬，<br>
+            一起看很多次海，一起许很多次愿，<br>
+            一起吃很多顿饭，一起做很多很多梦。
+            <br><br>
+            520快乐，我的小宝宝。<br>
+            我爱你，从过去到现在，到很远很远的未来。
+        </div>
+        <div class="letter-signature">—— 永远爱你的小狗 💕</div>
+        <button class="enter-journey-btn" id="enterJourneyBtn">✨ 进入我们的时光之旅 ✨</button>
+    </div>
+</div>
+
+<!-- 年度报告主内容 -->
 <div class="main-content" id="mainContent" style="display: none;">
     <div class="calendar-section">
         <div class="days-label">💕 我们已经在一起</div>
@@ -444,7 +585,8 @@
         </div>
     </div>
 
-    <!-- 时间线事件 -->
+    <div class="timeline-events" id="timelineEvents">
+  <!-- 时间线事件 -->
     <div class="timeline-events" id="timelineEvents">
         <div class="event-item" data-event-index="0">
             <div class="event-date">2025.11.11</div>
@@ -637,30 +779,40 @@
         }
     }
 
-    // ========== 2. 封面跳转 ==========
-    const hero = document.getElementById('hero');
-    const mainContent = document.getElementById('mainContent');
-    const enterBtn = document.getElementById('enterBtn');
-
-    enterBtn.addEventListener('click', () => {
-        startMusic();
-        hero.style.transform = 'translateY(-100%)';
-        setTimeout(() => {
-            hero.style.display = 'none';
-            mainContent.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            startCounterAnimation();
-            startProgressAnimation();
-            observeEvents();
-        }, 800);
-    });
-
+    // 点击页面任意位置启动音乐（浏览器策略）
     document.body.addEventListener('click', function initMusic() {
         startMusic();
         document.body.removeEventListener('click', initMusic);
     });
 
-    // ========== 3. 天数累加动画 ==========
+    // ========== 2. 信封逻辑 ==========
+    const envelopePage = document.getElementById('envelopePage');
+    const envelopeFlap = document.getElementById('envelopeFlap');
+    const letterPage = document.getElementById('letterPage');
+
+    envelopeFlap.addEventListener('click', () => {
+        // 信封盖翻转动画
+        envelopeFlap.style.transform = 'rotateX(180deg)';
+        setTimeout(() => {
+            envelopePage.classList.add('hide');
+            letterPage.classList.add('show');
+        }, 300);
+    });
+
+    // ========== 3. 进入时光之旅 ==========
+    const enterJourneyBtn = document.getElementById('enterJourneyBtn');
+    const mainContent = document.getElementById('mainContent');
+
+    enterJourneyBtn.addEventListener('click', () => {
+        letterPage.classList.remove('show');
+        mainContent.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        startCounterAnimation();
+        startProgressAnimation();
+        observeEvents();
+    });
+
+    // ========== 4. 天数累加动画 ==========
     function startCounterAnimation() {
         const START_DATE = new Date(2025, 10, 13);
         const today = new Date();
@@ -684,7 +836,7 @@
         }, stepTime);
     }
 
-    // ========== 4. 进度条动画 ==========
+    // ========== 5. 进度条动画 ==========
     function startProgressAnimation() {
         const START_DATE = new Date(2025, 10, 13);
         const TARGET_DATE = new Date(2026, 10, 13);
@@ -720,7 +872,7 @@
         }, 300);
     }
 
-    // ========== 5. 事件卡片滚动出现 ==========
+    // ========== 6. 事件卡片滚动出现 ==========
     function observeEvents() {
         const items = document.querySelectorAll('.event-item');
         const observer = new IntersectionObserver((entries) => {
@@ -739,17 +891,7 @@
             observer.observe(item);
         });
     }
-
-    window.addEventListener('resize', () => {
-        if (mainContent.style.display !== 'none') {
-            document.querySelectorAll('.event-item:not(.visible)').forEach(item => {
-                if (item.getBoundingClientRect().top < window.innerHeight - 80)
-                    item.classList.add('visible');
-            });
-        }
-    });
-
-    // ========== 6. 事件数据配置 ==========
+    // ========== 7. 事件数据配置 ==========
     const eventsData = [
         { title: "冲动的表白", desc: "“那你和我相亲好咯~”(,,-ω-,,)\n\n“张璐……其实……我喜欢你！”(⁄ ⁄•⁄ω⁄•⁄ ⁄)\n\n“啊？……我同意了~”✧(≖ ◡ ≖✿)\n\n那天的紧张和心动，我永远不会忘记。", images: ["images/photo1.jpg"] },
         { title: "正式在一起！", desc: "“张璐，我真的很喜欢你，和我在一起吧！”\n\n“好，同意了~”\n\n这是我们的恋爱纪念日，从这天开始，我的世界多了一个最重要的人。", images: ["images/photo0.jpg"] },
@@ -769,7 +911,15 @@
         { title: "永远永远！", desc: "我和小宝宝的路还很长很长……\n\n小宝宝我爱你！我想要和你一直一直在一起\n\n我发誓我要和宝宝一直走下去，直到永远永远！", images: ["images/photo13-2.jpg"] }
     ];
 
-    // ========== 7. 轮播图逻辑（自动播放 + 点击放大） ==========
+    window.addEventListener('resize', () => {
+        if (mainContent.style.display !== 'none') {
+            document.querySelectorAll('.event-item:not(.visible)').forEach(item => {
+                if (item.getBoundingClientRect().top < window.innerHeight - 80)
+                    item.classList.add('visible');
+            });
+        }
+    });
+ // ========== 7. 轮播图逻辑（自动播放 + 点击放大） ==========
     let currentSwiperIndex = 0;
     let currentImages = [];
     let autoPlayTimer = null;
