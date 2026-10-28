@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>一封给你的信 · 520特别版</title>
-    <link rel="preload" as="image" href="images/roses.webp">
-    <style>
+        <style>
         * {
             margin: 0;
             padding: 0;
@@ -610,6 +609,7 @@
 
         #cineGlow {
             position: absolute;
+            z-index: 0;
             left: 50%;
             top: 50%;
             width: 80vmin;
@@ -622,40 +622,99 @@
 
         #cineOverlay.roses #cineGlow { opacity: 1; }
 
-        #cineRoses {
+        /* 回忆之旅：一张张回忆从两侧缓缓升起（左右交替） */
+        #cineMemories {
             position: absolute;
-            left: 50%;
-            top: 50%;
-            width: min(92vw, 720px);
-            transform: translate(-50%, -50%) scale(1.14);
+            inset: 0;
             opacity: 0;
-            will-change: transform, opacity;
+            z-index: 5;
+            transition: opacity .5s ease;
+            pointer-events: none;
         }
 
-        #cineRoses img {
+        #cineMemories.on { opacity: 1; }
+
+        .mem-item {
+            position: absolute;
+            bottom: -30vh;
+            width: clamp(132px, 19vmin, 232px);
+            will-change: transform, opacity;
+            animation-name: memRise;
+            animation-duration: 4600ms;
+            animation-delay: 600ms;
+            animation-timing-function: cubic-bezier(.36, .07, .5, .96);
+            animation-fill-mode: both;
+        }
+
+        .mem-left  { left: clamp(8px, 4.5vw, 96px); }
+        .mem-right { right: clamp(8px, 4.5vw, 96px); text-align: right; }
+
+        .mem-pic {
+            border-radius: 9px;
+            overflow: hidden;
+            background: #170709;
+            transform: rotate(var(--rot, 0deg));
+            box-shadow:
+                0 12px 34px rgba(0, 0, 0, .7),
+                0 0 0 1px rgba(255, 226, 198, .26),
+                0 0 38px rgba(255, 148, 108, .18);
+        }
+
+        .mem-pic img {
             display: block;
             width: 100%;
-            height: auto;
-            filter: saturate(1.08) contrast(1.06) brightness(1.02);
-            mix-blend-mode: screen;
-            -webkit-mask-image: radial-gradient(ellipse at 50% 48%, #000 58%, rgba(0, 0, 0, .8) 74%, transparent 92%);
-            mask-image: radial-gradient(ellipse at 50% 48%, #000 58%, rgba(0, 0, 0, .8) 74%, transparent 92%);
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            filter: brightness(1.08) contrast(1.04) saturate(1.05);
         }
 
-        #cineOverlay.roses #cineRoses {
-            animation: cineRose 3.3s cubic-bezier(.22, .61, .36, 1) forwards;
+        .mem-cap {
+            margin-top: 7px;
+            font-family: "STXingkai", "华文行楷", "Xingkai SC", "Hannotate SC", "STKaiti", "KaiTi", cursive;
+            color: #ffe8d8;
+            line-height: 1.32;
+            transform: rotate(var(--rot, 0deg));
+            text-shadow:
+                0 1px 3px rgba(0, 0, 0, .95),
+                0 0 6px rgba(0, 0, 0, .8),
+                0 0 18px rgba(255, 132, 96, .5);
         }
 
-        @keyframes cineRose {
-            0%   { opacity: 0; transform: translate(-50%, -50%) scale(1.17); }
-            22%  { opacity: 1; transform: translate(-50%, -50%) scale(1.09); }
-            66%  { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        .mem-date {
+            display: block;
+            font-size: clamp(9px, 1.15vmin, 12px);
+            letter-spacing: .14em;
+            color: #ffc4a8;
+            opacity: .85;
+        }
+
+        .mem-title {
+            display: block;
+            font-size: clamp(13px, 1.7vmin, 18px);
+            letter-spacing: .03em;
+        }
+
+        .mem-line {
+            display: block;
+            margin-top: 1px;
+            font-size: clamp(10px, 1.3vmin, 13px);
+            opacity: .82;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @keyframes memRise {
+            0%   { opacity: 0; transform: translate3d(0, 0, 0) scale(.94); }
+            9%   { opacity: 1; }
+            74%  { opacity: 1; }
+            100% { opacity: 0; transform: translate3d(0, -150vh, 0) scale(1.03); }
         }
 
         #cineCanvas {
             position: absolute;
             inset: 0;
+            z-index: 1;
             width: 100%;
             height: 100%;
             opacity: 0;
@@ -667,6 +726,7 @@
         /* 「唯一」发光字幕：作为第二段转场的起始意象，随后化光散开 */
         #cineWord {
             position: absolute;
+            z-index: 5;
             left: 50%;
             top: 46%;
             transform: translate(-50%, -50%);
@@ -685,7 +745,7 @@
         }
 
         #cineOverlay.ink #cineWord {
-            animation: cineWord 2s cubic-bezier(.3, .62, .36, 1) forwards;
+            animation: cineWord 2.6s cubic-bezier(.3, .62, .36, 1) forwards;
         }
 
         @keyframes cineWord {
@@ -701,6 +761,7 @@
             content: "";
             position: absolute;
             inset: 0;
+            z-index: 4;
             pointer-events: none;
             background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, .62) 100%);
         }
@@ -754,6 +815,12 @@
             .event-date { margin-bottom: 6px; }
             .letter-card { padding: 30px 20px; }
             .letter-body { font-size: 15px; }
+            /* 竖屏：回忆卡片更窄一些，给中间的主烟花留出空间 */
+            .mem-item { width: clamp(96px, 27vw, 132px); }
+            .mem-left  { left: 10px; }
+            .mem-right { right: 10px; }
+            .mem-title { font-size: 15px; }
+            .mem-line  { font-size: 11px; }
         }
     </style>
 </head>
@@ -799,7 +866,7 @@
 <div id="cineOverlay" aria-hidden="true">
     <div id="cineGlow"></div>
     <div id="cineWord">唯一</div>
-    <div id="cineRoses"><img src="images/roses.webp" alt="一束玫瑰花" decoding="async"></div>
+    <div id="cineMemories" aria-hidden="true"></div>
     <canvas id="cineCanvas"></canvas>
 </div>
 
@@ -1110,7 +1177,6 @@
     }
 
     inlineIcons();
-    (new Image()).src = 'images/roses.webp';
 
     // ========== 0.1 电影感转场 A：黑屏 → 玫瑰花束 → 黑屏 → 信纸 ==========
     function playEnvelopeCinema() {
@@ -1130,14 +1196,73 @@
         // 玫瑰最亮时把信纸铺到黑幕后面，黑幕淡出时顺势露出
         setTimeout(() => {
             reveal();
-            ov.classList.remove('on');
+            if (ov.dataset.mode !== 'b') ov.classList.remove('on');
         }, 3320);
         setTimeout(() => ov.classList.remove('roses'), 3820);
     }
 
-    // ========== 0.2 电影感转场 B：黑屏 → 烟花升空炸开熄灭 → 主内容 ==========
+    // ========== 0.2 电影感转场 B：黑屏 → 回忆之旅（烟花 + 逐条升起）→ 主烟花 → 主内容 ==========
+    const MEMORY_STAGGER = 420;   // 相邻两条回忆的间隔（ms）
+    const MEMORY_RISE = 4600;     // 单条回忆从下升到消失的时长（ms）
+    const TOUR_LEAD = 560;        // 进入后第一条回忆出现前的留白（ms）
+
+    // 取卡片上那句最短的话当配文：去掉换行与首尾引号，太长就截断
+    function shortLine(text) {
+        if (!text) return '';
+        const first = String(text).split('\n').map(function (v) { return v.trim(); })
+            .filter(Boolean)[0] || '';
+        const clean = first.replace(/^["“]|["”]$/g, '').replace(/\s+/g, ' ').trim();
+        return clean.length > 14 ? clean.slice(0, 14) + '…' : clean;
+    }
+
+    function buildMemoryTour(box) {
+        const dates = Array.prototype.map.call(
+            document.querySelectorAll('.event-item .event-date'),
+            function (el) { return el.textContent.trim(); }
+        );
+        box.innerHTML = '';
+        const frag = document.createDocumentFragment();
+        eventsData.forEach(function (item, i) {
+            const wrap = document.createElement('div');
+            wrap.className = 'mem-item ' + (i % 2 ? 'mem-right' : 'mem-left');
+            wrap.style.animationDelay = (TOUR_LEAD + i * MEMORY_STAGGER) + 'ms';
+            wrap.style.animationDuration = MEMORY_RISE + 'ms';
+            wrap.style.setProperty('--rot', ((i % 2 ? 1 : -1) * (1.2 + (i % 4) * 0.55)).toFixed(2) + 'deg');
+
+            const pic = document.createElement('div');
+            pic.className = 'mem-pic';
+            const img = document.createElement('img');
+            img.src = item.images[0];
+            img.alt = item.title;
+            img.decoding = 'async';
+            pic.appendChild(img);
+
+            const cap = document.createElement('div');
+            cap.className = 'mem-cap';
+            const d = document.createElement('span');
+            d.className = 'mem-date';
+            d.textContent = dates[i] || '';
+            const t = document.createElement('span');
+            t.className = 'mem-title';
+            t.textContent = item.title;
+            const l = document.createElement('span');
+            l.className = 'mem-line';
+            l.textContent = shortLine(item.desc);
+            cap.appendChild(d);
+            cap.appendChild(t);
+            cap.appendChild(l);
+
+            wrap.appendChild(pic);
+            wrap.appendChild(cap);
+            frag.appendChild(wrap);
+        });
+        box.appendChild(frag);
+    }
+
     function playFireworksCinema() {
         const ov = document.getElementById('cineOverlay');
+        const canvas = document.getElementById('cineCanvas');
+        const memories = document.getElementById('cineMemories');
         const finish = () => {
             letterPage.classList.remove('show');
             mainContent.style.display = 'block';
@@ -1152,28 +1277,57 @@
             return;
         }
 
+        // 回忆全部飘完所需的时间：留白 + 间隔 × (N-1) + 单条时长
+        const total = TOUR_LEAD + (eventsData.length - 1) * MEMORY_STAGGER + MEMORY_RISE;
+        // 主花在回忆还没飘完时炸开：先算炸点，再倒推升空时刻
+        const burstAt = total - 2600;
+        const mainAt = Math.max(1.2, (burstAt - 1950) / 1000);
+        const wordAt = burstAt + 1150;             // 花火最盛之后，「唯一」才浮出来
+        const finishAt = wordAt + 1000;            // 露出主页
+        const endAt = total + 500;                 // 回忆飘完再落黑幕
+
+        ov.dataset.mode = 'b';
         ov.classList.add('on');
-        // 第一拍：「唯一」发光字浮现
-        setTimeout(() => ov.classList.add('ink'), 380);
-        // 第二拍：字化为光点，烟花升空炸开
+        // 火起：先只有零星烟花在远处点缀，主烟花留到最后
         setTimeout(() => {
-            ov.classList.remove('ink');
             ov.classList.add('fires');
-            startFireworks(document.getElementById('cineCanvas'), 3300);
-        }, 1780);
-        setTimeout(finish, 5250);
-        setTimeout(() => ov.classList.remove('on', 'fires'), 5760);
+            startFireworks(canvas, {
+                duration: endAt + 1200,
+                mainAt: mainAt
+            });
+        }, 240);
+        // 回忆一张张升起
+        setTimeout(() => {
+            buildMemoryTour(memories);
+            memories.classList.add('on');
+        }, 360);
+        // 主花最盛之后，"唯一"作为收束浮出来
+        setTimeout(() => ov.classList.add('ink'), Math.round(wordAt));
+        setTimeout(finish, Math.round(finishAt));
+        setTimeout(() => {
+            ov.classList.remove('on', 'fires', 'ink');
+            memories.classList.remove('on');
+            setTimeout(() => { memories.innerHTML = ''; }, 700);
+            delete ov.dataset.mode;
+        }, Math.round(endAt));
     }
 
-    // Canvas 烟花：火箭升空 → 炸开 → 粒子受重力/阻力衰减 → 熄灭
-    function startFireworks(canvas, duration) {
+    // Canvas 烟花：背景烟花持续点缀，主烟花升到最高点停顿一拍再怒放
+    function startFireworks(canvas, opts) {
+        if (typeof opts === 'number') opts = { duration: opts };
+        opts = opts || {};
+        const duration = opts.duration == null ? 6000 : opts.duration;
+        const mainAt = opts.mainAt == null ? 1.2 : opts.mainAt;   // 主烟花升空时刻（秒）
+        const endAt = duration / 1000;
         const ctx = canvas.getContext('2d');
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
         const TAU = Math.PI * 2;
-        const MAX_PARTS = 760;
-        const WHITE = [255, 250, 236];
+        const MAX_PARTS = 2200;
+        const WHITE = [255, 252, 240];
+        const G = 128;
         let W = 0;
         let H = 0;
+        let raf = 0;
 
         function size() {
             W = window.innerWidth;
@@ -1186,170 +1340,356 @@
         window.addEventListener('resize', size);
 
         const PALETTE = [
-            [255, 150, 68],    // 暖金
-            [255, 84, 116],    // 玫红
-            [255, 198, 96],    // 琥珀
-            [188, 138, 255],   // 藕紫
-            [255, 118, 58],    // 橘
-            [255, 214, 150]    // 淡金
+            [255, 158, 74],
+            [255, 92, 122],
+            [255, 202, 104],
+            [196, 150, 255],
+            [255, 126, 64],
+            [255, 226, 168],
+            [124, 208, 255]
         ];
         const rockets = [];
         const parts = [];
         const flashes = [];
-        let raf = 0;
+        const pending = [];
         const t0 = performance.now();
         let last = t0;
+        let mainFired = false;
+        let nextBg = 0.35;
 
-        function pickColor() {
+        function pick() {
             return PALETTE[(Math.random() * PALETTE.length) | 0];
         }
 
-        function tint(c) {
-            const j = () => (Math.random() - 0.5) * 26;
+        function tint(c, j) {
+            j = j || 26;
+            const d = () => (Math.random() - 0.5) * j;
             return [
-                Math.max(0, Math.min(255, c[0] + j())) | 0,
-                Math.max(0, Math.min(255, c[1] + j())) | 0,
-                Math.max(0, Math.min(255, c[2] + j())) | 0
+                Math.max(0, Math.min(255, c[0] + d())) | 0,
+                Math.max(0, Math.min(255, c[1] + d())) | 0,
+                Math.max(0, Math.min(255, c[2] + d())) | 0
             ];
         }
 
         function rgba(c, a) {
-            return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')';
+            return 'rgba(' + (c[0] | 0) + ',' + (c[1] | 0) + ',' + (c[2] | 0) + ',' + a + ')';
         }
 
-        function launch() {
-            const travel = H * (0.4 + Math.random() * 0.2);
-            const dur = 0.85 + Math.random() * 0.5;
+        // big=true 是主烟花：从正中升起、飞得更高、到顶点会停顿一拍
+        function launch(big) {
+            const x = big
+                ? W * (0.475 + Math.random() * 0.05)
+                : W * (0.07 + Math.random() * 0.86);
+            const y = H + 6;
+            const apex = big ? H * (0.135 + Math.random() * 0.015) : H * (0.22 + Math.random() * 0.13);
+            const g = big ? 500 : 640;
             rockets.push({
-                x: W * (0.16 + Math.random() * 0.68),
-                y: H + 8,
-                vx: (Math.random() - 0.5) * 18,
-                vy: -travel / dur - 30,
-                color: pickColor(),
-                t: 0,
-                dur: dur,
+                x: x,
+                y: y,
+                vx: (Math.random() - 0.5) * (big ? 5 : 34),
+                vy: -Math.sqrt(2 * g * (y - apex)),
+                g: g,
+                color: big ? [255, 232, 190] : pick(),
+                big: !!big,
+                hold: 0,
                 trail: []
             });
         }
 
-        function explode(x, y, color) {
-            flashes.push({ x: x, y: y, r: 12 + Math.random() * 10, life: 0.22, age: 0 });
-            const n = Math.round(92 + Math.random() * 56);
-            const base = 168 + Math.random() * 186;
-            const ring = Math.random() < 0.42;
+        // 撒一层粒子：从爆心沿方向铺开 r0 的起始半径，避免"一点炸出个白球"
+        function layer(x, y, n, spd, color, opt) {
+            opt = opt || {};
+            const r0 = opt.r0 == null ? 4 : opt.r0;
             for (let i = 0; i < n; i++) {
-                if (parts.length >= MAX_PARTS) break;
-                const a = (i / n) * TAU + Math.random() * 0.18;
-                const streamer = Math.random() < 0.07;
-                const sp = base * (streamer ? 1.26
-                    : ring ? 0.84 + Math.random() * 0.16
-                           : 0.24 + Math.random() * 0.92);
+                if (parts.length >= MAX_PARTS) return;
+                const ring = !!opt.ring;
+                const phase = opt.phase ? (opt.phase * TAU) / n : 0;
+                const a = (i / n) * TAU + phase + (ring ? (Math.random() - 0.5) * (opt.ang || 0.16) : (Math.random() - 0.5) * 0.26);
+                const spread = opt.spread == null ? 0.9 : opt.spread;
+                const sp = ring
+                    ? spd * (0.8 + Math.random() * 0.42)
+                    : spd * (1 - spread * 0.5 + Math.random() * spread);
+                parts.push({
+                    x: x + Math.cos(a) * r0,
+                    y: y + Math.sin(a) * r0,
+                    vx: Math.cos(a) * sp,
+                    vy: Math.sin(a) * sp * (0.72 + Math.random() * 0.3),
+                    c: Math.random() < (opt.white || 0.1) ? WHITE : tint(color, opt.jitter),
+                    life: (opt.life || 1.6) * (0.82 + Math.random() * 0.36),
+                    age: 0,
+                    w: opt.w || 1 + Math.random() * 1.1,
+                    grav: opt.grav == null ? G : opt.grav,
+                    drag: opt.drag == null ? 0.962 : opt.drag,
+                    tail: !!opt.tail,
+                    seed: Math.random() * 6.283
+                });
+            }
+        }
+
+        function explode(x, y, color, big) {
+            flashes.push({
+                x: x,
+                y: y,
+                r: big ? 300 : 62 + Math.random() * 26,
+                life: big ? 1.05 : 0.52,
+                age: 0,
+                big: !!big
+            });
+            if (big) {
+                // 白热内核：先给眼睛一记"炸开"的亮度
+                layer(x, y, 110, 300, WHITE, { r0: 8, spread: 0.8, life: 1.05, w: 2.2, white: 0.96, drag: 0.938 });
+                // 主环：玫红大菊，速度带抖动（不是规整的圆规圆）
+                layer(x, y, 230, 760, [255, 82, 124], { ring: true, r0: 14, life: 3.0, w: 2.3, white: 0.05, drag: 0.969, jitter: 34 });
+                // 次环：暖金，方向错开半格
+                layer(x, y, 160, 540, [255, 196, 112], { ring: true, r0: 10, life: 2.75, w: 1.95, white: 0.09, drag: 0.965, phase: 0.5 });
+                // 内环：银白碎钻，填满花心
+                layer(x, y, 120, 330, [255, 244, 220], { spread: 0.95, r0: 6, life: 2.1, w: 1.25, white: 0.6, drag: 0.955 });
+                // 尖刺：短促的放射线，让爆开的一瞬更"灿烂"
+                for (let k = 0; k < 26; k++) {
+                    const a = (k / 26) * TAU + Math.random() * 0.06;
+                    const sp = 820 + Math.random() * 160;
+                    parts.push({
+                        x: x + Math.cos(a) * 10,
+                        y: y + Math.sin(a) * 10,
+                        vx: Math.cos(a) * sp,
+                        vy: Math.sin(a) * sp * 0.72,
+                        c: Math.random() < 0.5 ? WHITE : [255, 226, 170],
+                        life: 0.55 + Math.random() * 0.35,
+                        age: 0,
+                        w: 2.6,
+                        grav: 240,
+                        drag: 0.9,
+                        tail: true,
+                        seed: Math.random() * 6.283
+                    });
+                }
+                // 外圈柳枝：长拖尾缓慢下垂
+                for (let k = 0; k < 44; k++) {
+                    const a = (k / 44) * TAU + Math.random() * 0.08;
+                    const sp = 640 + Math.random() * 170;
+                    parts.push({
+                        x: x + Math.cos(a) * 14,
+                        y: y + Math.sin(a) * 14,
+                        vx: Math.cos(a) * sp,
+                        vy: Math.sin(a) * sp * 0.9,
+                        c: tint([255, 226, 190], 26),
+                        life: 3.4 + Math.random() * 1.3,
+                        age: 0,
+                        w: 1.7,
+                        grav: 280,
+                        drag: 0.984,
+                        tail: true,
+                        seed: Math.random() * 6.283
+                    });
+                }
+                // 两波延迟星雨，让主花有余韵
+                pending.push({ x: x, y: y, color: [255, 96, 130], delay: 0.55 });
+                pending.push({ x: x, y: y, color: [255, 214, 150], delay: 1.15 });
+            } else {
+                const k = Math.random();
+                // 每一发都先补一颗实心核，避免炸开后中心是个黑洞
+                layer(x, y, 46, 120, WHITE, { spread: 1.1, r0: 3, life: 0.9, w: 1.6, white: 0.8, drag: 0.93 });
+                if (k < 0.34) {
+                    // 圆环菊：慢一点、密一点，才像一朵花
+                    layer(x, y, 240, 175 + Math.random() * 55, color, { ring: true, r0: 8, life: 1.35, w: 1.6, ang: 0.09 });
+                    layer(x, y, 120, 105, color, { spread: 1.2, r0: 4, life: 1.15, w: 1.3 });
+                } else if (k < 0.66) {
+                    // 满天花：四面八方，中间亮
+                    layer(x, y, 210 + Math.random() * 60, 200 + Math.random() * 70, color, { spread: 1.0, r0: 8, life: 1.4, w: 1.5 });
+                    layer(x, y, 46, 120, WHITE, { spread: 1.3, life: 1.6, white: 0.85 });
+                } else if (k < 0.86) {
+                    // 柳枝：长拖尾下垂
+                    layer(x, y, 96, 175, color, { life: 2.5, tail: true, grav: 110, drag: 0.982, w: 1.35, spread: 0.6 });
+                } else {
+                    // 金银双层
+                    layer(x, y, 150, 205, color, { ring: true, r0: 7, life: 1.35, w: 1.5 });
+                    layer(x, y, 130, 140, WHITE, { ring: true, life: 1.6, white: 0.55, r0: 7, phase: 0.5 });
+                }
+            }
+            for (let i = 0; i < (big ? 46 : 12); i++) {
                 parts.push({
                     x: x,
                     y: y,
-                    vx: Math.cos(a) * sp,
-                    vy: Math.sin(a) * sp * 0.82,
-                    c: Math.random() < 0.12 ? WHITE : tint(color),
-                    life: streamer ? 2.2 + Math.random() * 0.8 : 1.45 + Math.random() * 0.95,
+                    vx: (Math.random() - 0.5) * (big ? 150 : 110),
+                    vy: (Math.random() - 0.5) * (big ? 150 : 110),
+                    c: [255, 194, 146],
+                    life: 0.5 + Math.random() * 0.6,
                     age: 0,
-                    w: streamer ? 1.9 : 1.0 + Math.random() * 1.2,
+                    w: 1,
+                    grav: 62,
+                    drag: 0.9,
                     seed: Math.random() * 6.283
                 });
             }
         }
 
         function frame(now) {
-            const dt = Math.min(0.05, (now - last) / 1000);
+            const dt = Math.min(0.09, (now - last) / 1000);
             last = now;
             const elapsed = (now - t0) / 1000;
 
-            // 拖影：半透明黑覆盖，让尾迹自然余留
             ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.27)';
             ctx.fillRect(0, 0, W, H);
 
-            if (elapsed > 0.1 && elapsed < 2.5 && Math.random() < dt * 3.1) launch();
+            // 主烟花：整段只放一枚，压轴
+            if (!mainFired && elapsed > mainAt) {
+                mainFired = true;
+                launch(true);
+            }
+            // 背景烟花：全程零星点缀，主花绽放后逐渐收手
+            if (elapsed > nextBg && elapsed < endAt - 0.5) {
+                launch(false);
+                if (Math.random() < 0.22) launch(false);
+                const tail = elapsed > mainAt + 1.2 ? 1.5 : 0.9;
+                nextBg = elapsed + (0.42 + Math.random() * 0.7) * tail;
+            }
 
             ctx.globalCompositeOperation = 'lighter';
             ctx.lineCap = 'round';
 
-            // 火箭
+            // 火箭尾迹
             for (let i = rockets.length - 1; i >= 0; i--) {
                 const r = rockets[i];
-                r.t += dt;
-                r.vy += 190 * dt;
-                r.x += r.vx * dt;
-                r.y += r.vy * dt;
-                r.trail.push(r.x, r.y);
-                if (r.trail.length > 12) r.trail.splice(0, 2);
+                const holding = r.big && r.hold > 0;
+                if (!holding) {
+                    r.vy += r.g * dt;
+                    r.x += r.vx * dt;
+                    r.y += r.vy * dt;
+                    r.trail.push(r.x, r.y);
+                    if (r.trail.length > (r.big ? 26 : 11)) r.trail.splice(0, 2);
+                }
 
-                for (let k = 0; k < r.trail.length - 2; k += 2) {
-                    const f = (k / 2) / (r.trail.length / 2);
-                    ctx.strokeStyle = rgba([255, 214, 158], (0.05 + f * 0.5).toFixed(3));
-                    ctx.lineWidth = 0.8 + f * 1.6;
+                const n = r.trail.length / 2;
+                for (let k = 0; k < n - 1; k++) {
+                    const f = k / (n - 1);
+                    const a = f * f * (r.big ? 0.5 : 0.34) * (0.55 + Math.random() * 0.45);
+                    if (a < 0.02) continue;
+                    ctx.strokeStyle = rgba([255, 210, 156], a.toFixed(3));
+                    ctx.lineWidth = (0.55 + f * (r.big ? 2.2 : 1.2)) * (0.6 + Math.random() * 0.8);
                     ctx.beginPath();
-                    ctx.moveTo(r.trail[k], r.trail[k + 1]);
-                    ctx.lineTo(r.trail[k + 2], r.trail[k + 3]);
+                    ctx.moveTo(r.trail[k * 2], r.trail[k * 2 + 1]);
+                    ctx.lineTo(r.trail[k * 2 + 2], r.trail[k * 2 + 3]);
                     ctx.stroke();
                 }
-                ctx.fillStyle = 'rgba(255, 248, 226, .95)';
+                const hg = ctx.createRadialGradient(r.x, r.y, 0, r.x, r.y, r.big ? 13 : 7);
+                hg.addColorStop(0, 'rgba(255, 250, 232, .95)');
+                hg.addColorStop(0.5, 'rgba(255, 214, 148, .45)');
+                hg.addColorStop(1, 'rgba(255, 190, 120, 0)');
+                ctx.fillStyle = hg;
                 ctx.beginPath();
-                ctx.arc(r.x, r.y, 1.9, 0, TAU);
+                ctx.arc(r.x, r.y, r.big ? 13 : 7, 0, TAU);
                 ctx.fill();
 
-                if (r.vy > -100 || r.t > r.dur) {
-                    explode(r.x, r.y, r.color);
-                    rockets.splice(i, 1);
+                if (holding) {
+                    r.hold -= dt;
+                    if (r.hold <= 0) {
+                        explode(r.x, r.y, r.color, true);
+                        rockets.splice(i, 1);
+                    }
+                    continue;
+                }
+                if (r.vy >= -2) {
+                    if (r.big) {
+                        r.hold = 0.26;    // 顶点停顿一拍：先"停"，再"炸"
+                        r.trail.length = 0;
+                    } else {
+                        explode(r.x, r.y, r.color, r.big);
+                        rockets.splice(i, 1);
+                    }
                 }
             }
 
             // 粒子
-            const glowPass = parts.length < 520;
+            const glowPass = parts.length < 1500;
+            const sparkPass = parts.length < 900;
             for (let i = parts.length - 1; i >= 0; i--) {
                 const p = parts[i];
                 p.age += dt;
                 if (p.age > p.life) { parts.splice(i, 1); continue; }
-                p.vy += 92 * dt;
-                const drag = Math.pow(0.962, dt * 60);
+                p.vy += p.grav * dt;
+                const drag = Math.pow(p.drag, dt * 60);
                 p.vx *= drag;
                 p.vy *= drag;
                 p.x += p.vx * dt;
                 p.y += p.vy * dt;
 
                 const k = 1 - p.age / p.life;
-                const twinkle = 0.72 + 0.28 * Math.sin(p.age * 34 + p.seed);
-                const alpha = Math.pow(k, 1.55) * twinkle;
-                const x2 = p.x - p.vx * 0.05;
-                const y2 = p.y - p.vy * 0.05;
+                const twinkle = 0.72 + 0.28 * Math.sin(p.age * 30 + p.seed);
+                const born = Math.min(1, p.age / 0.07);
+                const alpha = Math.pow(k, 0.92) * twinkle * born;
+                const span = p.tail ? 0.1 : 0.055;
+                const x2 = p.x - p.vx * span;
+                const y2 = p.y - p.vy * span;
 
                 if (glowPass && p.age > 0.06) {
-                    ctx.strokeStyle = rgba(p.c, (alpha * 0.1).toFixed(3));
-                    ctx.lineWidth = p.w * 2.4;
+                    ctx.strokeStyle = rgba(p.c, (alpha * 0.14).toFixed(3));
+                    ctx.lineWidth = p.w * 2.8;
                     ctx.beginPath();
                     ctx.moveTo(p.x, p.y);
                     ctx.lineTo(x2, y2);
                     ctx.stroke();
                 }
-                ctx.strokeStyle = rgba(p.c, alpha.toFixed(3));
-                ctx.lineWidth = p.w * (0.45 + k * 0.9);
+                ctx.strokeStyle = rgba(p.c, Math.min(1, alpha).toFixed(3));
+                ctx.lineWidth = p.w * (0.55 + k * 1.15);
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
                 ctx.lineTo(x2, y2);
                 ctx.stroke();
+                if (sparkPass && k > 0.25) {
+                    ctx.fillStyle = rgba(p.c, (alpha * 0.75).toFixed(3));
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.w * 0.85, 0, TAU);
+                    ctx.fill();
+                }
             }
 
-            // 爆心闪光
+            // 主花余韵：延迟落下的星雨
+            for (let i = pending.length - 1; i >= 0; i--) {
+                const s = pending[i];
+                s.delay -= dt;
+                if (s.delay > 0) continue;
+                pending.splice(i, 1);
+                for (let k = 0; k < 90; k++) {
+                    const a = Math.random() * TAU;
+                    const rr = Math.random() * 150;
+                    parts.push({
+                        x: s.x + Math.cos(a) * rr,
+                        y: s.y + Math.sin(a) * rr * 0.7,
+                        vx: Math.cos(a) * 26,
+                        vy: 16 + Math.random() * 40,
+                        c: Math.random() < 0.6 ? WHITE : tint(s.color, 16),
+                        life: 1.9 + Math.random() * 1.6,
+                        age: 0,
+                        w: 0.9 + Math.random() * 0.8,
+                        grav: 62,
+                        drag: 0.982,
+                        tail: true,
+                        seed: Math.random() * 6.283
+                    });
+                }
+            }
+
+            // 爆心柔光
+            ctx.globalCompositeOperation = 'lighter';
             for (let i = flashes.length - 1; i >= 0; i--) {
                 const f = flashes[i];
                 f.age += dt;
                 if (f.age > f.life) { flashes.splice(i, 1); continue; }
                 const k = 1 - f.age / f.life;
-                const r = f.r * (1.25 - k * 0.55);
-                const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, r);
-                g.addColorStop(0, 'rgba(255, 250, 232, ' + (k * k).toFixed(3) + ')');
-                g.addColorStop(0.28, 'rgba(255, 206, 150, ' + (k * k * 0.55).toFixed(3) + ')');
-                g.addColorStop(1, 'rgba(255, 140, 100, 0)');
-                ctx.fillStyle = g;
+                const r = f.r * (1.22 - k * 0.42);
+                const g2 = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, r);
+                if (f.big) {
+                    g2.addColorStop(0, 'rgba(255, 250, 232, ' + (k * k * 0.62).toFixed(3) + ')');
+                    g2.addColorStop(0.16, 'rgba(255, 226, 178, ' + (k * k * 0.46).toFixed(3) + ')');
+                    g2.addColorStop(0.52, 'rgba(255, 176, 120, ' + (k * k * 0.18).toFixed(3) + ')');
+                    g2.addColorStop(1, 'rgba(255, 150, 104, 0)');
+                } else {
+                    g2.addColorStop(0, 'rgba(255, 250, 232, ' + (k * k * 0.5).toFixed(3) + ')');
+                    g2.addColorStop(0.3, 'rgba(255, 208, 150, ' + (k * k * 0.24).toFixed(3) + ')');
+                    g2.addColorStop(1, 'rgba(255, 150, 104, 0)');
+                }
+                ctx.fillStyle = g2;
                 ctx.beginPath();
                 ctx.arc(f.x, f.y, r, 0, TAU);
                 ctx.fill();
@@ -1364,7 +1704,7 @@
             cancelAnimationFrame(raf);
             ctx.clearRect(0, 0, W, H);
             window.removeEventListener('resize', size);
-        }, duration + 1800);
+        }, duration + 2600);
     }
 
     // ========== 1. 音乐播放 ==========
