@@ -652,7 +652,7 @@
         .mem-pic {
             border-radius: 9px;
             overflow: hidden;
-            background: #170709;
+            background: #170709 center / cover no-repeat;
             transform: rotate(var(--rot, 0deg));
             box-shadow:
                 0 12px 34px rgba(0, 0, 0, .7),
@@ -665,8 +665,12 @@
             width: 100%;
             aspect-ratio: 4 / 3;
             object-fit: cover;
+            opacity: 0;
             filter: brightness(1.08) contrast(1.04) saturate(1.05);
+            transition: opacity .5s ease;
         }
+
+        .mem-pic img.ready { opacity: 1; }
 
         .mem-cap {
             margin-top: 7px;
@@ -1157,6 +1161,22 @@
         const uri = LQIP[baseName(img.getAttribute('src'))];
         if (uri) el.style.setProperty('--lqip', 'url("' + uri + '")');
     });
+    // 预热回忆封面：空闲时逐张取回，点「进入回忆之旅」时能立刻出图
+    (function warmCovers() {
+        let urls = null;
+        let i = 0;
+        const idle = window.requestIdleCallback || function (fn) { return setTimeout(fn, 240); };
+        function next() {
+            if (!urls) urls = eventsData.map(function (it) { return it.images[0]; });
+            if (i >= urls.length) return;
+            const img = new Image();
+            img.decoding = 'async';
+            img.src = urls[i++];
+            idle(next);
+        }
+        setTimeout(next, 1400);
+    })();
+
     // ========== 0. SVG 图标内联（规避 sprite/<use> 在部分浏览器不渲染） ==========
     function inlineIcons(root) {
         (root || document).querySelectorAll('svg.ico > use').forEach(function (use) {
@@ -1231,11 +1251,17 @@
 
             const pic = document.createElement('div');
             pic.className = 'mem-pic';
+            const src = item.images[0];
+            const lq = LQIP[baseName(src)];
+            if (lq) pic.style.backgroundImage = 'url(' + lq + ')';
             const img = document.createElement('img');
-            img.src = item.images[0];
+            img.addEventListener('load', function () { img.classList.add('ready'); }, { once: true });
+            img.addEventListener('error', function () { img.classList.add('ready'); }, { once: true });
+            img.src = src;
             img.alt = item.title;
             img.decoding = 'async';
             pic.appendChild(img);
+            if (img.complete) img.classList.add('ready');
 
             const cap = document.createElement('div');
             cap.className = 'mem-cap';
