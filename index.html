@@ -1161,21 +1161,19 @@
         const uri = LQIP[baseName(img.getAttribute('src'))];
         if (uri) el.style.setProperty('--lqip', 'url("' + uri + '")');
     });
-    // 预热回忆封面：空闲时逐张取回，点「进入回忆之旅」时能立刻出图
-    (function warmCovers() {
-        let urls = null;
-        let i = 0;
-        const idle = window.requestIdleCallback || function (fn) { return setTimeout(fn, 240); };
-        function next() {
-            if (!urls) urls = eventsData.map(function (it) { return it.images[0]; });
-            if (i >= urls.length) return;
+    // 预热回忆封面缩略图：16 张并行取回（合计约 230KB），点「进入回忆之旅」时已在缓存里
+    function warmTourImages() {
+        eventsData.forEach(function (it) {
+            const src = it.images[0].replace('images/', 'images/tour/');
+            if (!warmTourImages.done) warmTourImages.done = {};
+            if (warmTourImages.done[src]) return;
+            warmTourImages.done[src] = true;
             const img = new Image();
             img.decoding = 'async';
-            img.src = urls[i++];
-            idle(next);
-        }
-        setTimeout(next, 1400);
-    })();
+            img.src = src;
+        });
+    }
+    setTimeout(warmTourImages, 500);
 
     // ========== 0. SVG 图标内联（规避 sprite/<use> 在部分浏览器不渲染） ==========
     function inlineIcons(root) {
@@ -1222,9 +1220,9 @@
     }
 
     // ========== 0.2 电影感转场 B：黑屏 → 回忆之旅（烟花 + 逐条升起）→ 主烟花 → 主内容 ==========
-    const MEMORY_STAGGER = 420;   // 相邻两条回忆的间隔（ms）
-    const MEMORY_RISE = 4600;     // 单条回忆从下升到消失的时长（ms）
-    const TOUR_LEAD = 560;        // 进入后第一条回忆出现前的留白（ms）
+    const MEMORY_STAGGER = 250;   // 相邻两条回忆的间隔（ms）
+    const MEMORY_RISE = 3100;     // 单条回忆从下升到消失的时长（ms）
+    const TOUR_LEAD = 220;        // 进入后第一条回忆出现前的留白（ms）
 
     // 取卡片上那句最短的话当配文：去掉换行与首尾引号，太长就截断
     function shortLine(text) {
@@ -1251,7 +1249,7 @@
 
             const pic = document.createElement('div');
             pic.className = 'mem-pic';
-            const src = item.images[0];
+            const src = item.images[0].replace('images/', 'images/tour/');
             const lq = LQIP[baseName(src)];
             if (lq) pic.style.backgroundImage = 'url(' + lq + ')';
             const img = document.createElement('img');
@@ -1306,11 +1304,12 @@
         // 回忆全部飘完所需的时间：留白 + 间隔 × (N-1) + 单条时长
         const total = TOUR_LEAD + (eventsData.length - 1) * MEMORY_STAGGER + MEMORY_RISE;
         // 主花在回忆还没飘完时炸开：先算炸点，再倒推升空时刻
-        const burstAt = total - 2600;
-        const mainAt = Math.max(1.2, (burstAt - 1950) / 1000);
-        const wordAt = burstAt + 1150;             // 花火最盛之后，「唯一」才浮出来
-        const finishAt = wordAt + 1000;            // 露出主页
-        const endAt = total + 500;                 // 回忆飘完再落黑幕
+        warmTourImages();
+        const burstAt = total - 1200;
+        const mainAt = Math.max(0.6, (burstAt - 1950) / 1000);
+        const wordAt = burstAt + 780;              // 花火最盛之后，「唯一」才浮出来
+        const finishAt = wordAt + 620;             // 露出主页
+        const endAt = total + 420;                 // 回忆飘完再落黑幕
 
         ov.dataset.mode = 'b';
         ov.classList.add('on');
@@ -1386,6 +1385,10 @@
         function pick() {
             return PALETTE[(Math.random() * PALETTE.length) | 0];
         }
+
+        // 开场先送两朵，黑幕刚落就有花，不用等火箭升空
+        explode(W * (0.18 + Math.random() * 0.12), H * (0.24 + Math.random() * 0.08), pick(), false);
+        explode(W * (0.68 + Math.random() * 0.14), H * (0.18 + Math.random() * 0.1), pick(), false);
 
         function tint(c, j) {
             j = j || 26;
