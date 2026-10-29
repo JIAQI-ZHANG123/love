@@ -1236,10 +1236,10 @@ body:has(#letterPage.show) #emojiFloat { opacity: .3; }
 
 .board-head {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 4px 4px 16px;
+    padding: 2px 4px 12px;
 }
 
 .board-title {
@@ -1679,32 +1679,56 @@ body:has(#letterPage.show) #emojiFloat { opacity: .3; }
     box-shadow: 0 6px 14px rgba(255, 158, 196, .28);
 }
 
-/* 主页底部固定入口 */
+/* 主页底部固定入口（六格） */
+body.has-footnav { padding-bottom: 76px; }
 .foot-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 900;
     display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 26px auto 30px;
-    padding: 0 18px;
+    align-items: stretch;
+    padding: 5px 6px calc(5px + env(safe-area-inset-bottom));
+    border-top: 1px solid #ffe4ee;
+    background: rgba(255, 253, 253, .95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 .foot-nav-btn {
-    display: inline-flex;
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
-    border: 1.5px solid #ffd9e8;
-    background: linear-gradient(180deg, #fffdfd, #fff4f9);
+    gap: 2px;
+    padding: 6px 2px;
+    border: 0;
+    border-radius: 13px;
+    background: none;
     color: #9c6478;
     font-family: "YouYuan", "幼圆", "PingFang SC", "Microsoft YaHei", sans-serif;
-    font-size: 14px;
+    font-size: 10.5px;
     font-weight: 700;
-    padding: 10px 20px;
-    border-radius: 999px;
     cursor: pointer;
-    box-shadow: 0 6px 16px rgba(255, 158, 196, .18);
-    transition: transform .18s ease, box-shadow .18s ease;
+    transition: background .18s ease, color .18s ease;
 }
-.foot-nav-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255, 158, 196, .3); }
+.foot-nav-btn span { font-size: 19px; line-height: 1; }
+.foot-nav-btn:hover, .foot-nav-btn:active { background: #fff0f7; color: #ff6f9f; }
+
+@media (min-width: 601px) {
+    body.has-footnav { padding-bottom: 92px; }
+    .foot-nav {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        bottom: 16px;
+        width: min(600px, calc(100% - 64px));
+        border: 1px solid #ffe4ee;
+        border-radius: 20px;
+        box-shadow: 0 16px 34px -22px rgba(255, 130, 175, .55);
+    }
+    .foot-nav-btn { font-size: 11px; }
+}
 
 /* ══════════════ 海报按钮 ══════════════ */
 .poster-btn {
@@ -3734,10 +3758,7 @@ window.LOVE_MAP_GEO={w:1000,h:640,prov:["M708.6 236.6L709.8 236.7L710.8 235.1L70
     page.innerHTML = [
         '<div class="board-shell">',
         '  <header class="board-head">',
-        '    <div>',
-        '      <h2 class="board-title">留言板 &amp; 创作区</h2>',
-        '      <p class="board-sub">写一句想说的话，或者补上一段新的回忆 <span class="sync-chip chip-local" id="syncChip">本机存储</span></p>',
-        '    </div>',
+        '    <span class="sync-chip chip-local" id="syncChip">本机存储</span>',
         '    <button class="board-close" id="boardClose" type="button" aria-label="关闭">✕</button>',
         '  </header>',
 
@@ -4397,35 +4418,6 @@ window.LOVE_MAP_GEO={w:1000,h:640,prov:["M708.6 236.6L709.8 236.7L710.8 235.1L70
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && page.classList.contains('show')) closeBoard();
     });
-
-    /* ── 回忆之旅末尾的入口卡片 ── */
-    function mountJump() {
-        var items = document.querySelectorAll('.event-item');
-        if (!items.length) return;
-        var host = items[items.length - 1].parentElement;
-        if (!host || host.querySelector('.board-jump')) return;
-
-        var card = document.createElement('div');
-        card.className = 'board-jump';
-        card.setAttribute('role', 'button');
-        card.setAttribute('tabindex', '0');
-        card.innerHTML =
-            '<div class="jump-emo">💬 ✍️</div>' +
-            '<div class="jump-title">留言板 · 创作区</div>' +
-            '<div class="jump-sub">写下想对你说的话，或者补上一段还没记录下来的回忆</div>' +
-            '<span class="jump-btn">进去看看 →</span>';
-
-        function go(e) {
-            if (e) e.preventDefault();
-            openBoard('gb');
-        }
-        card.addEventListener('click', go);
-        card.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') go(e);
-        });
-
-        host.appendChild(card);
-    }
 
     /* ══════════════════════════════════════════════════════════
        时间胶囊 / 相册 / 足迹 / 海报 / 离线缓存
@@ -5352,14 +5344,15 @@ window.LOVE_MAP_GEO={w:1000,h:640,prov:["M708.6 236.6L709.8 236.7L710.8 235.1L70
         jump.appendChild(row);
     }
 
-    /* 底部固定入口：相册 / 足迹 / 留言板 */
+    /* 底部固定入口：留言板 / 创作 / 改旧 / 胶囊 / 相册 / 足迹 */
     function mountFootNav() {
         if (document.getElementById('footNav')) return;
-        if (!document.querySelector('.board-jump')) return;
-        var bar = document.createElement('div');
+        var bar = document.createElement('nav');
         bar.id = 'footNav';
         bar.className = 'foot-nav';
-        [['al', '📷', '相册'], ['mp', '🗺️', '足迹'], ['gb', '💬', '留言板']].forEach(function (t) {
+        bar.setAttribute('aria-label', '留言板与创作区入口');
+        [['gb', '💬', '留言板'], ['cr', '✍️', '创作'], ['ed', '✎', '改旧'],
+        ['cp', '💌', '胶囊'], ['al', '📷', '相册'], ['mp', '🗺️', '足迹']].forEach(function (t) {
             var b = document.createElement('button');
             b.type = 'button';
             b.className = 'foot-nav-btn';
@@ -5367,9 +5360,8 @@ window.LOVE_MAP_GEO={w:1000,h:640,prov:["M708.6 236.6L709.8 236.7L710.8 235.1L70
             b.addEventListener('click', function () { openBoard(t[0]); });
             bar.appendChild(b);
         });
-        var foot = document.querySelector('.footer');
-        if (!foot) return;
-        foot.insertAdjacentElement('afterend', bar);
+        document.body.appendChild(bar);
+        document.body.classList.add('has-footnav');
     }
 
     /* 离线缓存 */
@@ -5411,7 +5403,6 @@ window.LOVE_MAP_GEO={w:1000,h:640,prov:["M708.6 236.6L709.8 236.7L710.8 235.1L70
     renderCp();
     renderAlbum();
     renderMap();
-    mountJump();
     mountFootNav();
     mountPoster();
     mountCities();
