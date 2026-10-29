@@ -832,6 +832,10 @@
 /* ============================================================
    可爱 · 浪漫 · 回忆感（奶油马卡龙手帐风）
    ============================================================ */
+html, body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
 :root {
     --c-cream: #fffaf3;
     --c-pink: #ff9ec4;
@@ -1136,7 +1140,11 @@ body {
     #emojiFloat { display: none; }
 }
 
+/* 信纸展开时把漂浮 emoji 压淡，避免盖住正文 */
+body:has(#letterPage.show) #emojiFloat { opacity: .3; }
+
 @media (max-width: 600px) {
+    #emojiFloat { opacity: .62; }
     .days-number { font-size: 58px; padding: 2px 22px 4px; }
     .event-title { font-size: 19px; }
     .event-item { padding: 20px 16px 20px; }
@@ -1594,8 +1602,17 @@ body {
 @media (max-width: 600px) {
     .board-shell { padding: 18px 13px 60px; }
     .board-card { padding: 18px 15px 16px; }
-    .board-tabs { flex-wrap: wrap; justify-content: center; border-radius: 22px; }
-    .board-tab { padding: 10px 14px; font-size: 12.5px; }
+    .board-tabs {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        border-radius: 18px;
+    }
+    .board-tabs::-webkit-scrollbar { display: none; }
+    .board-tab { flex: 0 0 auto; padding: 9px 13px; font-size: 12.5px; }
     .board-title { font-size: 22px; }
     .cr-item { gap: 10px; padding: 10px; }
     .cr-thumb { width: 68px; height: 54px; }
@@ -1631,6 +1648,252 @@ body {
 .sync-chip.chip-busy  { background: #eef4ff; color: #6f86b8; border-color: #dbe6fb; }
 .sync-chip.chip-ok    { background: #eafaf1; color: #4f9a72; border-color: #d3f0e0; }
 .sync-chip.chip-err   { background: #fff1f2; color: #c2646f; border-color: #ffd9e0; }
+
+/* ══════════════ 入口工具条（相册 / 足迹 / 时间胶囊） ══════════════ */
+.jump-tools {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding: 0 14px 14px;
+    flex-wrap: wrap;
+}
+.jump-tool {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1.5px dashed #ffd2e2;
+    background: #fff8fb;
+    color: #a4738a;
+    font-family: "YouYuan", "幼圆", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 7px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.jump-tool span { font-size: 14px; }
+.jump-tool:hover {
+    transform: translateY(-2px);
+    background: #fff0f7;
+    box-shadow: 0 6px 14px rgba(255, 158, 196, .28);
+}
+
+/* 主页底部固定入口 */
+.foot-nav {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 26px auto 30px;
+    padding: 0 18px;
+}
+.foot-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1.5px solid #ffd9e8;
+    background: linear-gradient(180deg, #fffdfd, #fff4f9);
+    color: #9c6478;
+    font-family: "YouYuan", "幼圆", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(255, 158, 196, .18);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.foot-nav-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255, 158, 196, .3); }
+
+/* ══════════════ 海报按钮 ══════════════ */
+.poster-btn {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border: 1.5px dashed #ffd2e2;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fff6fb, #fffaf0);
+    color: #a56a83;
+    font-family: "YouYuan", "幼圆", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.poster-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(255, 158, 196, .26); }
+
+/* ══════════════ 时间胶囊 ══════════════ */
+.cp-list { display: flex; flex-direction: column; gap: 12px; margin-top: 6px; }
+.cp-item {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 16px 18px;
+    border-radius: 18px;
+    border: 1.5px solid #ffe3ee;
+    background: linear-gradient(160deg, #fffdfb, #fff5f9);
+    box-shadow: 0 8px 20px rgba(255, 170, 200, .14);
+}
+.cp-item.openable { border-color: #ffc9dd; background: linear-gradient(160deg, #fffdf8, #fff2f7); }
+.cp-seal {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #fff0f6;
+    border: 1.5px solid #ffd7e6;
+    font-size: 19px;
+}
+.cp-body { flex: 1; min-width: 0; }
+.cp-when { font-size: 12.5px; color: #b98aa8; letter-spacing: .3px; }
+.cp-text {
+    margin: 7px 0 0;
+    font-size: 15px;
+    line-height: 1.85;
+    color: #4a3f45;
+    word-break: break-word;
+}
+.cp-meta { margin: 7px 0 0; font-size: 14px; color: #a98c99; }
+.cp-meta b { color: #ff8ab5; font-size: 17px; }
+.cp-item .gb-del { opacity: 0; }
+.cp-item:hover .gb-del { opacity: 1; }
+
+/* ══════════════ 相册 ══════════════ */
+.al-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+.al-count { font-size: 13px; color: #b18e9c; }
+.al-year {
+    border: 1.5px solid #ffe0ec;
+    background: #fff9fc;
+    color: #a37488;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 4px 11px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: "YouYuan", "幼圆", sans-serif;
+}
+.al-year:hover { background: #fff0f7; }
+.al-group { margin-bottom: 20px; }
+.al-h {
+    margin: 14px 0 10px;
+    font-size: 15px;
+    color: #8a6274;
+    font-family: "YouYuan", "幼圆", sans-serif;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.al-h span { font-size: 12px; color: #bd9dab; font-weight: 400; }
+.al-cols { column-count: 3; column-gap: 10px; }
+.al-cell {
+    margin: 0 0 10px;
+    break-inside: avoid;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #ffe6ef;
+    box-shadow: 0 6px 16px rgba(255, 170, 200, .14);
+    cursor: zoom-in;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.al-cell:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(255, 150, 190, .28); }
+.al-cell img { display: block; width: 100%; height: auto; }
+.al-cell figcaption {
+    padding: 7px 9px 8px;
+    font-size: 12px;
+    color: #8e6b7a;
+    line-height: 1.4;
+    font-family: "YouYuan", "幼圆", sans-serif;
+}
+@media (max-width: 600px) {
+    .al-cols { column-count: 2; }
+}
+
+/* 查看器 */
+.al-view {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(40, 26, 34, .82);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.al-view.show { display: flex; }
+.al-view figure { margin: 0; max-width: min(100%, 1000px); text-align: center; }
+.al-view img {
+    max-width: 100%;
+    max-height: 78vh;
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .5);
+    display: block;
+}
+.al-view figcaption { margin-top: 12px; color: #ffe7f1; font-size: 14px; }
+.al-view-x {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .16);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* ══════════════ 足迹地图 ══════════════ */
+.mp-wrap {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1.5px solid #ffe3ee;
+    background: #fffaf8;
+    box-shadow: 0 10px 24px rgba(255, 170, 200, .16);
+}
+.mp-wrap svg { display: block; width: 100%; height: auto; }
+.mp-dot { cursor: pointer; }
+.mp-dot:hover circle:nth-of-type(2) { fill: #ff6f9f; }
+.mp-hint {
+    margin: 12px 2px 16px;
+    font-size: 12.5px;
+    color: #b093a0;
+    line-height: 1.7;
+}
+.mp-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mp-card {
+    display: flex;
+    gap: 10px;
+    padding: 9px;
+    border-radius: 14px;
+    border: 1px solid #ffe6ef;
+    background: #fffdfd;
+    transition: opacity .2s ease, transform .2s ease;
+}
+.mp-card.dim { opacity: .34; }
+.mp-thumb { width: 62px; height: 62px; flex: none; border-radius: 10px; overflow: hidden; background: #f7eef2; }
+.mp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mp-body { min-width: 0; }
+.mp-city { font-size: 11.5px; color: #ff8ab5; font-weight: 700; }
+.mp-title { font-size: 13px; color: #4d3f45; margin-top: 2px; line-height: 1.35; }
+.mp-date { margin: 3px 0 0; font-size: 11px; color: #b79aa6; }
+@media (max-width: 600px) {
+    .mp-list { grid-template-columns: 1fr; }
+}
 
 </style>
 
@@ -2996,10 +3259,10 @@ window.LOVE_BOARD_CFG = {
     function fromGbRow(r) { return { id: r.id, name: r.name || '', text: r.body || '', emo: r.emo || '', ts: Number(r.ts) || Date.now() }; }
     function fromCrRow(r) {
         return { id: r.id, ts: Number(r.ts) || Date.now(), title: r.title || '', desc: r.descr || '', date: r.date || '',
-                 images: Array.isArray(r.images) ? r.images : [] };
+                 place: r.place || '', images: Array.isArray(r.images) ? r.images : [] };
     }
     function toGbRow(m) { return { id: m.id, name: m.name || '', body: m.text || '', emo: m.emo || '', ts: m.ts || Date.now() }; }
-    function toCrRow(m) { return { id: m.id, title: m.title || '', date: m.date || '', descr: m.desc || '', images: m.images || [], ts: m.ts || Date.now() }; }
+    function toCrRow(m) { return { id: m.id, title: m.title || '', date: m.date || '', descr: m.desc || '', place: m.place || '', images: m.images || [], ts: m.ts || Date.now() }; }
 
     function mergeList(remote, local) {
         var seen = {}, out = [];
@@ -3015,13 +3278,14 @@ window.LOVE_BOARD_CFG = {
         return Promise.all([
             sbReq('love_guestbook?select=*&order=ts.desc'),
             sbReq('love_creations?select=*&order=ts.desc'),
-            sbReq('love_overrides?select=*')
+            sbReq('love_overrides?select=*'),
+            sbReq('love_capsules?select=*&order=unlock_at.asc')
         ]).then(function (res) {
             var rGb = (res[0] || []).map(fromGbRow);
             var rCr = (res[1] || []).map(fromCrRow);
             var rOv = {};
             (res[2] || []).forEach(function (r) {
-                var o = { title: r.title || '', date: r.date || '', desc: r.descr || '' };
+                var o = { title: r.title || '', date: r.date || '', desc: r.descr || '', place: r.place || '' };
                 if (r.image) o.image = r.image;
                 rOv[r.idx] = o;
             });
@@ -3052,6 +3316,18 @@ window.LOVE_BOARD_CFG = {
             writeArr(CR_KEY, crList);
             writeArrSafe(ED_KEY, overrides);
 
+            // 时间胶囊
+            if (res[3]) {
+                var rCp = (res[3] || []).map(fromCpRow);
+                var localCp = cpList.slice();
+                var remoteCpIds = {};
+                rCp.forEach(function (c) { remoteCpIds[c.id] = 1; });
+                cpList = mergeList(rCp, localCp);
+                writeArr(CP_KEY, cpList);
+                localCp.forEach(function (c) { if (!remoteCpIds[c.id]) queueOp({ type: 'upsert', table: 'love_capsules', row: toCpRow(c) }); });
+                renderCp();
+            }
+
             // 重放覆盖：先还原，再套云端
             for (var i = 0; i < ORIG.length; i++) if (ORIG[i]) restoreRow(i);
             Object.keys(overrides).forEach(function (k) {
@@ -3076,7 +3352,7 @@ window.LOVE_BOARD_CFG = {
 
     function toOvRow(idx, o) {
         return { idx: Number(idx), title: o.title || '', date: o.date || '', descr: o.desc || '',
-                 image: o.image || null, ts: Date.now() };
+                 place: o.place || '', image: o.image || null, ts: Date.now() };
     }
 
     var gbList = [];       // 留言
@@ -3161,6 +3437,9 @@ window.LOVE_BOARD_CFG = {
         '    <button class="board-tab active" type="button" data-tab="gb" role="tab">💬 留言板</button>',
         '    <button class="board-tab" type="button" data-tab="cr" role="tab">✍️ 创作新增</button>',
         '    <button class="board-tab" type="button" data-tab="ed" role="tab">🖊️ 改旧回忆</button>',
+        '    <button class="board-tab" type="button" data-tab="cp" role="tab">💌 时间胶囊</button>',
+        '    <button class="board-tab" type="button" data-tab="al" role="tab">📷 相册</button>',
+        '    <button class="board-tab" type="button" data-tab="mp" role="tab">🗺️ 足迹</button>',
         '  </div>',
 
         /* 留言板 */
@@ -3200,6 +3479,10 @@ window.LOVE_BOARD_CFG = {
         '        <input class="board-input" id="crDate" type="text" maxlength="20" placeholder="例如 2026年5月20日" autocomplete="off">',
         '      </div>',
         '      <div class="board-field">',
+        '        <span class="board-label">地点（填了会出现在「足迹」地图上）</span>',
+        '        <input class="board-input" id="crPlace" type="text" maxlength="12" list="cityList" placeholder="杭州 / 东京 …" autocomplete="off">',
+        '      </div>',
+        '      <div class="board-field">',
         '        <span class="board-label">配文（一句话就够）</span>',
         '        <textarea class="board-textarea" id="crDesc" maxlength="300" placeholder="那天的风很轻，你笑起来很好看"></textarea>',
         '      </div>',
@@ -3232,6 +3515,10 @@ window.LOVE_BOARD_CFG = {
         '        <input class="board-input" id="edDate" type="text" maxlength="20" placeholder="2025.11.11">',
         '      </div>',
         '      <div class="board-field">',
+        '        <span class="board-label">地点</span>',
+        '        <input class="board-input" id="edPlace" type="text" maxlength="12" list="cityList" placeholder="杭州 / 东京 …">',
+        '      </div>',
+        '      <div class="board-field">',
         '        <span class="board-label">配文</span>',
         '        <textarea class="board-textarea" id="edDesc" maxlength="600" placeholder="这段回忆想写成什么样……"></textarea>',
         '      </div>',
@@ -3250,6 +3537,36 @@ window.LOVE_BOARD_CFG = {
         '      </div>',
         '    </div>',
         '    <div class="cr-list" id="edList"></div>',
+        '  </section>',
+
+        /* 时间胶囊 */
+        '  <section class="board-panel" id="panelCp">',
+        '    <div class="board-card">',
+        '      <div class="board-field">',
+        '        <span class="board-label">写给未来的信（到那天才打得开）</span>',
+        '        <textarea class="board-textarea" id="cpText" maxlength="1200" placeholder="明年今天，我想对你说……"></textarea>',
+        '      </div>',
+        '      <div class="board-row">',
+        '        <label class="board-field"><span class="board-label">什么时候可以打开</span>',
+        '          <input class="board-input" id="cpDate" type="date"></label>',
+        '        <div class="board-actions"><button class="board-btn" id="cpSave" type="button">封存起来 💌</button></div>',
+        '      </div>',
+        '      <p class="board-note" id="cpNote">到期那天自动解锁，在那之前只显示一个倒计时</p>',
+        '    </div>',
+        '    <div class="cp-list" id="cpList"></div>',
+        '  </section>',
+
+        /* 相册 */
+        '  <section class="board-panel" id="panelAl">',
+        '    <div class="al-bar" id="alBar"></div>',
+        '    <div class="al-grid" id="alGrid"></div>',
+        '  </section>',
+
+        /* 足迹 */
+        '  <section class="board-panel" id="panelMp">',
+        '    <div class="mp-wrap"><svg id="mpSvg" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet"></svg></div>',
+        '    <p class="mp-hint">按时间连起来，就是我们一起走过的地方 · 点一下看那次的照片</p>',
+        '    <div class="mp-list" id="mpList"></div>',
         '  </section>',
         '</div>'
     ].join('\n');
@@ -3328,6 +3645,36 @@ window.LOVE_BOARD_CFG = {
     });
 
     /* ── 创作区 ── */
+    /* 图片：有云端就上传到 Storage，只把地址存进数据库；没配置就退回 dataURL */
+    var BUCKET = 'love-uploads';
+    function uploadImage(dataUrl) {
+        if (!SB) return Promise.resolve(dataUrl);
+        var m = /^data:([^;]+);base64,([\s\S]*)$/.exec(dataUrl);
+        if (!m) return Promise.resolve(dataUrl);
+        var bin = atob(m[2]);
+        var arr = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        var type = m[1].indexOf('png') >= 0 ? 'image/png' : 'image/jpeg';
+        var ext = type === 'image/png' ? '.png' : '.jpg';
+        var name = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) + ext;
+        return fetch(SB.url + '/storage/v1/object/' + BUCKET + '/' + name, {
+            method: 'POST',
+            headers: {
+                'apikey': SB.key,
+                'Authorization': 'Bearer ' + SB.key,
+                'Content-Type': type,
+                'cache-control': '31536000'
+            },
+            body: new Blob([arr], { type: type })
+        }).then(function (r) {
+            if (!r.ok) throw new Error('upload ' + r.status);
+            return SB.url + '/storage/v1/object/public/' + BUCKET + '/' + name;
+        }).catch(function (e) {
+            console.warn('[board] 图片上传失败，先存本机', e);
+            return dataUrl;
+        });
+    }
+
     function shrink(file) {
         return new Promise(function (resolve, reject) {
             var reader = new FileReader();
@@ -3347,7 +3694,7 @@ window.LOVE_BOARD_CFG = {
                     ctx.fillStyle = '#fff';
                     ctx.fillRect(0, 0, w, h);
                     ctx.drawImage(img, 0, 0, w, h);
-                    resolve(canvas.toDataURL('image/jpeg', 0.75));
+                    resolve(uploadImage(canvas.toDataURL('image/jpeg', 0.75)));
                 };
                 img.src = reader.result;
             };
@@ -3413,6 +3760,7 @@ window.LOVE_BOARD_CFG = {
         editingId = m ? m.id : null;
         $('crTitle').value = m ? m.title : '';
         $('crDate').value = m ? (m.date || '') : '';
+        $('crPlace').value = m ? (m.place || '') : '';
         $('crDesc').value = m ? (m.desc || '') : '';
         pickImgs = m ? m.images.slice() : [];
         renderThumbs();
@@ -3435,6 +3783,7 @@ window.LOVE_BOARD_CFG = {
         var title = $('crTitle').value.trim();
         var desc = $('crDesc').value.trim();
         var date = $('crDate').value.trim();
+        var place = $('crPlace').value.trim();
         if (!pickImgs.length) { toast('先选一张封面图吧'); return; }
         if (!title) { toast('给这段回忆起个名字'); $('crTitle').focus(); return; }
 
@@ -3442,11 +3791,11 @@ window.LOVE_BOARD_CFG = {
         if (editingId) {
             crList = crList.map(function (m) {
                 if (m.id !== editingId) return m;
-                savedItem = { id: m.id, ts: Date.now(), title: title, desc: desc, date: date, images: pickImgs.slice() };
+                savedItem = { id: m.id, ts: Date.now(), title: title, desc: desc, date: date, place: place, images: pickImgs.slice() };
                 return savedItem;
             });
         } else {
-            savedItem = { id: uid(), ts: Date.now(), title: title, desc: desc, date: date, images: pickImgs.slice() };
+            savedItem = { id: uid(), ts: Date.now(), title: title, desc: desc, date: date, place: place, images: pickImgs.slice() };
             crList.unshift(savedItem);
         }
 
@@ -3523,7 +3872,8 @@ window.LOVE_BOARD_CFG = {
             date: ((card.querySelector('.event-date') || {}).textContent || '').trim(),
             title: tn ? tn.nodeValue.trim() : (t ? t.textContent.trim() : ''),
             desc: (card.querySelector('.event-desc') || {}).textContent || '',
-            img: im ? im.getAttribute('src') : ''
+            img: im ? im.getAttribute('src') : '',
+            place: card.dataset.place || ''
         };
     }
 
@@ -3548,6 +3898,7 @@ window.LOVE_BOARD_CFG = {
             var im = card.querySelector('.event-img img');
             if (im) { im.src = o.image; im.removeAttribute('srcset'); }
         }
+        if (o.place !== undefined) card.dataset.place = o.place || '';
     }
 
     function applyRow(i, o) {
@@ -3557,6 +3908,7 @@ window.LOVE_BOARD_CFG = {
             if (o.title) data.title = o.title;
             if (o.desc) data.desc = o.desc;
             if (o.date) data.date = o.date;
+            if (o.place !== undefined) data.place = o.place;
             if (o.image) data.images[0] = o.image;
         }
         paintCard(i, o);
@@ -3572,9 +3924,11 @@ window.LOVE_BOARD_CFG = {
             data.desc = base.desc;
             delete data.date;
             data.images[0] = base.img;
+            if (base.place !== undefined) data.place = base.place;
         }
         var card = cardOf(i);
         if (card) {
+            if (base.place !== undefined) card.dataset.place = base.place;
             var t = card.querySelector('.event-title');
             var tn = titleNode(t);
             if (tn) tn.nodeValue = ' ' + base.title;
@@ -3619,6 +3973,9 @@ window.LOVE_BOARD_CFG = {
         $('edWhich').textContent = '正在改：第 ' + (i + 1) + ' 段 · ' + base.title;
         $('edTitle').value = base.title;
         $('edDate').value = base.date;
+        var curPlace = '';
+        try { curPlace = eventsData[i].place || ''; } catch (e) { curPlace = ''; }
+        $('edPlace').value = curPlace || base.place || '';
         $('edDesc').value = base.desc;
         $('edHint').textContent = '不换就保持原图';
         $('edCard').style.display = 'block';
@@ -3651,8 +4008,9 @@ window.LOVE_BOARD_CFG = {
         var title = $('edTitle').value.trim();
         var date = $('edDate').value.trim();
         var desc = $('edDesc').value.trim();
+        var place = $('edPlace').value.trim();
         if (!title) { toast('标题不能空着'); return; }
-        var o = { title: title, date: date, desc: desc };
+        var o = { title: title, date: date, desc: desc, place: place };
         if (edNewImg) o.image = edNewImg;
         overrides[edIndex] = o;
         if (!writeArrSafe(ED_KEY, overrides)) return;
@@ -3692,9 +4050,10 @@ window.LOVE_BOARD_CFG = {
         Array.prototype.forEach.call(page.querySelectorAll('.board-tab'), function (b) {
             b.classList.toggle('active', b.dataset.tab === tab);
         });
-        $('panelGb').classList.toggle('on', tab === 'gb');
-        $('panelCr').classList.toggle('on', tab === 'cr');
-        $('panelEd').classList.toggle('on', tab === 'ed');
+        ['gb', 'cr', 'ed', 'cp', 'al', 'mp'].forEach(function (k) {
+            var el = $('panel' + k.charAt(0).toUpperCase() + k.slice(1));
+            if (el) el.classList.toggle('on', tab === k);
+        });
     }
 
     function openBoard(tab) {
@@ -3703,8 +4062,12 @@ window.LOVE_BOARD_CFG = {
         page.scrollTop = 0;
         document.body.style.overflow = 'hidden';
         if (SB && Date.now() - lastPull > 20000) pullAll();
-        if ((tab || activeTab) === 'cr') renderCr();
-        else if ((tab || activeTab) === 'ed') renderEd();
+        var t = tab || activeTab;
+        if (t === 'cr') renderCr();
+        else if (t === 'ed') renderEd();
+        else if (t === 'cp') renderCp();
+        else if (t === 'al') renderAlbum();
+        else if (t === 'mp') renderMap();
         else renderGb();
     }
 
@@ -3753,6 +4116,642 @@ window.LOVE_BOARD_CFG = {
         host.appendChild(card);
     }
 
+    /* ══════════════════════════════════════════════════════════
+       时间胶囊 / 相册 / 足迹 / 海报 / 离线缓存
+       ══════════════════════════════════════════════════════════ */
+
+    /* ── 时间胶囊 ── */
+    var CP_KEY = 'love.capsules.v1';
+    var cpList = [];
+
+    function fromCpRow(r) {
+        return { id: r.id, body: r.body || '', unlockAt: Number(r.unlock_at) || 0, ts: Number(r.ts) || Date.now() };
+    }
+    function toCpRow(c) {
+        return { id: c.id, body: c.body || '', unlock_at: c.unlockAt || 0, ts: c.ts || Date.now() };
+    }
+    function dayStr(ts) {
+        var d = new Date(ts);
+        return d.getFullYear() + ' 年 ' + (d.getMonth() + 1) + ' 月 ' + d.getDate() + ' 日';
+    }
+    function leftDays(ts) { return Math.max(0, Math.ceil((ts - Date.now()) / 86400000)); }
+
+    function renderCp() {
+        var box = $('cpList');
+        if (!box) return;
+        if (!cpList.length) {
+            box.innerHTML = '<div class="board-empty"><span class="big">💌</span><p>还没有封存过信<br>写一封，约好某一天再打开</p></div>';
+            return;
+        }
+        var arr = cpList.slice().sort(function (a, b) { return a.unlockAt - b.unlockAt; });
+        box.innerHTML = arr.map(function (c) {
+            var open = Date.now() >= c.unlockAt;
+            return '<article class="cp-item' + (open ? ' openable' : '') + '">' +
+                '<div class="cp-seal">' + (open ? '🔓' : '🔒') + '</div>' +
+                '<div class="cp-body">' +
+                    '<div class="cp-when">' + esc(dayStr(c.unlockAt)) + ' 打开</div>' +
+                    (open
+                        ? '<p class="cp-text">' + esc(c.body).replace(/\n/g, '<br>') + '</p>'
+                        : '<p class="cp-meta">还有 <b>' + leftDays(c.unlockAt) + '</b> 天，到那天再来点开它</p>') +
+                '</div>' +
+                '<button class="gb-del" type="button" data-cp="' + esc(c.id) + '">删除</button>' +
+            '</article>';
+        }).join('');
+    }
+
+    $('cpSave').addEventListener('click', function () {
+        var body = $('cpText').value.trim();
+        var dateStr = $('cpDate').value;
+        if (!body) { toast('还没写内容呢'); $('cpText').focus(); return; }
+        if (!dateStr) { toast('选一个可以打开的日子'); $('cpDate').focus(); return; }
+        var unlockAt = new Date(dateStr + 'T00:00:00').getTime();
+        if (!unlockAt || unlockAt <= Date.now()) { toast('要选未来的日子哦'); return; }
+        var cap = { id: uid(), body: body, unlockAt: unlockAt, ts: Date.now() };
+        cpList.unshift(cap);
+        if (!writeArr(CP_KEY, cpList)) { cpList.shift(); return; }
+        queueOp({ type: 'upsert', table: 'love_capsules', row: toCpRow(cap) });
+        $('cpText').value = '';
+        $('cpDate').value = '';
+        renderCp();
+        toast('封好啦，到那天才打得开 💌');
+    });
+
+    $('cpList').addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-cp]');
+        if (!btn) return;
+        if (!btn.dataset.confirm) { btn.dataset.confirm = '1'; btn.textContent = '再点一次'; return; }
+        var id = btn.dataset.cp;
+        cpList = cpList.filter(function (c) { return c.id !== id; });
+        writeArr(CP_KEY, cpList);
+        queueOp({ type: 'delete', table: 'love_capsules', match: 'id=eq.' + encodeURIComponent(id) });
+        renderCp();
+        toast('已经删掉了');
+    });
+
+    /* ── 相册 ── */
+    function albumItems() {
+        var out = [];
+        try {
+            if (typeof eventsData !== 'undefined' && eventsData) {
+                eventsData.forEach(function (it, i) {
+                    var imgs = it.images || [];
+                    var date = it.date || '';
+                    if (!date) {
+                        var card = document.querySelector('.event-item[data-event-index="' + i + '"]');
+                        var de = card && card.querySelector('.event-date');
+                        if (de) date = de.textContent || '';
+                    }
+                    for (var j = 0; j < imgs.length; j++) {
+                        out.push({ src: imgs[j], title: it.title || '', date: date, desc: it.desc || '', idx: i });
+                    }
+                });
+            }
+        } catch (e) { /* ignore */ }
+        crList.forEach(function (m) {
+            (m.images || []).forEach(function (src) {
+                out.push({ src: src, title: m.title || '', date: m.date || '', desc: m.desc || '', idx: -1 });
+            });
+        });
+        return out;
+    }
+
+    function yearOf(s) {
+        var m = /(19|20)\d{2}/.exec(String(s || ''));
+        return m ? m[0] : '未标注';
+    }
+
+    function renderAlbum() {
+        var grid = $('alGrid');
+        var bar = $('alBar');
+        if (!grid) return;
+        var items = albumItems();
+        var groups = {};
+        var order = [];
+        items.forEach(function (it) {
+            var y = yearOf(it.date);
+            if (!groups[y]) { groups[y] = []; order.push(y); }
+            groups[y].push(it);
+        });
+        order.sort(function (a, b) {
+            if (a === '未标注') return 1;
+            if (b === '未标注') return -1;
+            return Number(b) - Number(a);
+        });
+        bar.innerHTML = '<span class="al-count">一共 ' + items.length + ' 张照片</span>' +
+            order.map(function (y) {
+                return '<button class="al-year" type="button" data-jump="' + esc(y) + '">' + esc(y) + ' · ' + groups[y].length + '</button>';
+            }).join('');
+        if (!items.length) {
+            grid.innerHTML = '<div class="board-empty"><span class="big">📷</span><p>还没有照片</p></div>';
+            return;
+        }
+        grid.innerHTML = order.map(function (y) {
+            return '<section class="al-group" id="alY_' + esc(y) + '">' +
+                '<h3 class="al-h">' + esc(y) + '<span>' + groups[y].length + ' 张</span></h3>' +
+                '<div class="al-cols">' +
+                groups[y].map(function (it) {
+                    return '<figure class="al-cell" data-src="' + esc(it.src) + '" data-cap="' + esc(it.title + (it.date ? ' · ' + it.date : '')) + '">' +
+                        '<img src="' + esc(it.src) + '" alt="' + esc(it.title) + '" loading="lazy" decoding="async">' +
+                        (it.title ? '<figcaption>' + esc(it.title) + '</figcaption>' : '') +
+                    '</figure>';
+                }).join('') +
+                '</div></section>';
+        }).join('');
+    }
+
+    $('alBar').addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-jump]');
+        if (!btn) return;
+        var el = document.getElementById('alY_' + btn.dataset.jump);
+        if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+
+    /* 相册查看器 */
+    var alView = document.createElement('div');
+    alView.className = 'al-view';
+    alView.innerHTML = '<button class="al-view-x" type="button" aria-label="关闭">✕</button>' +
+        '<figure><img alt=""><figcaption></figcaption></figure>';
+    document.body.appendChild(alView);
+
+    function openView(src, cap) {
+        alView.querySelector('img').src = src;
+        alView.querySelector('figcaption').textContent = cap || '';
+        alView.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+    alView.addEventListener('click', function (e) {
+        if (e.target.closest('figure') && !e.target.closest('figcaption') && e.target.tagName === 'IMG') return;
+        alView.classList.remove('show');
+        document.body.style.overflow = page.classList.contains('show') ? 'hidden' : '';
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && alView.classList.contains('show')) {
+            alView.classList.remove('show');
+            document.body.style.overflow = page.classList.contains('show') ? 'hidden' : '';
+        }
+    });
+
+    $('alGrid').addEventListener('click', function (e) {
+        var cell = e.target.closest('.al-cell');
+        if (!cell) return;
+        openView(cell.dataset.src, cell.dataset.cap);
+    });
+
+    /* ── 足迹地图 ── */
+    var CITY = {
+        '杭州': [120.15, 30.28], '西湖': [120.14, 30.25], '灵隐': [120.10, 30.24],
+        '上海': [121.47, 31.23], '苏州': [120.62, 31.32], '南京': [118.80, 32.06],
+        '北京': [116.40, 39.90], '天津': [117.20, 39.13], '成都': [104.07, 30.67],
+        '重庆': [106.55, 29.56], '西安': [108.94, 34.34], '武汉': [114.31, 30.52],
+        '青岛': [120.38, 36.07], '厦门': [118.09, 24.48], '香港': [114.17, 22.32],
+        '澳门': [113.55, 22.20], '广州': [113.26, 23.13], '深圳': [114.06, 22.55],
+        '长沙': [112.94, 28.23], '昆明': [102.83, 24.88], '大理': [100.23, 25.60],
+        '三亚': [109.51, 18.25], '哈尔滨': [126.53, 45.80], '东京': [139.69, 35.69],
+        '京都': [135.77, 35.01], '大阪': [135.50, 34.69], '首尔': [126.98, 37.57]
+    };
+
+    function placeOf(it) {
+        if (it && it.place) return String(it.place).trim();
+        var text = ((it && it.title) || '') + ' ' + ((it && it.desc) || '');
+        var keys = Object.keys(CITY).sort(function (a, b) { return b.length - a.length; });
+        for (var i = 0; i < keys.length; i++) {
+            if (text.indexOf(keys[i]) >= 0) return keys[i];
+        }
+        return '';
+    }
+
+    function project(lon, lat) {
+        var x = (lon - 70) / (146 - 70);
+        var y = (lat - 15) / (55 - 15);
+        return [70 + x * 860, 545 - y * 470];
+    }
+
+    function renderMap() {
+        var svg = $('mpSvg');
+        var list = $('mpList');
+        if (!svg) return;
+        var rows = [];
+        try {
+            if (typeof eventsData !== 'undefined' && eventsData) {
+                eventsData.forEach(function (it, i) {
+                    var p = placeOf(it);
+                    if (p && CITY[p]) rows.push({ city: p, lon: CITY[p][0], lat: CITY[p][1], item: it, idx: i, order: i });
+                });
+            }
+        } catch (e) { /* ignore */ }
+
+        var parts = [];
+        parts.push('<defs>' +
+            '<linearGradient id="mpBg" x1="0" y1="0" x2="0" y2="1">' +
+              '<stop offset="0" stop-color="#fff8f6"/><stop offset="1" stop-color="#eef8f4"/>' +
+            '</linearGradient>' +
+            '<filter id="mpSoft" x="-30%" y="-30%" width="160%" height="160%">' +
+              '<feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#ff9ec4" flood-opacity=".45"/>' +
+            '</filter>' +
+        '</defs>');
+        parts.push('<rect width="1000" height="620" fill="url(#mpBg)" rx="26"/>');
+
+        // 淡淡的经纬网格
+        for (var gx = 0; gx <= 8; gx++) {
+            parts.push('<line x1="' + (70 + gx * 107.5) + '" y1="60" x2="' + (70 + gx * 107.5) + '" y2="560" stroke="#ffd7e6" stroke-width="1" stroke-dasharray="3 9" opacity=".55"/>');
+        }
+        for (var gy = 0; gy <= 6; gy++) {
+            parts.push('<line x1="60" y1="' + (60 + gy * 83.3) + '" x2="940" y2="' + (60 + gy * 83.3) + '" stroke="#ffd7e6" stroke-width="1" stroke-dasharray="3 9" opacity=".55"/>');
+        }
+
+        if (!rows.length) {
+            svg.innerHTML = parts.join('') +
+                '<text x="500" y="300" text-anchor="middle" font-size="26" fill="#c69aa9">还没有带地点的回忆</text>' +
+                '<text x="500" y="340" text-anchor="middle" font-size="17" fill="#d9b3bf">在「创作新增 / 改旧回忆」里填上地点（杭州、东京…），这里就会亮起来</text>';
+            list.innerHTML = '';
+            return;
+        }
+
+        // 按时间连线
+        rows.sort(function (a, b) { return a.order - b.order; });
+        var pts = rows.map(function (r) { return project(r.lon, r.lat); });
+        var route = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+        parts.push('<path d="' + route + '" fill="none" stroke="#ffa8c8" stroke-width="2.4" stroke-dasharray="7 8" stroke-linecap="round" opacity=".85"/>');
+
+        var byCity = {};
+        rows.forEach(function (r) { (byCity[r.city] = byCity[r.city] || []).push(r); });
+
+        Object.keys(byCity).forEach(function (city, ci) {
+            var arr = byCity[city];
+            var p = project(arr[0].lon, arr[0].lat);
+            var multi = arr.length > 1;
+            parts.push('<g class="mp-dot" data-city="' + esc(city) + '" transform="translate(' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ')">' +
+                '<circle r="26" fill="#ffd9e8" opacity=".55"/>' +
+                '<circle r="11" fill="#ff8fb6" stroke="#fff" stroke-width="3" filter="url(#mpSoft)"/>' +
+                (multi ? '<circle r="4.5" fill="#fff" opacity=".9"/>' : '') +
+                '<text x="17" y="5" font-size="19" fill="#8a5b6e" font-weight="600">' + esc(city) + (multi ? ' ×' + arr.length : '') + '</text>' +
+            '</g>');
+        });
+
+        svg.innerHTML = parts.join('');
+
+        list.innerHTML = rows.map(function (r) {
+            var img = (r.item.images && r.item.images[0]) || '';
+            return '<article class="mp-card" data-city="' + esc(r.city) + '">' +
+                '<div class="mp-thumb"><img src="' + esc(img) + '" alt="" loading="lazy" decoding="async"></div>' +
+                '<div class="mp-body"><div class="mp-city">' + esc(r.city) + '</div>' +
+                '<div class="mp-title">' + esc(r.item.title || '') + '</div>' +
+                '<p class="mp-date">' + esc(r.item.date || '') + '</p></div>' +
+            '</article>';
+        }).join('');
+    }
+
+    $('mpSvg').addEventListener('click', function (e) {
+        var g = e.target.closest('.mp-dot');
+        if (!g) return;
+        var city = g.dataset.city;
+        Array.prototype.forEach.call($('mpList').children, function (el) {
+            el.classList.toggle('dim', el.dataset.city !== city);
+        });
+        var first = $('mpList').querySelector('.mp-card[data-city="' + city + '"]');
+        if (first) first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
+
+    /* ── 海报 ── */
+    function newestMemory() {
+        try {
+            if (typeof eventsData !== 'undefined' && eventsData) {
+                for (var i = eventsData.length - 1; i >= 0; i--) {
+                    if (eventsData[i].images && eventsData[i].images[0]) return { item: eventsData[i], idx: i };
+                }
+            }
+        } catch (e) { /* ignore */ }
+        if (crList.length && crList[0].images && crList[0].images[0]) return { item: crList[0], idx: -1 };
+        return null;
+    }
+
+    function roundRect(g, x, y, w, h, r) {
+        g.beginPath();
+        g.moveTo(x + r, y);
+        g.arcTo(x + w, y, x + w, y + h, r);
+        g.arcTo(x + w, y + h, x, y + h, r);
+        g.arcTo(x, y + h, x, y, r);
+        g.arcTo(x, y, x + w, y, r);
+        g.closePath();
+    }
+
+    function makePoster(skipPhoto) {
+        var W = 1080;
+        var H = 1440;
+        var c = document.createElement('canvas');
+        c.width = W;
+        c.height = H;
+        var g = c.getContext('2d');
+        var FONT = '"Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif';
+
+        // ── 背景
+        var grd = g.createLinearGradient(0, 0, W, H);
+        grd.addColorStop(0, '#fffaf7');
+        grd.addColorStop(0.55, '#ffeef5');
+        grd.addColorStop(1, '#eef9f3');
+        g.fillStyle = grd;
+        g.fillRect(0, 0, W, H);
+
+        [[150, 170, 280, 'rgba(255,190,214,.5)'], [940, 290, 230, 'rgba(186,234,212,.45)'], [850, 1300, 320, 'rgba(255,226,176,.42)']].forEach(function (s) {
+            var rg = g.createRadialGradient(s[0], s[1], 0, s[0], s[1], s[2]);
+            rg.addColorStop(0, s[3]);
+            rg.addColorStop(1, 'rgba(255,255,255,0)');
+            g.fillStyle = rg;
+            g.beginPath();
+            g.arc(s[0], s[1], s[2], 0, Math.PI * 2);
+            g.fill();
+        });
+
+        // ── 天数
+        var daysEl = document.querySelector('.days-number');
+        var days = daysEl ? String(daysEl.textContent).replace(/[^\d]/g, '') : '';
+        var sinceTxt = (document.querySelector('.target-info span') || {}).textContent || '';
+        if (!days || days === '0') {
+            var dm = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(sinceTxt);
+            if (dm) {
+                var d0 = new Date(Number(dm[1]), Number(dm[2]) - 1, Number(dm[3])).getTime();
+                var calc = Math.floor((Date.now() - d0) / 86400000) + 1;
+                if (calc > 0) days = String(calc);
+            }
+        }
+        if (!days) days = '—';
+        var since = sinceTxt.trim();
+
+        g.textAlign = 'center';
+        g.fillStyle = '#c39fb0';
+        g.font = '500 26px ' + FONT;
+        g.fillText('T O G E T H E R', W / 2, 150);
+
+        g.fillStyle = '#ff7fae';
+        g.font = '800 186px ' + FONT;
+        g.fillText(days, W / 2, 356);
+
+        g.fillStyle = '#8a6b78';
+        g.font = '600 38px ' + FONT;
+        g.fillText('第 ' + days + ' 天', W / 2, 428);
+
+        if (since) {
+            g.fillStyle = '#bda2af';
+            g.font = '400 25px ' + FONT;
+            g.fillText(since, W / 2, 474);
+        }
+
+        // 小装饰
+        function heart(cx, cy, s, color) {
+            g.beginPath();
+            g.moveTo(cx, cy + s * 0.38);
+            g.bezierCurveTo(cx + s * 1.02, cy - s * 0.42, cx + s * 0.52, cy - s * 1.02, cx, cy - s * 0.42);
+            g.bezierCurveTo(cx - s * 0.52, cy - s * 1.02, cx - s * 1.02, cy - s * 0.42, cx, cy + s * 0.38);
+            g.closePath();
+            g.fillStyle = color;
+            g.fill();
+        }
+
+        function wrap(text, maxW, maxLines) {
+            var out = [];
+            var line = '';
+            for (var i = 0; i < text.length; i++) {
+                var ch = text.charAt(i);
+                var test = line + ch;
+                if (g.measureText(test).width > maxW && line) {
+                    out.push(line);
+                    line = ch;
+                    if (out.length === maxLines) { out[maxLines - 1] = out[maxLines - 1].slice(0, -1) + '…'; return out; }
+                } else {
+                    line = test;
+                }
+            }
+            if (line) out.push(line);
+            return out;
+        }
+
+        // ── 相框
+        var FX = 150;
+        var FY = 556;
+        var FW = 780;
+        var FH = 474;
+
+        function drawFrame() {
+            g.save();
+            g.shadowColor = 'rgba(190,120,150,.24)';
+            g.shadowBlur = 44;
+            g.shadowOffsetY = 16;
+            g.fillStyle = '#fff';
+            roundRect(g, FX - 18, FY - 18, FW + 36, FH + 36, 28);
+            g.fill();
+            g.restore();
+        }
+
+        function drawPhotoSurface(source) {
+            g.save();
+            roundRect(g, FX, FY, FW, FH, 18);
+            g.clip();
+            var iw = source.naturalWidth || source.width;
+            var ih = source.naturalHeight || source.height;
+            var s = Math.max(FW / iw, FH / ih);
+            var dw = iw * s;
+            var dh = ih * s;
+            g.drawImage(source, FX + (FW - dw) / 2, FY + (FH - dh) / 2, dw, dh);
+            g.restore();
+        }
+
+        function drawPlaceholder() {
+            g.save();
+            roundRect(g, FX, FY, FW, FH, 18);
+            g.clip();
+            var rg = g.createRadialGradient(W / 2, FY + FH / 2, 30, W / 2, FY + FH / 2, 420);
+            rg.addColorStop(0, '#ffe0ec');
+            rg.addColorStop(1, '#fff7fa');
+            g.fillStyle = rg;
+            g.fillRect(FX, FY, FW, FH);
+            g.globalAlpha = 0.5;
+            heart(W / 2, FY + FH / 2, 74, '#ff8ab5');
+            g.globalAlpha = 0.9;
+            heart(W / 2, FY + FH / 2, 48, '#ff6fa2');
+            g.restore();
+        }
+
+        // ── 文字与页脚
+        function drawTextAndFooter(mem) {
+            var y = FY + FH + 74;
+
+            if (mem && mem.item) {
+                g.textAlign = 'center';
+                g.fillStyle = '#6f5462';
+                g.font = '700 32px ' + FONT;
+                var title = String(mem.item.title || '').replace(/\s+/g, ' ').trim();
+                if (title.length > 20) title = title.slice(0, 20) + '…';
+                if (title) g.fillText(title, W / 2, y);
+
+                var desc = String(mem.item.desc || '').replace(/\s+/g, ' ').replace(/<br\s*\/?>/gi, ' ').trim();
+                if (desc) {
+                    g.fillStyle = '#a08995';
+                    g.font = '400 24px ' + FONT;
+                    var lines = wrap(desc, 820, 2);
+                    lines.forEach(function (ln, i) {
+                        g.fillText(ln, W / 2, y + 44 + i * 38);
+                    });
+                }
+            }
+
+            heart(W / 2 - 22, 1256, 11, 'rgba(255,158,196,.55)');
+            heart(W / 2 + 22, 1256, 11, 'rgba(255,158,196,.55)');
+
+            var d = new Date();
+            g.textAlign = 'center';
+            g.fillStyle = '#c3a6b3';
+            g.font = '400 22px ' + FONT;
+            g.fillText(d.getFullYear() + '.' + pad(d.getMonth() + 1) + '.' + pad(d.getDate()), W / 2, 1336);
+
+            g.fillStyle = '#d6bcc7';
+            g.font = '400 20px ' + FONT;
+            g.fillText('一封给你的信 · 我们的回忆', W / 2, 1374);
+
+            exportJpg();
+        }
+
+        // ── 导出
+        function exportJpg() {
+            try {
+                c.toBlob(function (blob) {
+                    if (!blob) { toast('海报生成失败，换个浏览器试试'); return; }
+                    var a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = '我们的第' + days + '天.jpg';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+                    toast('海报生成好啦，去下载里看看 🎞️');
+                }, 'image/jpeg', 0.92);
+            } catch (e) {
+                if (!skipPhoto) {
+                    toast('照片跨域了，改成不带照片的版本');
+                    makePoster(true);
+                } else {
+                    toast('海报生成失败，换个浏览器试试');
+                }
+            }
+        }
+
+        // ── 主流程
+        var mem = newestMemory();
+        var src = mem ? (mem.item.images || [])[0] : '';
+
+        if (skipPhoto || !src) {
+            drawFrame();
+            drawPlaceholder();
+            drawTextAndFooter(mem);
+            return;
+        }
+
+        var domImg = null;
+        if (mem.idx >= 0) {
+            var cardImg = document.querySelector('.event-item[data-event-index="' + mem.idx + '"] .event-img img');
+            if (cardImg && cardImg.complete && cardImg.naturalWidth) domImg = cardImg;
+        }
+
+        if (domImg) {
+            drawFrame();
+            drawPhotoSurface(domImg);
+            drawTextAndFooter(mem);
+            return;
+        }
+
+        var img = new Image();
+        if (location.protocol !== 'file:') img.crossOrigin = 'anonymous';
+        var settled = false;
+        var timer = setTimeout(function () {
+            if (settled) return;
+            settled = true;
+            drawFrame();
+            drawPlaceholder();
+            drawTextAndFooter(mem);
+        }, 6000);
+        img.onload = function () {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            drawFrame();
+            drawPhotoSurface(img);
+            drawTextAndFooter(mem);
+        };
+        img.onerror = function () {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            drawFrame();
+            drawPlaceholder();
+            drawTextAndFooter(mem);
+        };
+        img.src = src;
+    }
+
+    function mountPoster() {
+        if (document.getElementById('posterBtn')) return;
+        var host = document.querySelector('.calendar-section') || document.querySelector('.target-info');
+        if (!host) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.id = 'posterBtn';
+        btn.className = 'poster-btn';
+        btn.innerHTML = '🎞️ 生成「我们的第 N 天」海报';
+        btn.addEventListener('click', makePoster);
+        host.appendChild(btn);
+    }
+
+    /* 地点候选 */
+    function mountCities() {
+        if (document.getElementById('cityList')) return;
+        var dl = document.createElement('datalist');
+        dl.id = 'cityList';
+        dl.innerHTML = Object.keys(CITY).map(function (c) { return '<option value="' + c + '">'; }).join('');
+        document.body.appendChild(dl);
+    }
+
+    /* 入口：相册 / 足迹 / 胶囊 */
+    function mountTools() {
+        var jump = document.querySelector('.board-jump');
+        if (!jump || jump.querySelector('.jump-tools')) return;
+        var row = document.createElement('div');
+        row.className = 'jump-tools';
+        [['al', '📷', '相册'], ['mp', '🗺️', '足迹'], ['cp', '💌', '时间胶囊']].forEach(function (t) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'jump-tool';
+            b.innerHTML = '<span>' + t[1] + '</span>' + t[2];
+            b.addEventListener('click', function (e) { e.stopPropagation(); openBoard(t[0]); });
+            row.appendChild(b);
+        });
+        jump.appendChild(row);
+    }
+
+    /* 底部固定入口：相册 / 足迹 / 留言板 */
+    function mountFootNav() {
+        if (document.getElementById('footNav')) return;
+        if (!document.querySelector('.board-jump')) return;
+        var bar = document.createElement('div');
+        bar.id = 'footNav';
+        bar.className = 'foot-nav';
+        [['al', '📷', '相册'], ['mp', '🗺️', '足迹'], ['gb', '💬', '留言板']].forEach(function (t) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'foot-nav-btn';
+            b.innerHTML = '<span>' + t[1] + '</span>' + t[2];
+            b.addEventListener('click', function () { openBoard(t[0]); });
+            bar.appendChild(b);
+        });
+        var foot = document.querySelector('.footer');
+        if (!foot) return;
+        foot.insertAdjacentElement('afterend', bar);
+    }
+
+    /* 离线缓存 */
+    function initSW() {
+        if (!('serviceWorker' in navigator)) return;
+        if (location.protocol !== 'https:') return;
+        navigator.serviceWorker.register('sw.js').catch(function () { /* 忽略 */ });
+    }
+
     /* ── 启动 ── */
     gbList = readArr(GB_KEY);
     crList = readArr(CR_KEY);
@@ -3774,11 +4773,21 @@ window.LOVE_BOARD_CFG = {
         if (ORIG[idx] && overrides[k]) applyRow(idx, overrides[k] || {});
     });
 
+    cpList = readArr(CP_KEY);
+
     syncTour();
     renderGb();
     renderCr();
     renderEd();
+    renderCp();
+    renderAlbum();
+    renderMap();
     mountJump();
+    mountFootNav();
+    mountPoster();
+    mountCities();
+    mountTools();
+    initSW();
     setSyncState(SB ? 'busy' : 'local');
     if (SB) pullAll();
 })();
