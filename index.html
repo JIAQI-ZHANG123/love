@@ -1225,11 +1225,13 @@ body:has(#letterPage.show) #emojiFloat { opacity: .3; }
         linear-gradient(180deg, #fffaf5, #fff6ef 58%, #fffaf2);
 }
 
-.board-page.show { display: block; animation: boardIn .4s ease both; }
+/* 注意：这里只能用 opacity 做入场，一旦给 .board-page 加上 transform，
+   它就会成为内部 position: fixed 底栏的包含块，底栏会跟着内容一起滚走。 */
+.board-page.show { display: block; animation: boardIn .34s ease both; }
 
 @keyframes boardIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: none; }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 .board-shell { width: min(880px, 100%); margin: 0 auto; padding: 26px 18px 70px; }
@@ -1691,9 +1693,8 @@ body.has-footnav { padding-bottom: 76px; }
     align-items: stretch;
     padding: 5px 6px calc(5px + env(safe-area-inset-bottom));
     border-top: 1px solid #ffe4ee;
-    background: rgba(255, 253, 253, .95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255, 253, 253, .985);
+    box-shadow: 0 -10px 24px -20px rgba(200, 140, 170, .7);
 }
 .foot-nav-btn {
     flex: 1 1 0;
@@ -1934,10 +1935,8 @@ body.has-footnav { padding-bottom: 76px; }
     border: 0;
     border-top: 1px solid #ffe4ee;
     border-radius: 0;
-    background: rgba(255, 253, 253, .96);
+    background: rgba(255, 253, 253, .985);
     box-shadow: 0 -10px 26px -20px rgba(190, 120, 150, .9);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
 }
 .board-page .board-tab {
     flex: 1 1 0;
