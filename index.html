@@ -1144,7 +1144,7 @@ body {
 body:has(#letterPage.show) #emojiFloat { opacity: .3; }
 
 @media (max-width: 600px) {
-    #emojiFloat { opacity: .62; }
+    #emojiFloat { opacity: .5; }
     .days-number { font-size: 58px; padding: 2px 22px 4px; }
     .event-title { font-size: 19px; }
     .event-item { padding: 20px 16px 20px; }
@@ -4658,7 +4658,15 @@ window.LOVE_BOARD_CFG = {
         }
 
         var img = new Image();
-        if (location.protocol !== 'file:') img.crossOrigin = 'anonymous';
+        // 只有跨域图片才需要 CORS 模式；同源图设了 crossOrigin 反而会被 GitHub Pages 的
+        // 不带 CORS 头的响应挡掉，导致海报退化成占位图。
+        var crossOrigin = false;
+        try {
+            crossOrigin = new URL(src, location.href).origin !== location.origin;
+        } catch (e) {
+            crossOrigin = false;
+        }
+        if (crossOrigin) img.crossOrigin = 'anonymous';
         var settled = false;
         var timer = setTimeout(function () {
             if (settled) return;
@@ -4695,7 +4703,7 @@ window.LOVE_BOARD_CFG = {
         btn.id = 'posterBtn';
         btn.className = 'poster-btn';
         btn.innerHTML = '🎞️ 生成「我们的第 N 天」海报';
-        btn.addEventListener('click', makePoster);
+        btn.addEventListener('click', function () { makePoster(false); });
         host.appendChild(btn);
     }
 
