@@ -1159,7 +1159,7 @@
         const img = el.querySelector('img');
         if (!img) return;
         const uri = LQIP[baseName(img.getAttribute('src'))];
-        if (uri) el.style.setProperty('--lqip', 'url("' + uri + '")');
+        if (uri) el.style.setProperty('--lqip', 'url("data:image/webp;base64,' + uri + '")');
     });
     // 预热回忆封面缩略图：16 张并行取回（合计约 230KB），点「进入回忆之旅」时已在缓存里
     function warmTourImages() {
@@ -1251,7 +1251,7 @@
             pic.className = 'mem-pic';
             const src = item.images[0].replace('images/', 'images/tour/');
             const lq = LQIP[baseName(src)];
-            if (lq) pic.style.backgroundImage = 'url(' + lq + ')';
+            if (lq) pic.style.backgroundImage = 'url(data:image/webp;base64,' + lq + ')';
             const img = document.createElement('img');
             img.addEventListener('load', function () { img.classList.add('ready'); }, { once: true });
             img.addEventListener('error', function () { img.classList.add('ready'); }, { once: true });
@@ -1946,7 +1946,7 @@
             slide.className = 'swiper-slide';
             slide.dataset.src = imgSrc;
             const uri = LQIP[baseName(imgSrc)];
-            if (uri) slide.style.setProperty('--lqip', 'url("' + uri + '")');
+            if (uri) slide.style.setProperty('--lqip', 'url("data:image/webp;base64,' + uri + '")');
             swiperTrack.appendChild(slide);
 
             const dot = document.createElement('div');
