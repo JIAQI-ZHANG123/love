@@ -1865,7 +1865,7 @@ body:has(#letterPage.show) #emojiFloat { opacity: .3; }
     background: #fffaf8;
     box-shadow: 0 10px 24px rgba(255, 170, 200, .16);
 }
-.mp-wrap svg { display: block; width: 100%; height: auto; }
+.mp-wrap svg { display: block; width: 100%; height: auto; max-height: min(56vh, 520px); }
 .mp-dot { cursor: pointer; }
 .mp-dot:hover circle:nth-of-type(2) { fill: #ff6f9f; }
 .mp-hint {
@@ -2092,6 +2092,7 @@ body:has(#letterPage.show) #emojiFloat { opacity: .3; }
 .mp-wrap.editing .mp-dot { cursor: move; }
 .mp-wrap.editing .mp-halo { opacity: .3; stroke: #ff8ab5; stroke-dasharray: 3 3; stroke-width: 1; }
 .mp-empty {
+    grid-column: 1 / -1;
     padding: 18px 14px;
     border-radius: 16px;
     border: 1px dashed #ffd9e7;
