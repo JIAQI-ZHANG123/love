@@ -826,9 +826,153 @@
             .mem-title { font-size: 15px; }
             .mem-line  { font-size: 11px; }
         }
+        /* ── 密码门禁 ── */
+        .gate-page {
+            position: fixed; inset: 0; z-index: 6000; display: flex;
+            align-items: center; justify-content: center; padding: 24px 18px;
+            background:
+                radial-gradient(120% 90% at 12% 0%, #fff2f8 0%, rgba(255, 242, 248, 0) 60%),
+                radial-gradient(110% 80% at 92% 10%, #eafaf3 0%, rgba(234, 250, 243, 0) 58%),
+                linear-gradient(168deg, #ffeaf2, #fff0e4 48%, #eaf8f1);
+            font-family: "YouYuan", "幼圆", "Yuanti SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+            transition: opacity .55s ease, visibility .55s;
+        }
+        .gate-page.out { opacity: 0; visibility: hidden; pointer-events: none; }
+        body.gated { overflow: hidden; height: 100%; }
+        .gate-card {
+            position: relative; width: min(392px, 100%); padding: 30px 24px 20px;
+            background: rgba(255, 253, 253, .94); border: 1.5px dashed #ffd9e8; border-radius: 26px;
+            box-shadow: 0 24px 60px -28px rgba(255, 140, 180, .7), inset 0 2px 0 #fff;
+            text-align: center; animation: gateIn .5s ease both;
+        }
+        .gate-card::before {
+            content: ""; position: absolute; top: -11px; left: 50%; width: 92px; height: 22px;
+            transform: translateX(-50%) rotate(-3deg); border-radius: 3px;
+            background: repeating-linear-gradient(90deg, #ffd1e3 0 7px, #ffe3ef 7px 14px);
+            box-shadow: 0 2px 6px rgba(255, 150, 190, .25);
+        }
+        @keyframes gateIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+        .gate-kicker { margin: 0 0 6px; font-size: 12.5px; letter-spacing: .14em; color: #c98aa6; }
+        .gate-title { margin: 0; font-size: 23px; font-weight: 700; color: #4d3f45; }
+        .gate-sub { margin: 8px 0 18px; font-size: 12.5px; line-height: 1.8; color: #a98b98; }
+        .gate-form { display: flex; gap: 8px; }
+        .gate-input {
+            flex: 1 1 auto; min-width: 0; height: 44px; padding: 0 14px; outline: none;
+            border: 1.5px solid #ffd9e8; border-radius: 14px; background: #fffafc; color: #4d3f45;
+            font-family: inherit; font-size: 15px; letter-spacing: .12em; text-align: center;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .gate-input::placeholder { letter-spacing: 0; color: #d7bccb; }
+        .gate-input:focus { border-color: #ffb3d1; box-shadow: 0 0 0 4px rgba(255, 179, 209, .22); }
+        .gate-btn {
+            flex: 0 0 auto; min-width: 86px; height: 44px; padding: 0 18px; border: 0; border-radius: 14px; cursor: pointer;
+            background: linear-gradient(135deg, #ffb3d1, #ffc9dd 55%, #ffe0a3); color: #fff;
+            font-family: inherit; font-size: 14.5px; font-weight: 700;
+            box-shadow: 0 10px 22px -12px rgba(255, 120, 170, .95);
+            transition: transform .16s, filter .2s;
+        }
+        .gate-btn:hover { filter: brightness(1.03); }
+        .gate-btn:active { transform: scale(.97); }
+        .gate-meme { display: none; margin: 16px 0 0; }
+        .gate-meme.on { display: block; animation: memeIn .38s ease both; }
+        @keyframes memeIn { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
+        .gate-meme img {
+            display: block; width: min(100%, 300px); max-height: 38vh; margin: 0 auto;
+            border-radius: 16px; object-fit: contain;
+        }
+        .gate-cap { margin: 10px 0 0; min-height: 1.2em; font-size: 13px; line-height: 1.6; color: #8a6f7c; }
+        .gate-page[data-state="no"] .gate-input { border-color: #ffc3c3; }
+        .gate-page[data-state="no"] .gate-card { animation: gateShake .42s ease; }
+        @keyframes gateShake { 10%, 90% { transform: translateX(-2px); } 30%, 70% { transform: translateX(4px); } 50% { transform: translateX(-5px); } }
+        .gate-page[data-state="ok"] .gate-input,
+        .gate-page[data-state="ok"] .gate-btn { opacity: .45; pointer-events: none; }
+        @media (max-width: 600px) {
+            .gate-card { padding: 26px 18px 16px; }
+            .gate-title { font-size: 20px; }
+            .gate-meme img { width: min(100%, 260px); max-height: 34vh; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .gate-card, .gate-meme.on { animation: none; }
+        }
+        /* ── 电影感手写字幕 & 相片卡 ── */
+        .cine-hand {
+            font-family: "STKaiti", "KaiTi", "Kaiti SC", "楷体", "Hannotate SC", "Hanzipen SC", "Songti SC", serif;
+        }
+        #cineOverlay .cine-ink {
+            position: absolute; left: 0; right: 0; top: 50%; z-index: 6;
+            padding: 0 9vw; text-align: center; opacity: 0; pointer-events: none;
+            transform: translateY(-50%);
+            will-change: opacity, transform;
+        }
+        #cineOverlay .cine-ink.show { animation: cineInk var(--dur, 3.4s) ease both; }
+        @keyframes cineInk {
+            0%   { opacity: 0; transform: translateY(-46%) scale(.985); }
+            12%  { opacity: 1; transform: translateY(-50%) scale(1); }
+            76%  { opacity: 1; transform: translateY(-50%) scale(1); }
+            100% { opacity: 0; transform: translateY(-54%) scale(1.01); }
+        }
+        #cineOverlay .cine-ink-line {
+            margin: 0 auto; max-width: 18em;
+            font-size: clamp(18px, 2.5vw, 30px); line-height: 1.95; letter-spacing: .05em;
+            color: #fff6f1;
+            text-shadow: 0 3px 22px rgba(0, 0, 0, .78), 0 0 3px rgba(0, 0, 0, .55);
+        }
+        #cineOverlay .cine-ink-line + .cine-ink-line { margin-top: .35em; }
+        #cineOverlay .cine-big {
+            display: inline-block;
+            font-size: clamp(30px, 5.4vw, 62px); line-height: 1.35; letter-spacing: .07em;
+            color: #fff8f2;
+            text-shadow: 0 0 34px rgba(255, 158, 180, .55), 0 4px 26px rgba(0, 0, 0, .72);
+        }
+        #cineOverlay .cine-card {
+            position: absolute; left: 50%; top: 50%; z-index: 7;
+            width: min(46vw, 404px); margin: 0; padding: 11px 11px 13px;
+            background: rgba(255, 252, 250, .97); border-radius: 15px;
+            box-shadow: 0 30px 70px -18px rgba(0, 0, 0, .85), 0 2px 0 #fff inset;
+            opacity: 0; pointer-events: none;
+            transform: translate(-50%, -50%);
+            will-change: opacity, transform;
+        }
+        #cineOverlay .cine-card.show { animation: cineCard var(--dur, 6.4s) ease both; }
+        @keyframes cineCard {
+            0%   { opacity: 0; transform: translate(-50%, -46%) scale(.965); }
+            9%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            88%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -52%) scale(1.012); }
+        }
+        #cineOverlay .cine-card img {
+            display: block; width: 100%; max-height: 46vh; object-fit: cover;
+            border-radius: 10px; background: #f3e7e2;
+        }
+        #cineOverlay .cine-card .cine-cap {
+            margin: 10px 3px 0; text-align: center;
+            font-size: clamp(14px, 1.75vw, 20px); line-height: 1.7; color: #5c4a50;
+        }
+        @media (max-width: 600px) {
+            #cineOverlay .cine-card { width: min(72vw, 330px); }
+            #cineOverlay .cine-card img { max-height: 34vh; }
+            #cineOverlay .cine-ink-line { font-size: 17px; }
+        }
     </style>
 </head>
-<body>
+<body class="gated">
+
+<div id="gatePage" class="gate-page" data-state="idle">
+    <div class="gate-card">
+        <p class="gate-kicker">🔒 需要口令</p>
+        <h1 class="gate-title">先对上暗号</h1>
+        <p class="gate-sub">这道门要输对<br>只有我们才知道的那串数字</p>
+        <form class="gate-form" id="gateForm" autocomplete="off">
+            <input class="gate-input" id="gateInput" type="password" inputmode="numeric" maxlength="16"
+                   placeholder="输入密码" aria-label="密码">
+            <button class="gate-btn" type="submit">开门</button>
+        </form>
+        <div class="gate-meme" id="gateMeme">
+            <img id="gateImg" alt="">
+            <p class="gate-cap" id="gateCap" aria-live="polite"></p>
+        </div>
+    </div>
+</div>
 
 <svg class="icon-sprite" aria-hidden="true" focusable="false">
     <defs>
@@ -1283,6 +1427,34 @@
         box.appendChild(frag);
     }
 
+    // 手写字幕：浮在烟花之上，播完自动回收
+    function cineInk(ov, lines, dur) {
+        const box = document.createElement('div');
+        box.className = 'cine-ink';
+        box.style.setProperty('--dur', (dur / 1000).toFixed(2) + 's');
+        box.innerHTML = lines.map(function (t) {
+            return '<div class="cine-ink-line cine-hand">' + t + '</div>';
+        }).join('');
+        ov.appendChild(box);
+        void box.offsetWidth;
+        box.classList.add('show');
+        setTimeout(function () { box.remove(); }, dur + 160);
+        return box;
+    }
+
+    // 相片卡：最后一张回忆 + 下方手写配文
+    function cineCard(ov, src, capHtml, dur) {
+        const card = document.createElement('div');
+        card.className = 'cine-card';
+        card.style.setProperty('--dur', (dur / 1000).toFixed(2) + 's');
+        card.innerHTML = '<img src="' + src + '" alt=""><p class="cine-cap cine-hand">' + capHtml + '</p>';
+        ov.appendChild(card);
+        void card.offsetWidth;
+        card.classList.add('show');
+        setTimeout(function () { card.remove(); }, dur + 180);
+        return card;
+    }
+
     function playFireworksCinema() {
         const ov = document.getElementById('cineOverlay');
         const canvas = document.getElementById('cineCanvas');
@@ -1303,22 +1475,37 @@
 
         // 回忆全部飘完所需的时间：留白 + 间隔 × (N-1) + 单条时长
         const total = TOUR_LEAD + (eventsData.length - 1) * MEMORY_STAGGER + MEMORY_RISE;
-        // 主花在回忆还没飘完时炸开：先算炸点，再倒推升空时刻
         warmTourImages();
-        const burstAt = total - 1200;
-        const mainAt = Math.max(0.6, (burstAt - 1950) / 1000);
-        const wordAt = burstAt + 780;              // 花火最盛之后，「唯一」才浮出来
-        const finishAt = wordAt + 620;             // 露出主页
-        const endAt = total + 420;                 // 回忆飘完再落黑幕
+
+        const gap = 400;                          // 回忆飘完后先"卡"一下
+        const inkDur = 2400;                      // 第一段字幕停留时长
+        const inkAt = total + gap;
+        const burstAt = inkAt + inkDur + 300;     // 主烟花炸开的时刻
+        const RISE_MS = 2020;                     // 主花从地面升到高点约 2 秒
+        const mainAt = Math.max(0.8, (burstAt - 240 - RISE_MS) / 1000);
+        const cardDur = 3400;                     // 相片卡展示时长
+        const finalAt = burstAt + cardDur + 150;  // 卡片淡出后，「520 永远爱你」浮现
+        const finalDur = 2200;
+        const finishAt = finalAt + 1600;          // 露出主页
+        const endAt = finalAt + finalDur + 700;   // 黑幕彻底退场
 
         ov.dataset.mode = 'b';
         ov.classList.add('on');
+        let fireworks = null;
         // 火起：先只有零星烟花在远处点缀，主烟花留到最后
         setTimeout(() => {
             ov.classList.add('fires');
-            startFireworks(canvas, {
-                duration: endAt + 1200,
-                mainAt: mainAt
+            fireworks = startFireworks(canvas, {
+                duration: endAt + 1500,
+                mainAt: mainAt,
+                onMain: function () {
+                    const last = eventsData[eventsData.length - 1] || {};
+                    const raw = (last.images && last.images[0]) || '';
+                    const src = raw.indexOf('data:') === 0 ? raw : raw.replace('images/', 'images/tour/');
+                    const brief = shortLine(last.desc);
+                    const cap = (last.title || '永远永远！') + (brief ? '<br>' + brief + ' 💕' : ' 💕');
+                    cineCard(ov, src, cap, cardDur);
+                }
             });
         }, 240);
         // 回忆一张张升起
@@ -1326,8 +1513,19 @@
             buildMemoryTour(memories);
             memories.classList.add('on');
         }, 360);
-        // 主花最盛之后，"唯一"作为收束浮出来
-        setTimeout(() => ov.classList.add('ink'), Math.round(wordAt));
+        // 回忆落尽 → 卡一下 → 浮出第一段手写字幕
+        setTimeout(() => {
+            cineInk(ov, ['如果时间可以再慢一点', '我想和你多待一会儿 ⏳'], inkDur);
+        }, Math.round(inkAt));
+        // 主花炸开时，最后一张回忆带着配文浮上来（onMain 里触发）
+        // 烟花正盛，收一句「520 永远爱你」
+        setTimeout(() => {
+            cineInk(ov, ['<span class="cine-big">520 永远爱你 ❤️</span>'], finalDur);
+            if (fireworks && fireworks.burst) {
+                fireworks.burst(3);
+                setTimeout(() => { if (fireworks && fireworks.burst) fireworks.burst(2); }, 650);
+            }
+        }, Math.round(finalAt));
         setTimeout(finish, Math.round(finishAt));
         setTimeout(() => {
             ov.classList.remove('on', 'fires', 'ink');
@@ -1615,6 +1813,9 @@
                     if (r.hold <= 0) {
                         explode(r.x, r.y, r.color, true);
                         rockets.splice(i, 1);
+                        if (typeof opts.onMain === 'function') {
+                            try { opts.onMain(); } catch (e) { /* 回调出错不影响烟花 */ }
+                        }
                     }
                     continue;
                 }
@@ -1734,6 +1935,14 @@
             ctx.clearRect(0, 0, W, H);
             window.removeEventListener('resize', size);
         }, duration + 2600);
+
+        // 给上层留个把手：收尾字幕时补几朵，别让天空空着
+        return {
+            burst: function (n) {
+                n = n || 2;
+                for (var i = 0; i < n; i++) launch(false);
+            }
+        };
     }
 
     // ========== 1. 音乐播放 ==========
@@ -2026,6 +2235,87 @@
     if (imagePreview) {
         imagePreview.onclick = () => { imagePreview.classList.remove('active'); };
     }
+</script>
+
+<script id="gate-js">
+(function () {
+    'use strict';
+    var PASS = '20251113';                   // ← 口令，改这一行即可
+    // 开门时间（测试用：已经改成"昨天"= 2026-10-29；正式上线想改回 11 月 4 日就写 new Date(2026, 10, 4)）
+    var OPEN_AT = new Date(2026, 9, 29, 0, 0, 0).getTime();
+    var SRC = {
+        ok: 'images/gate-ok.webp',
+        no: 'images/gate-no.webp',
+        wip: 'images/gate-wip.webp'
+    };
+    var gate = document.getElementById('gatePage');
+    if (!gate) return;
+    var form = document.getElementById('gateForm');
+    var input = document.getElementById('gateInput');
+    var meme = document.getElementById('gateMeme');
+    var img = document.getElementById('gateImg');
+    var cap = document.getElementById('gateCap');
+    var done = false;
+
+    // 到点才开门
+    function opened() {
+        var now = window.__GATE_NOW ? window.__GATE_NOW : Date.now();
+        return now >= OPEN_AT;
+    }
+
+    function show(state, which, text) {
+        gate.setAttribute('data-state', state);
+        img.src = SRC[which];
+        img.alt = text;
+        cap.textContent = text;
+        meme.classList.add('on');
+    }
+
+    function unlock() {
+        if (done) return;
+        done = true;
+        gate.classList.add('out');
+        document.body.classList.remove('gated');
+        setTimeout(function () {
+            if (gate.parentNode) gate.parentNode.removeChild(gate);
+        }, 700);
+    }
+
+    function submit(e) {
+        if (e) e.preventDefault();
+        if (done) return;
+        var val = (input.value || '').trim();
+
+        if (!opened()) {
+            show('wip', 'wip', '还没到日子哦，再等等 🤍');
+            input.value = '';
+            return;
+        }
+        if (val === PASS) {
+            show('ok', 'ok', '答对啦，进去吧 ✨');
+            input.value = '';
+            input.blur();
+            setTimeout(unlock, 1000);        // 过一秒再进站
+            return;
+        }
+        show('no', 'no', '不对哦，再想想');
+        input.value = '';
+        input.focus();
+    }
+
+    form.addEventListener('submit', submit);
+    gate.addEventListener('click', function (ev) {
+        if (ev.target === gate) input.focus();
+    });
+
+    // 预热三张表情包，避免第一次点开时白一下
+    window.addEventListener('load', function () {
+        Object.keys(SRC).forEach(function (k) { var im = new Image(); im.src = SRC[k]; });
+        if (window.innerWidth > 760) input.focus();
+    });
+
+    if (!opened()) input.placeholder = '还没到日子';
+})();
 </script>
 </body>
 </html>
