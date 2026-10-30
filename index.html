@@ -2398,6 +2398,99 @@ body.has-footnav { padding-bottom: 76px; }
   .mp-compass { right: 8px; bottom: 8px; }
 }
 
+/* ══════════ 计划 ══════════ */
+.pl-terms { display: flex; gap: 7px; margin: 2px 0 13px; }
+.pl-term {
+    flex: 1 1 0;
+    height: 36px;
+    border-radius: 12px;
+    border: 1.5px solid #ffe0ec;
+    background: #fffafc;
+    color: #a97e91;
+    font-family: "YouYuan", "幼圆", "Yuanti SC", "PingFang SC", sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .18s ease;
+}
+.pl-term.on {
+    background: linear-gradient(135deg, #ffe6f0, #fff0e6);
+    border-color: #ffb9d2;
+    color: #d1547f;
+    box-shadow: 0 6px 14px -10px rgba(255, 120, 165, .9);
+}
+.pl-emos { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 14px; }
+.pl-emo {
+    width: 34px; height: 34px;
+    border-radius: 11px;
+    border: 1.5px solid #ffe4ee;
+    background: #fffdfe;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    transition: all .16s ease;
+}
+.pl-emo.on { background: #ffe9f3; border-color: #ff9ec4; box-shadow: 0 0 0 2.5px #ffe6f0; }
+.pl-group { margin: 17px 0 6px; }
+.pl-h {
+    display: flex; align-items: center; gap: 6px;
+    margin: 0 3px 9px;
+    font-size: 13px; font-weight: 700; color: #7d5a68; letter-spacing: .04em;
+    font-family: "YouYuan", "幼圆", "Yuanti SC", "PingFang SC", sans-serif;
+}
+.pl-h span { font-size: 15px; }
+.pl-h em {
+    margin-left: auto; font-style: normal; font-size: 11px; color: #c09aab;
+    background: #fff2f7; border-radius: 999px; padding: 1px 9px;
+}
+.pl-cards { display: flex; flex-direction: column; gap: 8px; }
+.pl-card {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 11px 12px;
+    border-radius: 16px;
+    border: 1.5px solid #ffe6ef;
+    background: #fffdfe;
+    box-shadow: 0 8px 18px -16px rgba(200, 120, 160, .85);
+}
+.pl-card.done { background: #fbf8f9; border-style: dashed; border-color: #f3e3ea; }
+.pl-card.done .pl-title { text-decoration: line-through; color: #b49aa6; }
+.pl-card.done .pl-note { color: #c2afb8; }
+.pl-card.done .pl-emoji { filter: grayscale(.75); opacity: .55; }
+.pl-check {
+    flex: 0 0 auto; width: 22px; height: 22px; margin-top: 2px;
+    border-radius: 50%; border: 1.7px solid #ffc2d8; background: #fff;
+    color: #fff; font-size: 12px; line-height: 1; cursor: pointer; padding: 0;
+    transition: all .16s ease;
+}
+.pl-card.done .pl-check { background: #ff9ec4; border-color: #ff9ec4; }
+.pl-emoji { font-size: 20px; line-height: 1.3; flex: 0 0 auto; }
+.pl-body { flex: 1 1 auto; min-width: 0; }
+.pl-title { margin: 0; font-size: 14.5px; color: #4d3f45; font-weight: 600; line-height: 1.55; word-break: break-word; }
+.pl-note { margin: 3px 0 0; font-size: 12.5px; color: #8d7683; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
+.pl-acts { flex: 0 0 auto; display: flex; gap: 4px; }
+.pl-acts button {
+    width: 25px; height: 25px; border: none; border-radius: 8px;
+    background: #fff2f7; color: #bb7f98; font-size: 12px; line-height: 1; cursor: pointer; padding: 0;
+}
+.pl-acts button.arm { background: #e2567f; color: #fff; }
+.pl-empty { padding: 28px 12px; text-align: center; color: #b79aa8; }
+.pl-empty p { margin: 0 0 7px; font-size: 14px; }
+.pl-empty small { font-size: 12px; line-height: 1.75; }
+
+@media (max-width: 600px) {
+    .pl-term { height: 34px; font-size: 12px; }
+    .pl-emo { width: 31px; height: 31px; font-size: 15px; }
+    .pl-title { font-size: 14px; }
+    .pl-note { font-size: 12px; }
+}
+
+/* 底栏是 fixed，提示条要抬到底栏上方 */
+.board-toast { bottom: 104px; }
+@media (max-width: 600px) {
+    .board-toast { bottom: 88px; }
+}
+
 </style>
 
 </head>
@@ -3835,6 +3928,7 @@ window.LOVE_BOARD_CFG = {
     var PH_KEY = 'love.photos.v1';     // 相册每张照片的日期 / 说明
     var MP_KEY = 'love.map.v1';        // 足迹地图上的点
     var RP_KEY = 'love.routes.v1';     // 地名连线（去了几次）
+    var PL_KEY = 'love.plans.v1';      // 计划（长期 / 中期 / 短期）
     var EMOJIS = ['💗', '🌸', '✨', '🎀', '🫧', '🐰'];
     var MAX_IMGS = 3;
 
@@ -3972,7 +4066,8 @@ window.LOVE_BOARD_CFG = {
             sbReq('love_capsules?select=*&order=unlock_at.asc'),
             sbReq('love_photos?select=*'),
             sbReq('love_map?select=*&order=ord.asc'),
-            sbReq('love_routes?select=*')
+            sbReq('love_routes?select=*'),
+            sbReq('love_plans?select=*')
         ]).then(function (res) {
             var rGb = (res[0] || []).map(fromGbRow);
             var rCr = (res[1] || []).map(fromCrRow);
@@ -4059,6 +4154,19 @@ window.LOVE_BOARD_CFG = {
                 renderMap();
             }
 
+            // 计划
+            if (res[7]) {
+                var rPl = (res[7] || []).map(fromPlRow);
+                var localPl = planList.slice();
+                var remotePlIds = {};
+                rPl.forEach(function (p) { remotePlIds[p.id] = 1; });
+                planList = mergeList(rPl, localPl);
+                planList.sort(function (a, b) { return (Number(a.done) - Number(b.done)) || ((b.ts || 0) - (a.ts || 0)); });
+                writeArr(PL_KEY, planList);
+                localPl.forEach(function (p) { if (!remotePlIds[p.id]) queueOp({ type: 'upsert', table: PL_TABLE, row: toPlRow(p) }); });
+                renderPl();
+            }
+
             // 重放覆盖：先还原，再按稳定 id 套云端
             for (var i = 0; i < ORIG.length; i++) if (ORIG[i]) restoreRow(i);
             Object.keys(overrides).forEach(function (k) {
@@ -4091,6 +4199,7 @@ window.LOVE_BOARD_CFG = {
     var phList = [];       // 相册每张图的日期 / 说明（覆盖）
     var mapStops = [];     // 足迹地图上的点
     var routeList = [];    // 地名连线
+    var planList = [];     // 计划
     var pickImgs = [];     // 当前表单里的图片 dataURL
     var editingId = null;
     var activeTab = 'gb';
@@ -4279,6 +4388,30 @@ window.LOVE_BOARD_CFG = {
         '    <div class="cp-list" id="cpList"></div>',
         '  </section>',
 
+        /* 计划 */
+        '  <section class="board-panel" id="panelPl">',
+        '    <div class="board-card">',
+        '      <div class="pl-terms" id="plTerms" role="tablist">',
+        '        <button class="pl-term on" type="button" data-term="long">🌳 长期</button>',
+        '        <button class="pl-term" type="button" data-term="mid">🌿 中期</button>',
+        '        <button class="pl-term" type="button" data-term="short">🌱 短期</button>',
+        '      </div>',
+        '      <div class="board-field">',
+        '        <span class="board-label">想一起做的事</span>',
+        '        <input class="board-input" id="plTitle" type="text" maxlength="40" placeholder="比如：一起去看一次极光" autocomplete="off">',
+        '      </div>',
+        '      <div class="board-field">',
+        '        <span class="board-label">补充（可选）</span>',
+        '        <textarea class="board-textarea" id="plNote" maxlength="200" placeholder="什么时候、去哪里、和谁一起……"></textarea>',
+        '      </div>',
+        '      <span class="board-label">挑个表情</span>',
+        '      <div class="pl-emos" id="plEmos"></div>',
+        '      <div class="board-actions"><button class="board-btn" id="plAdd" type="button">加进计划 ✨</button></div>',
+        '      <p class="board-note">写下来就多一分实现的机会 · 做到以后点一下左边的圆圈打勾</p>',
+        '    </div>',
+        '    <div class="pl-list" id="plList"></div>',
+        '  </section>',
+
         /* 相册 */
         '  <section class="board-panel" id="panelAl">',
         '    <div class="al-bar" id="alBar"></div>',
@@ -4320,6 +4453,7 @@ window.LOVE_BOARD_CFG = {
         '    <button class="board-tab" type="button" data-tab="cp" role="tab">💌<span>胶囊</span></button>',
         '    <button class="board-tab" type="button" data-tab="al" role="tab">📷<span>相册</span></button>',
         '    <button class="board-tab" type="button" data-tab="mp" role="tab">🗺️<span>足迹</span></button>',
+        '    <button class="board-tab" type="button" data-tab="pl" role="tab">📌<span>计划</span></button>',
         '  </nav>'
     ].join('\n');
     document.body.appendChild(page);
@@ -4853,7 +4987,7 @@ window.LOVE_BOARD_CFG = {
         Array.prototype.forEach.call(page.querySelectorAll('.board-tab'), function (b) {
             b.classList.toggle('active', b.dataset.tab === tab);
         });
-        ['gb', 'cr', 'ed', 'cp', 'al', 'mp'].forEach(function (k) {
+        ['gb', 'cr', 'ed', 'cp', 'al', 'mp', 'pl'].forEach(function (k) {
             var el = $('panel' + k.charAt(0).toUpperCase() + k.slice(1));
             if (el) el.classList.toggle('on', tab === k);
         });
@@ -4877,6 +5011,7 @@ window.LOVE_BOARD_CFG = {
         else if (t === 'cp') renderCp();
         else if (t === 'al') renderAlbum();
         else if (t === 'mp') { ensureMapGeo(function () { renderMap(); }); renderMap(); }
+        else if (t === 'pl') renderPl();
         else renderGb();
     }
 
@@ -5176,6 +5311,223 @@ window.LOVE_BOARD_CFG = {
         if (e.target.closest('.al-edit')) { openPhEdit(cell.dataset.src); return; }
         openView(cell.dataset.src, cell.dataset.cap);
     });
+
+    /* ── 计划：长期 / 中期 / 短期 ── */
+    var PL_TABLE = 'love_plans';
+    var PL_TERMS = [['long', '🌳', '长期'], ['mid', '🌿', '中期'], ['short', '🌱', '短期']];
+    var PL_EMO = ['✨', '💗', '🌸', '🎀', '🫧', '🐰', '⭐', '🍓', '🎂', '🎁', '🌙', '🏔️', '🎡', '🌊'];
+    var plTerm = 'long', plEmo = '✨', plArm = null, plArmT = null;
+
+    function fromPlRow(r) {
+        return { id: r.id, term: r.term || 'long', title: r.title || '', note: r.note || '',
+                 emoji: r.emoji || '✨', done: !!r.done, ts: Number(r.ts) || Date.now() };
+    }
+    function toPlRow(p) {
+        return { id: p.id, term: p.term || 'long', title: p.title || '', note: p.note || '',
+                 emoji: p.emoji || '✨', done: !!p.done, ts: p.ts || Date.now() };
+    }
+    function plTermName(t) {
+        for (var i = 0; i < PL_TERMS.length; i++) if (PL_TERMS[i][0] === t) return PL_TERMS[i][2];
+        return '长期';
+    }
+    function renderPlEmos(box, cur, cb) {
+        if (!box) return;
+        box.innerHTML = PL_EMO.map(function (e) {
+            return '<button type="button" class="pl-emo' + (e === cur ? ' on' : '') + '" data-emo="' + e + '">' + e + '</button>';
+        }).join('');
+        box.onclick = function (ev) {
+            var b = ev.target.closest('.pl-emo');
+            if (!b) return;
+            Array.prototype.forEach.call(box.querySelectorAll('.pl-emo'), function (x) { x.classList.toggle('on', x === b); });
+            cb(b.getAttribute('data-emo'));
+        };
+    }
+
+    function renderPl() {
+        var list = $('plList');
+        if (!list) return;
+        if (!planList.length) {
+            list.innerHTML = '<div class="pl-empty"><p>还没有计划</p>' +
+                '<small>先写一句想一起做的事吧：看一场极光、养一只猫、去一次海边……</small></div>';
+            return;
+        }
+        var out = '';
+        PL_TERMS.forEach(function (t) {
+            var rows = planList.filter(function (p) { return p.term === t[0]; });
+            if (!rows.length) return;
+            rows = rows.slice().sort(function (a, b) {
+                return (Number(a.done) - Number(b.done)) || ((b.ts || 0) - (a.ts || 0));
+            });
+            out += '<div class="pl-group"><h4 class="pl-h"><span>' + t[1] + '</span>' + t[2] +
+                '<em>' + rows.length + '</em></h4><div class="pl-cards">';
+            rows.forEach(function (p) {
+                out += '<article class="pl-card' + (p.done ? ' done' : '') + '" data-plan="' + esc(p.id) + '">' +
+                    '<button class="pl-check" type="button" data-pl-done="' + esc(p.id) + '" aria-label="' + (p.done ? '改成没做' : '标记为做到') + '">' + (p.done ? '✓' : '') + '</button>' +
+                    '<div class="pl-emoji">' + esc(p.emoji || '✨') + '</div>' +
+                    '<div class="pl-body">' +
+                        '<p class="pl-title">' + esc(p.title) + '</p>' +
+                        (p.note ? '<p class="pl-note">' + esc(p.note) + '</p>' : '') +
+                    '</div>' +
+                    '<div class="pl-acts">' +
+                        '<button type="button" data-pl-edit="' + esc(p.id) + '" aria-label="编辑">✎</button>' +
+                        '<button type="button" data-pl-del="' + esc(p.id) + '" aria-label="删掉">✕</button>' +
+                    '</div>' +
+                '</article>';
+            });
+            out += '</div></div>';
+        });
+        list.innerHTML = out;
+    }
+
+    function addPlan() {
+        var el = $('plTitle');
+        var title = el ? el.value.trim() : '';
+        if (!title) { toast('先写一句想做的事'); if (el) el.focus(); return; }
+        var p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5),
+                  term: plTerm, title: title, note: ($('plNote') ? $('plNote').value.trim() : ''),
+                  emoji: plEmo, done: false, ts: Date.now() };
+        planList.unshift(p);
+        writeArr(PL_KEY, planList);
+        queueOp({ type: 'upsert', table: PL_TABLE, row: toPlRow(p) });
+        if (el) el.value = '';
+        if ($('plNote')) $('plNote').value = '';
+        renderPl();
+        toast(plTermName(plTerm) + '计划 ＋1 ' + p.emoji);
+    }
+
+    function togglePlan(id) {
+        var p = null;
+        planList.forEach(function (x) { if (x.id === id) p = x; });
+        if (!p) return;
+        p.done = !p.done;
+        p.ts = Date.now();
+        writeArr(PL_KEY, planList);
+        queueOp({ type: 'upsert', table: PL_TABLE, row: toPlRow(p) });
+        renderPl();
+        toast(p.done ? '做到啦 🎉' : '又放回「还没做」');
+    }
+
+    function deletePlan(id) {
+        planList = planList.filter(function (p) { return p.id !== id; });
+        writeArr(PL_KEY, planList);
+        queueOp({ type: 'delete', table: PL_TABLE, match: 'id=eq.' + encodeURIComponent(id) });
+        renderPl();
+        toast('计划删掉了');
+    }
+
+    /* 编辑弹层 */
+    var plEdit = document.createElement('div');
+    plEdit.className = 'mp-edit';
+    plEdit.innerHTML =
+        '<div class="mp-box">' +
+        '  <h4>改一下这个计划</h4>' +
+        '  <div class="pl-terms" id="peTerms">' +
+        PL_TERMS.map(function (t) { return '<button type="button" class="pl-term" data-term="' + t[0] + '">' + t[1] + ' ' + t[2] + '</button>'; }).join('') +
+        '  </div>' +
+        '  <label class="ph-row"><span>计划</span><input id="peTitle" type="text" maxlength="40"></label>' +
+        '  <label class="ph-row"><span>补充</span><input id="peNote" type="text" maxlength="200"></label>' +
+        '  <div class="pl-emos" id="peEmos"></div>' +
+        '  <div class="ph-acts">' +
+        '    <button class="board-submit" id="peSave" type="button">保存</button>' +
+        '    <button class="board-ghost" id="peDel" type="button">删掉这个计划</button>' +
+        '    <button class="board-ghost" id="peCancel" type="button">取消</button>' +
+        '  </div>' +
+        '</div>';
+    document.body.appendChild(plEdit);
+    var peEditing = null, peTerm = 'long', peEmo = '✨';
+
+    function syncPeTerms() {
+        Array.prototype.forEach.call(plEdit.querySelectorAll('.pl-term'), function (b) {
+            b.classList.toggle('on', b.getAttribute('data-term') === peTerm);
+        });
+    }
+    function openPlEdit(id) {
+        var p = null;
+        planList.forEach(function (x) { if (x.id === id) p = x; });
+        if (!p) return;
+        peEditing = p;
+        peTerm = p.term || 'long';
+        peEmo = p.emoji || '✨';
+        $('peTitle').value = p.title || '';
+        $('peNote').value = p.note || '';
+        syncPeTerms();
+        renderPlEmos($('peEmos'), peEmo, function (e) { peEmo = e; });
+        plEdit.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+    function closePlEdit() {
+        plEdit.classList.remove('show');
+        document.body.style.overflow = '';
+        peEditing = null;
+    }
+    plEdit.addEventListener('click', function (e) {
+        var t = e.target.closest('.pl-term');
+        if (t) { peTerm = t.getAttribute('data-term'); syncPeTerms(); return; }
+        if (e.target === plEdit) closePlEdit();
+    });
+    if ($('peSave')) $('peSave').addEventListener('click', function () {
+        if (!peEditing) return;
+        var title = $('peTitle').value.trim();
+        if (!title) { toast('计划不能是空的'); return; }
+        peEditing.term = peTerm;
+        peEditing.emoji = peEmo;
+        peEditing.title = title;
+        peEditing.note = $('peNote').value.trim();
+        peEditing.ts = Date.now();
+        writeArr(PL_KEY, planList);
+        queueOp({ type: 'upsert', table: PL_TABLE, row: toPlRow(peEditing) });
+        closePlEdit();
+        renderPl();
+        toast('改好了 ✓');
+    });
+    if ($('peDel')) $('peDel').addEventListener('click', function () {
+        if (!peEditing) return;
+        var id = peEditing.id;
+        closePlEdit();
+        deletePlan(id);
+    });
+    if ($('peCancel')) $('peCancel').addEventListener('click', closePlEdit);
+
+    (function () {
+        var box = $('plTerms');
+        if (box) box.addEventListener('click', function (e) {
+            var b = e.target.closest('.pl-term');
+            if (!b) return;
+            plTerm = b.getAttribute('data-term');
+            Array.prototype.forEach.call(box.querySelectorAll('.pl-term'), function (x) { x.classList.toggle('on', x === b); });
+            if ($('plTitle')) {
+                $('plTitle').placeholder = plTerm === 'long' ? '比如：一起去看一次极光'
+                    : (plTerm === 'mid' ? '比如：明年一起去趟海边' : '比如：这个周末去吃那家店');
+            }
+        });
+        renderPlEmos($('plEmos'), plEmo, function (e) { plEmo = e; });
+        if ($('plAdd')) $('plAdd').addEventListener('click', addPlan);
+        if ($('plTitle')) $('plTitle').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); addPlan(); }
+        });
+        var list = $('plList');
+        if (list) list.addEventListener('click', function (e) {
+            var d = e.target.closest('[data-pl-done]');
+            if (d) { togglePlan(d.getAttribute('data-pl-done')); return; }
+            var ed = e.target.closest('[data-pl-edit]');
+            if (ed) { openPlEdit(ed.getAttribute('data-pl-edit')); return; }
+            var del = e.target.closest('[data-pl-del]');
+            if (del) {
+                var id = del.getAttribute('data-pl-del');
+                if (plArm !== id) {
+                    plArm = id;
+                    del.classList.add('arm');
+                    toast('再点一下删掉');
+                    clearTimeout(plArmT);
+                    plArmT = setTimeout(function () { plArm = null; del.classList.remove('arm'); }, 2600);
+                    return;
+                }
+                clearTimeout(plArmT);
+                plArm = null;
+                deletePlan(id);
+            }
+        });
+    })();
 
     /* ── 足迹地图 ── */
     var MAP = window.LOVE_MAP_GEO || { w: 1600, h: 1024, prov: [], name: [], cx: [], cy: [] };
@@ -6375,7 +6727,8 @@ window.LOVE_BOARD_CFG = {
         bar.className = 'foot-nav';
         bar.setAttribute('aria-label', '留言板与创作区入口');
         [['gb', '💬', '留言板'], ['cr', '✍️', '创作'], ['ed', '✎', '改旧'],
-        ['cp', '💌', '胶囊'], ['al', '📷', '相册'], ['mp', '🗺️', '足迹']].forEach(function (t) {
+        ['cp', '💌', '胶囊'], ['al', '📷', '相册'], ['mp', '🗺️', '足迹'],
+        ['pl', '📌', '计划']].forEach(function (t) {
             var b = document.createElement('button');
             b.type = 'button';
             b.className = 'foot-nav-btn';
@@ -6420,6 +6773,7 @@ window.LOVE_BOARD_CFG = {
     phList = readArr(PH_KEY);
     mapStops = readArr(MP_KEY);
     routeList = readArr(RP_KEY);
+    planList = readArr(PL_KEY);
 
     syncTour();
     renderGb();
@@ -6428,6 +6782,7 @@ window.LOVE_BOARD_CFG = {
     renderCp();
     renderAlbum();
     renderRoutes();
+    renderPl();
     renderMap();
     mountFootNav();
     mountPoster();
