@@ -622,18 +622,6 @@
 
         #cineOverlay.roses #cineGlow { opacity: 1; }
 
-        /* 信封 → 信纸：一刀切黑，再快速转亮 */
-        #cineOverlay.envelope {
-            background: #000;
-            transition: opacity .09s linear, visibility .09s linear;
-        }
-
-        #cineOverlay.envelope.revealing {
-            transition: opacity .34s ease-out, visibility .34s ease-out;
-        }
-
-        #cineOverlay.envelope #cineGlow { opacity: 0; }
-
         /* 回忆之旅：一张张回忆从两侧缓缓升起（左右交替） */
         #cineMemories {
             position: absolute;
@@ -1352,34 +1340,10 @@
 
     inlineIcons();
 
-    // ========== 0.1 转场 A：快切黑 → 黑里换页 → 由黑转亮 → 信纸 ==========
+    // ========== 0.1 转场 A：点信封直接进信纸（无过渡、无黑屏） ==========
     function playEnvelopeCinema() {
-        const ov = document.getElementById('cineOverlay');
-        const reveal = () => {
-            envelopePage.classList.add('hide');
-            letterPage.classList.add('show');
-        };
-
-        if (prefersReducedMotion()) {
-            setTimeout(reveal, 120);
-            return;
-        }
-
-        // 快切：黑幕瞬间压下来 → 黑里换页 → 由黑转亮
-        ov.classList.remove('roses', 'memories', 'revealing');
-        ov.classList.add('envelope');
-        ov.classList.add('on');
-        setTimeout(reveal, 110);
-        setTimeout(function () {
-            ov.classList.add('revealing');
-            ov.classList.remove('on');
-        }, 135);
-        setTimeout(function () {
-            if (ov.dataset.mode !== 'b') {
-                ov.classList.remove('envelope', 'revealing');
-                ov.classList.remove('on');
-            }
-        }, 520);
+        envelopePage.classList.add('hide');
+        letterPage.classList.add('show');
     }
 
     // ========== 0.2 电影感转场 B：黑屏 → 回忆之旅（烟花 + 逐条升起）→ 主烟花 → 主内容 ==========
