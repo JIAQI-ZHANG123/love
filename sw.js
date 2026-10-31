@@ -1,6 +1,6 @@
 /* 离线缓存：让第二次打开几乎立刻出现 */
-const CACHE = 'love-v3';
-const CORE = ['./', './index.html', './map-geo.js'];
+const CACHE = 'love-v4';
+const CORE = ['./', './index.html', './map-geo.js', './world-nbr.js'];
 
 self.addEventListener('install', function (e) {
     self.skipWaiting();

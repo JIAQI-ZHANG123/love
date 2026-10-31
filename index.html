@@ -1278,7 +1278,7 @@ body:has(#letterPage.show) #emojiFloat { opacity: .3; }
     .letter-salute { font-size: 19px; }
     .letter-body { font-size: 15.5px; }
 }
-
+﻿
 /* ══════════════════ 留言板 · 创作区 ══════════════════ */
 .board-jump {
     position: relative;
@@ -2321,18 +2321,19 @@ body.has-footnav { padding-bottom: 76px; }
   box-shadow: 0 6px 14px -8px rgba(255, 120, 170, .85); cursor: pointer; padding: 0;
 }
 .mp-zoom button:active { background: #fff0f7; }
-.mp-zoom button:disabled { opacity: .35; cursor: default; }
+.mp-zoom button:disabled { opacity: .62; cursor: default; background: #fff; border-color: #ecd7e1; color: #c2aab6; }
 .mp-zoom button.on { background: #ffe9f3; border-color: #ffb3d1; }
 
 /* ══════════ 地图 v3：地名连线 / 比例尺 / 指北针 ══════════ */
-.mp-wrap svg .mp-wrap svg .mp-gridlab {
-  fill: #7fa3ba; paint-order: stroke; stroke: #f2f9fc; stroke-width: 2.4px;
+.mp-wrap svg .mp-gridlab {
+  fill: #6f95ad; paint-order: stroke; stroke: #eaf4fa; stroke-width: 1.6px;
   stroke-linejoin: round; opacity: .95; font-weight: 600; letter-spacing: .02em;
 }
 .mp-route path { pointer-events: none; }
 .mp-wrap svg .mp-prov {
-  fill: #c88da6; paint-order: stroke; stroke: #fffdf8; stroke-width: 3.2px;
-  stroke-linejoin: round; font-weight: 700; letter-spacing: .22em; opacity: .95;
+  fill: #ad6f8c; paint-order: stroke; stroke: #fffdf8; stroke-width: 2.6px;
+  stroke-linejoin: round; font-weight: 600; letter-spacing: .04em; opacity: .92;
+  stroke-width: 1.5px;
 }
 .mp-wrap svg .mp-rcount { fill: #b23a62; font-weight: 700; letter-spacing: .02em; }
 
@@ -2371,16 +2372,22 @@ body.has-footnav { padding-bottom: 76px; }
 
 .mp-scale {
   position: absolute; left: 12px; bottom: 12px; z-index: 4;
-  display: flex; flex-direction: column; gap: 3px;
-  padding: 5px 8px 6px; border-radius: 9px;
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 4px 7px 5px; border-radius: 8px;
   background: rgba(255, 255, 255, .84);
   box-shadow: 0 4px 12px -6px rgba(120, 90, 105, .5);
   pointer-events: none;
 }
 .mp-scale i {
-  display: block; height: 6px; width: 84px;
-  border: 1.4px solid #7a8fa0; border-top: none; border-radius: 0 0 2px 2px;
+  display: block; position: relative; height: 3px; width: 84px;
+  background: #8ea2b1; border-radius: 2px;
 }
+.mp-scale i::before, .mp-scale i::after {
+  content: ''; position: absolute; top: -2.5px; width: 1.5px; height: 8px;
+  background: #8ea2b1; border-radius: 1px;
+}
+.mp-scale i::before { left: 0; }
+.mp-scale i::after { right: 0; }
 .mp-scale b { font-size: 10px; font-weight: 600; color: #71869a; letter-spacing: .02em; }
 
 .mp-compass { position: absolute; right: 12px; bottom: 12px; z-index: 4; opacity: .72; pointer-events: none; }
@@ -2510,6 +2517,142 @@ body.has-footnav { padding-bottom: 76px; }
     box-shadow: 0 2px 6px -3px rgba(200, 90, 130, .8);
 }
 .pl-proof img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ══════════ 地图 v4：满幅 / 质感 / 手机手势 ══════════ */
+.mp-wrap { position: relative; border-radius: 18px; overflow: hidden; background: #e6f2f9; }
+.mp-wrap svg { display: block; width: 100%; height: auto; max-height: none; touch-action: pan-y; -webkit-user-select: none; user-select: none; overflow: hidden; }
+.mp-wrap.zoomed svg { touch-action: none; cursor: grab; }
+.mp-wrap.grabbing svg { cursor: grabbing; }
+.mp-wrap.fs {
+  /* 竖屏 meet 会上下留白，用海色铺底，看起来仍是海面而不是空白 */
+  background: linear-gradient(#def1f9 0%, #cfe7f3 42%, #c2dfee 100%);
+  position: fixed; inset: 0; z-index: 4500; border-radius: 0; width: 100vw; height: 100vh;
+  padding: 0; background: #cfe6f2; display: block;
+}
+.mp-wrap.fs svg { width: 100%; height: 100%; max-height: none; }
+.mp-wrap.fs::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 40%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%);
+}
+body.map-fs { overflow: hidden; }
+
+.mp-zoom { gap: 7px; }
+.mp-zoom button {
+  width: 38px; height: 38px; font-size: 18px;
+  box-shadow: 0 6px 14px -8px rgba(190, 110, 140, .8);
+}
+.mp-zoom button:active { transform: scale(.96); }
+.mp-wrap.fs .mp-zoom button { width: 42px; height: 42px; }
+
+.mp-ref-t { fill: #9a6b80; paint-order: stroke; stroke: #fffdf8; stroke-width: 1.5px; stroke-linejoin: round; }
+.mp-ref-t.lv2 { fill: #b98fa0; }
+.mp-ref-t.lv3 { fill: #c3a0af; }
+.mp-name { fill: #8a3659; paint-order: stroke; stroke: #fffdf8; stroke-width: 1.9px; stroke-linejoin: round; }
+.mp-name--last { fill: #b21f52; }
+.mp-date-t { fill: #a67a90; paint-order: stroke; stroke: #fffdf8; stroke-width: 1.4px; }
+.mp-rcount { fill: #b2305d; }
+
+@media (max-width: 600px) {
+  .mp-zoom { right: 8px; top: 8px; gap: 6px; }
+  .mp-zoom button { width: 40px; height: 40px; font-size: 19px; }
+  .mp-scale { left: 8px; bottom: 8px; }
+}
+
+.mp-fstip { display: none; }
+
+/* 手机端：内嵌地图只留一个「放大」按钮，避免四颗大圆钮压住地图 */
+@media (max-width: 600px) {
+  .mp-wrap:not(.fs) .mp-zoom { right: 8px; bottom: 8px; top: auto; flex-direction: row; gap: 6px; }
+  .mp-wrap:not(.fs) .mp-zoom button { width: 30px; height: 30px; font-size: 15px; }
+  .mp-wrap:not(.fs) #mpZoomIn,
+  .mp-wrap:not(.fs) #mpZoomOut,
+  .mp-wrap:not(.fs) #mpZoomFit { display: none; }
+  .mp-wrap:not(.fs) .mp-compass { display: none; }
+  .mp-wrap:not(.fs) .mp-scale { left: 8px; bottom: 8px; }
+}
+@media (max-width: 600px) {
+  .mp-fstip {
+    display: block; margin: 7px 2px 0; font-size: 11px; color: #b48ba0;
+    text-align: center; letter-spacing: .02em;
+  }
+  .mp-wrap.fs .mp-fstip { display: none; }
+
+/* 手机端：内嵌地图只留一个「放大」按钮，避免四颗大圆钮压住地图 */
+@media (max-width: 600px) {
+  .mp-wrap:not(.fs) .mp-zoom { right: 8px; bottom: 8px; top: auto; flex-direction: row; gap: 6px; }
+  .mp-wrap:not(.fs) .mp-zoom button { width: 30px; height: 30px; font-size: 15px; }
+  .mp-wrap:not(.fs) #mpZoomIn,
+  .mp-wrap:not(.fs) #mpZoomOut,
+  .mp-wrap:not(.fs) #mpZoomFit { display: none; }
+  .mp-wrap:not(.fs) .mp-compass { display: none; }
+  .mp-wrap:not(.fs) .mp-scale { left: 8px; bottom: 8px; }
+}
+}
+
+/* 指北针：必须定死尺寸，否则全屏拉伸会把整张图糊上一个大三角 */
+.mp-compass, .mp-compass svg { width: 38px; height: 38px; display: block; }
+.mp-compass {
+    filter: drop-shadow(0 2px 5px rgba(120, 90, 105, .16));
+}
+.mp-compass span {
+    margin-top: 2px; text-align: center; font-size: 9px; font-weight: 700;
+    color: #8a6a7a; letter-spacing: .04em;
+}
+.mp-compass svg { overflow: visible; }
+.mp-wrap.fs .mp-compass {
+  opacity: .62;
+  right: 10px;
+  bottom: max(14px, env(safe-area-inset-bottom, 0px) + 10px);
+}
+.mp-wrap.fs .mp-zoom { right: 12px; top: max(12px, env(safe-area-inset-top)); gap: 8px; }
+.mp-wrap.fs .mp-zoom button { width: 44px; height: 44px; font-size: 20px; }
+
+/* 竖屏全屏：svg 盒子 = 地图矩形，避免 viewBox 外的邻国路径溢出到留白 */
+@media (orientation: portrait) {
+  .mp-wrap.fs {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    background: linear-gradient(#e2f2fa 0%, #cfe7f3 46%, #c3dfee 100%);
+  }
+  .mp-wrap.fs svg {
+    width: 100%;
+    height: auto;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 5%, #000 95%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 5%, #000 95%, transparent 100%);
+  }
+  .mp-wrap.fs .mp-zoom { top: max(10px, env(safe-area-inset-top)); }
+}
+
+/* 全屏：整屏一张地图，列表留在原处不搬进来 */
+.mp-mapbox { position: relative; width: 100%; }
+.mp-wrap.fs {
+  display: block;
+  padding: 0;
+  background: #cfe7f3;
+}
+.mp-wrap.fs .mp-mapbox { width: 100%; height: 100%; }
+.mp-wrap.fs svg { width: 100%; height: 100%; display: block; }
+.mp-wrap.fs .mp-zoom #mpZoomFit { display: none; }
+@media (orientation: portrait) {
+  .mp-wrap.fs .mp-zoom { top: max(12px, env(safe-area-inset-top)); }
+}
+.mp-nbr-t {
+  fill: #b0a89b;
+  opacity: .85;
+  letter-spacing: .28em;
+  paint-order: stroke;
+  stroke: #f3f1e8;
+  stroke-width: 2.4px;
+  stroke-linejoin: round;
+  font-weight: 600;
+}
+
+/* 小屏内嵌：比例尺太挤，直接收起来（全屏时仍显示） */
+@media (max-width: 600px) {
+  .mp-wrap:not(.fs) .mp-scale { display: none; }
+}
 
 </style>
 
@@ -4433,18 +4576,31 @@ window.LOVE_BOARD_CFG = {
         '    </div>',
         '    <div class="rt-chips" id="rtChips"></div>',
         '    <div class="mp-wrap" id="mpWrap">',
+        '      <div class="mp-mapbox" id="mpBox">',
         '      <svg id="mpSvg" viewBox="0 0 1600 1024" preserveAspectRatio="xMidYMid meet"></svg>',
         '      <div class="mp-zoom">',
         '        <button type="button" id="mpZoomIn" aria-label="放大">＋</button>',
         '        <button type="button" id="mpZoomOut" aria-label="缩小">－</button>',
         '        <button type="button" id="mpZoomFit" aria-label="看全图">⤢</button>',
+        '        <button type="button" id="mpZoomFs" aria-label="放大看地图">⛶</button>',
         '      </div>',
         '      <div class="mp-scale" id="mpScale"><i></i><b>500 km</b></div>',
         '      <div class="mp-compass" aria-hidden="true">',
-        '        <svg viewBox="0 0 24 34"><path d="M12 1 L17.5 22 L12 18.5 L6.5 22 Z" fill="#e2567f"/><path d="M12 33 L8.4 22.6 L12 24.4 L15.6 22.6 Z" fill="#f0c3d3"/></svg>',
-        '        <span>N</span>',
+        '        <svg viewBox="0 0 40 40">',
+        '          <circle cx="20" cy="20" r="18.2" fill="rgba(255,255,255,.86)" stroke="#e6cfda" stroke-width="1"/>',
+        '          <path d="M20 4.6 L23.4 20 L20 20 Z" fill="#e2567f"/>',
+        '          <path d="M20 4.6 L16.6 20 L20 20 Z" fill="#f28aa9"/>',
+        '          <path d="M20 35.4 L16.6 20 L20 20 Z" fill="#dcc4d0"/>',
+        '          <path d="M20 35.4 L23.4 20 L20 20 Z" fill="#eedbe4"/>',
+        '          <path d="M4.6 20 L20 16.9 L20 23.1 Z" fill="#dfc9d4"/>',
+        '          <path d="M35.4 20 L20 23.1 L20 16.9 Z" fill="#efdde6"/>',
+        '          <circle cx="20" cy="20" r="1.7" fill="#fff" stroke="#c2809a" stroke-width="1"/>',
+        '        </svg>',
+        '        <span>北</span>',
+        '      </div>',
         '      </div>',
         '    </div>',
+        '    <p class="mp-fstip">点 ⛶ 放大细看：双指缩放、拖动平移</p>',
         '    <p class="mp-hint">按顺序连起来，就是我们一起走过的路线 · 点一下看那次的照片</p>',
         '    <div class="mp-list" id="mpList"></div>',
         '  </section>',
@@ -5586,10 +5742,29 @@ window.LOVE_BOARD_CFG = {
     })();
 
     /* ── 足迹地图 ── */
-    var MAP = window.LOVE_MAP_GEO || { w: 1600, h: 1024, prov: [], name: [], cx: [], cy: [] };
+    var MAP = window.LOVE_MAP_GEO ||
+        { w: 1600, h: 924, lon0: 72.6, lon1: 136, lat0: 17.4, lat1: 54, prov: [], name: [], cx: [], cy: [] };
 
     // 省界几何 200KB+，改成打开「足迹」时才加载（首屏不必等它）
     var geoWaiters = [], geoLoading = false;
+    var nbrWaiters = [], nbrLoading = false;
+    function ensureWorldNbr(cb) {
+        if (window.LOVE_WORLD_NBR) { if (cb) cb(); return; }
+        if (cb) nbrWaiters.push(cb);
+        if (nbrLoading) return;
+        nbrLoading = true;
+        var s = document.createElement('script');
+        s.src = 'world-nbr.js';
+        s.onload = function () {
+            nbrLoading = false;
+            var list = nbrWaiters; nbrWaiters = [];
+            try { renderMap(); } catch (e) { }
+            for (var i = 0; i < list.length; i++) { try { list[i](); } catch (e2) { } }
+        };
+        s.onerror = function () { nbrLoading = false; };
+        document.head.appendChild(s);
+    }
+
     function ensureMapGeo(cb) {
         if (window.LOVE_MAP_GEO) {
             if (MAP !== window.LOVE_MAP_GEO) MAP = window.LOVE_MAP_GEO;
@@ -5606,6 +5781,7 @@ window.LOVE_BOARD_CFG = {
         s.onload = function () {
             MAP = window.LOVE_MAP_GEO || MAP;
             geoLoading = false;
+            ensureWorldNbr();
             var list = geoWaiters; geoWaiters = [];
             try { renderMap(); } catch (e) { }
             for (var i = 0; i < list.length; i++) { try { list[i](); } catch (e2) { } }
@@ -5689,17 +5865,20 @@ window.LOVE_BOARD_CFG = {
     CITIES.forEach(function (c) { CITY[c[0]] = [c[1], c[2]]; });
 
     var MAP_HINT = '编辑模式下点地图任意位置添加足迹';
-    var MAP_IDLE = '滚轮 / 双指缩放，拖动平移 · 点一下足迹看顺序';
+    var MAP_IDLE = '双指缩放 / 双击放大，拖动平移 · 点足迹看顺序';
     var MAP_VIEW = { k: 1, x: 0, y: 0 };
+    var MAP_PPU = 1, MAP_SW = 0, MAP_SH = 0;   // 渲染像素比例与渲染尺寸（slice 时 ≠ clientWidth）
     var MAP_MIN_K = 1, MAP_MAX_K = 8;
-    // 1 个地图单位 ≈ 多少公里（纬度 16°→55° 共 39° 映射到 MAP.h）
-    var KM_PER_UNIT = (39 * 111) / MAP.h;
+    // 1 个地图单位 ≈ 多少公里（视窗纬度跨度映射到 MAP.h）
+    function kmPerUnit() { return ((MAP.lat1 - MAP.lat0) * 111) / MAP.h; }
 
     function project(lon, lat) {
-        return [(lon - 72) / 64 * MAP.w, (55 - lat) / 39 * MAP.h];
+        return [(lon - MAP.lon0) / (MAP.lon1 - MAP.lon0) * MAP.w,
+                (MAP.lat1 - lat) / (MAP.lat1 - MAP.lat0) * MAP.h];
     }
     function unproject(x, y) {
-        return { lon: 72 + x / MAP.w * 64, lat: 55 - y / MAP.h * 39 };
+        return { lon: MAP.lon0 + x / MAP.w * (MAP.lon1 - MAP.lon0),
+                 lat: MAP.lat1 - y / MAP.h * (MAP.lat1 - MAP.lat0) };
     }
     function nearestCity(lon, lat) {
         var best = '', bd = 1e9;
@@ -5715,21 +5894,25 @@ window.LOVE_BOARD_CFG = {
         (MAP.prov || []).forEach(function (d) {
             out.push('<path d="' + d + '"/>');
         });
-        return '<g class="mp-land" fill="url(#mpLandG)" stroke="#dcaac0" stroke-width="' + (1.15 * u).toFixed(3) +
-            '" stroke-linejoin="round" filter="url(#mpLandShadow)">' + out.join('') + '</g>';
+        var body = out.join('');
+        return '<g class="mp-landwrap" filter="url(#mpLandShadow)">' +
+                 '<g class="mp-land" fill="url(#mpLandG)">' + body + '</g>' +
+               '</g>' +
+               '<g class="mp-coast" fill="url(#mpLandG)" filter="url(#mpCoast)">' + body + '</g>' +
+               '<g class="mp-borders" fill="none" stroke="#e9cfda" stroke-width="' + (0.55 * u).toFixed(3) +
+                 '" stroke-linejoin="round">' + body + '</g>';
     }
 
     // 经纬网 + 度数标注（标注贴在当前视口边缘，放大也不会跑掉）
     function latLonGrid(u) {
         var out = [], i, x, y, sx, sy, k = MAP_VIEW.k;
         var vw = MAP.w / k, vh = MAP.h / k;
-        var svg = $('mpSvg');
-        var sw = (svg && svg.clientWidth) || MAP.w;
-        var shh = sw * MAP.h / MAP.w;
+        var sw = MAP_SW || MAP.w;
+        var shh = MAP_SH || (sw * MAP.h / MAP.w);
         var lons = [80, 90, 100, 110, 120, 130], lats = [20, 30, 40, 50];
         var fs = (8.6 * u).toFixed(2);
         for (i = 0; i < lons.length; i++) {
-            x = (lons[i] - 72) / 64 * MAP.w;
+            x = (lons[i] - MAP.lon0) / (MAP.lon1 - MAP.lon0) * MAP.w;
             if (x < MAP_VIEW.x - 2 || x > MAP_VIEW.x + vw + 2) continue;
             out.push('<line x1="' + x.toFixed(1) + '" y1="0" x2="' + x.toFixed(1) + '" y2="' + MAP.h +
                 '" stroke="#b9d6e4" stroke-width="' + u.toFixed(3) + '" stroke-dasharray="' +
@@ -5740,7 +5923,7 @@ window.LOVE_BOARD_CFG = {
                 (MAP_VIEW.y + (13 * u)).toFixed(2) + '" style="font-size:' + fs + 'px">' + lons[i] + '°E</text>');
         }
         for (i = 0; i < lats.length; i++) {
-            y = (55 - lats[i]) / 39 * MAP.h;
+            y = (MAP.lat1 - lats[i]) / (MAP.lat1 - MAP.lat0) * MAP.h;
             if (y < MAP_VIEW.y - 2 || y > MAP_VIEW.y + vh + 2) continue;
             out.push('<line x1="0" y1="' + y.toFixed(1) + '" x2="' + MAP.w + '" y2="' + y.toFixed(1) +
                 '" stroke="#b9d6e4" stroke-width="' + u.toFixed(3) + '" stroke-dasharray="' +
@@ -5754,18 +5937,22 @@ window.LOVE_BOARD_CFG = {
     }
 
     // 省名（放大到 1.55× 以上才出现，按屏幕像素避让）
+    var PROV_SHORT = { '内蒙古': '内蒙', '黑龙江': '龙江', '新疆': '新疆', '西藏': '西藏' };
     function provinceLabels(u, placed, mb) {
-        if (MAP_VIEW.k < 1.55 || !MAP.name || !MAP.name.length) return '';
+        if (!MAP.name || !MAP.name.length) return '';
         var out = [], i, nm, px, py, fs, w, box, bad, j, b, k = MAP_VIEW.k;
-        var sw = $('mpSvg') ? ($('mpSvg').clientWidth || MAP.w) : MAP.w;
+        var sw = MAP_SW || MAP.w;
+        if (sw < 470 && k < 1.8) return '';   // 小屏内嵌时先不挤省名，放大后再出现
+        var full = k >= 2.6;
         for (i = 0; i < MAP.name.length; i++) {
             nm = String(MAP.name[i] || '').replace(/(壮族|回族|维吾尔)?自治区|特别行政区|省|市/g, '');
             if (!nm) continue;
+            if (!full) nm = PROV_SHORT[nm] || nm;
             px = (MAP.cx[i] - MAP_VIEW.x) / (MAP.w / k) * sw;
-            py = (MAP.cy[i] - MAP_VIEW.y) / (MAP.h / k) * (sw * MAP.h / MAP.w);
+            py = (MAP.cy[i] - MAP_VIEW.y) / (MAP.h / k) * (MAP_SH || (sw * MAP.h / MAP.w));
             if (px < 6 || px > sw - 6 || py < 10) continue;
-            fs = 11.4 * mb;
-            w = nm.length * fs * 1.02;
+            fs = (full ? 11.2 : 10.2) * mb;
+            w = nm.length * fs * 1.16;
             box = { x: px - w / 2 - 2, y: py - fs, w: w + 4, h: fs + 3 };
             bad = false;
             for (j = 0; j < placed.length; j++) {
@@ -5773,6 +5960,16 @@ window.LOVE_BOARD_CFG = {
                 if (box.x < b.x + b.w && b.x < box.x + box.w && box.y < b.y + b.h && b.y < box.y + box.h) { bad = true; break; }
             }
             if (bad) continue;
+            // 省名与省会重叠时让位（省的质心多半就在省会附近）
+            var nearCity = false;
+            for (j = 0; j < CITIES.length; j++) {
+                if (CITIES[j][3] !== 1) continue;
+                var cp = project(CITIES[j][1], CITIES[j][2]);
+                var cpx = (cp[0] - MAP_VIEW.x) / (MAP.w / k) * sw;
+                var cpy = (cp[1] - MAP_VIEW.y) / (MAP.h / k) * (MAP_SH || (sw * MAP.h / MAP.w));
+                if (Math.abs(cpx - px) < fs * 2.0 && Math.abs(cpy - py) < fs * 1.6) { nearCity = true; break; }
+            }
+            if (nearCity) continue;
             placed.push(box);
             out.push('<text x="' + (MAP_VIEW.x + (px * u)).toFixed(2) + '" y="' + (MAP_VIEW.y + (py * u)).toFixed(2) +
                 '" text-anchor="middle" class="mp-prov" style="font-size:' + (fs * u).toFixed(2) + 'px">' + esc(nm) + '</text>');
@@ -5803,8 +6000,10 @@ window.LOVE_BOARD_CFG = {
 
     function clampView() {
         var w = MAP.w / MAP_VIEW.k, h = MAP.h / MAP_VIEW.k;
-        MAP_VIEW.x = Math.min(Math.max(0, MAP_VIEW.x), MAP.w - w);
-        MAP_VIEW.y = Math.min(Math.max(0, MAP_VIEW.y), MAP.h - h);
+        if (w >= MAP.w) { MAP_VIEW.x = (MAP.w - w) / 2; }
+        else { MAP_VIEW.x = Math.min(Math.max(0, MAP_VIEW.x), MAP.w - w); }
+        if (h >= MAP.h) { MAP_VIEW.y = (MAP.h - h) / 2; }
+        else { MAP_VIEW.y = Math.min(Math.max(0, MAP_VIEW.y), MAP.h - h); }
     }
     function applyViewBox() {
         var svg = $('mpSvg');
@@ -5820,8 +6019,9 @@ window.LOVE_BOARD_CFG = {
         if (!el) return;
         var bar = el.querySelector('i'), lab = el.querySelector('b');
         var svg = $('mpSvg');
-        var sw = (svg && (svg.clientWidth || svg.getBoundingClientRect().width)) || MAP.w;
-        var kmPerPx = KM_PER_UNIT / (MAP_VIEW.k * (sw / MAP.w));
+        var ctm = svg && svg.getScreenCTM && svg.getScreenCTM();
+        var ppu = (ctm && Math.abs(ctm.a)) ? Math.abs(ctm.a) : ((svg ? svg.clientWidth : MAP.w) * MAP_VIEW.k / MAP.w);
+        var kmPerPx = kmPerUnit() / (ppu || 1);
         var steps = [2000, 1000, 500, 200, 100, 50, 20, 10];
         var pick = steps[0];
         for (var i = 0; i < steps.length; i++) { if (steps[i] / kmPerPx <= 118) { pick = steps[i]; break; } }
@@ -5830,7 +6030,8 @@ window.LOVE_BOARD_CFG = {
         if (lab) lab.textContent = pick + ' km';
     }
     function viewAround(k, ax, ay) {
-        k = Math.min(MAP_MAX_K, Math.max(MAP_MIN_K, k));
+        var lo = ($('mpWrap') && $('mpWrap').classList.contains('fs')) ? 0.5 : MAP_MIN_K;
+        k = Math.min(MAP_MAX_K, Math.max(lo, k));
         var w0 = MAP.w / MAP_VIEW.k, h0 = MAP.h / MAP_VIEW.k;
         var fx = (ax - MAP_VIEW.x) / w0, fy = (ay - MAP_VIEW.y) / h0;
         MAP_VIEW.k = k;
@@ -5846,31 +6047,85 @@ window.LOVE_BOARD_CFG = {
         if (!svg) return;
         var stops = sortedStops();
         var k = MAP_VIEW.k;
-        var sw = svg.clientWidth || svg.getBoundingClientRect().width || MAP.w;
-        var sh = svg.clientHeight || (sw * MAP.h / MAP.w);
-        var sr = sw / MAP.w;           // 屏幕上每个地图单位占多少像素
-        var u = 1 / (k * sr);          // 1 个屏幕像素 = 多少地图单位
-        var mb = sw < 520 ? 1.22 : 1;  // 手机上字号放大一点
+        // 真实缩放比：全屏用 preserveAspectRatio="slice" 时，clientWidth 和
+        // 实际渲染比例不一致，必须问浏览器要 CTM 的缩放分量
+        var ctm = svg.getScreenCTM && svg.getScreenCTM();
+        var ppu = (ctm && (Math.abs(ctm.a) + Math.abs(ctm.d)))
+            ? Math.max(Math.abs(ctm.a), Math.abs(ctm.d))
+            : ((svg.clientWidth || MAP.w) * k / MAP.w);
+        var u = 1 / ppu;
+        var sw = ppu * (MAP.w / k);    // 渲染出来的像素宽
+        var sh = ppu * (MAP.h / k);
+        var sr = ppu / k;              // 与下方 (p - view.x) * k * sr 的换算配套
+        MAP_PPU = ppu; MAP_SW = sw; MAP_SH = sh;
+        var inFs = !!($('mpWrap') && $('mpWrap').classList.contains('fs'));
+        var mb = (sw < 520 && !inFs) ? 1.22 : 1;  // 手机内嵌时字号放大一点，全屏不需要
         var placed = [];
         var parts = [];
 
         parts.push('<defs>' +
-            '<linearGradient id="mpSea" x1="0" y1="0" x2=".25" y2="1">' +
-              '<stop offset="0" stop-color="#eef8fd"/><stop offset=".55" stop-color="#dceef7"/><stop offset="1" stop-color="#c9e2ee"/>' +
+            '<linearGradient id="mpSea" x1=".1" y1="0" x2=".9" y2="1">' +
+              '<stop offset="0" stop-color="#d5ecf8"/><stop offset=".42" stop-color="#b3d6e9"/><stop offset="1" stop-color="#8fbcd6"/>' +
             '</linearGradient>' +
-            '<linearGradient id="mpLandG" x1="0" y1="0" x2="0" y2="1">' +
-              '<stop offset="0" stop-color="#fffefb"/><stop offset="1" stop-color="#fdf5ee"/>' +
+            '<radialGradient id="mpSeaGlow" cx=".5" cy=".44" r=".62">' +
+              '<stop offset="0" stop-color="#f4fbfe" stop-opacity=".85"/><stop offset="1" stop-color="#f4fbfe" stop-opacity="0"/>' +
+            '</radialGradient>' +
+            '<linearGradient id="mpLandG" x1=".2" y1="0" x2=".7" y2="1">' +
+              '<stop offset="0" stop-color="#fffefa"/><stop offset=".5" stop-color="#fdf6ea"/><stop offset="1" stop-color="#f6e8d6"/>' +
             '</linearGradient>' +
-            '<filter id="mpLandShadow" x="-20%" y="-20%" width="140%" height="140%">' +
-              '<feDropShadow dx="0" dy="' + (2.4 * u).toFixed(2) + '" stdDeviation="' + (2.6 * u).toFixed(2) +
-              '" flood-color="#8fb2c6" flood-opacity=".5"/>' +
+            '<filter id="mpLandShadow" x="-25%" y="-25%" width="150%" height="150%">' +
+              '<feDropShadow dx="0" dy="' + (1.6 * u).toFixed(2) + '" stdDeviation="' + (1.3 * u).toFixed(2) +
+                '" flood-color="#7fa6be" flood-opacity=".42"/>' +
+              '<feDropShadow dx="0" dy="' + (5 * u).toFixed(2) + '" stdDeviation="' + (7 * u).toFixed(2) +
+                '" flood-color="#6d9db6" flood-opacity=".34"/>' +
+            '</filter>' +
+            '<filter id="mpCoast" x="-10%" y="-10%" width="120%" height="120%">' +
+              '<feMorphology in="SourceAlpha" operator="erode" radius="' + (1.35 * u).toFixed(3) + '" result="inner"/>' +
+              '<feComposite in="SourceAlpha" in2="inner" operator="out" result="ring"/>' +
+              '<feFlood flood-color="#b07d95" flood-opacity=".46"/>' +
+              '<feComposite in2="ring" operator="in"/>' +
             '</filter>' +
             '<filter id="mpSoft" x="-40%" y="-40%" width="180%" height="180%">' +
               '<feDropShadow dx="0" dy="2" stdDeviation="3.4" flood-color="#ff9ec4" flood-opacity=".5"/>' +
             '</filter>' +
+            '<filter id="mpGrain" x="0" y="0" width="100%" height="100%">' +
+              '<feTurbulence type="fractalNoise" baseFrequency="' + (0.9 / (u * 1000) * 1000).toFixed(3) +
+                '" numOctaves="2" seed="7"/>' +
+              '<feColorMatrix type="saturate" values="0"/>' +
+            '</filter>' +
+            '<radialGradient id="mpVig" cx=".5" cy=".48" r=".72">' +
+              '<stop offset=".62" stop-color="#7d5a6c" stop-opacity="0"/><stop offset="1" stop-color="#7d5a6c" stop-opacity=".16"/>' +
+            '</radialGradient>' +
+            '<linearGradient id="mpRouteG" x1="0" y1="0" x2="1" y2="1">' +
+              '<stop offset="0" stop-color="#ff8fb4"/><stop offset=".55" stop-color="#e8457a"/><stop offset="1" stop-color="#c21f52"/>' +
+            '</linearGradient>' +
         '</defs>');
         parts.push('<rect width="' + MAP.w + '" height="' + MAP.h + '" fill="url(#mpSea)"/>');
+        parts.push('<rect width="' + MAP.w + '" height="' + MAP.h + '" fill="url(#mpSeaGlow)"/>');
         parts.push(latLonGrid(u));
+        if (window.LOVE_WORLD_NBR && window.LOVE_WORLD_NBR.length) {
+            var nb = [];
+            for (var ni = 0; ni < window.LOVE_WORLD_NBR.length; ni++) {
+                nb.push('<path d="' + window.LOVE_WORLD_NBR[ni] + '"/>');
+            }
+            parts.push('<g class="mp-nbr" fill="#ecebe1" stroke="#dbd8ca" stroke-width="' +
+                (0.7 * u).toFixed(3) + '" stroke-linejoin="round">' + nb.join('') + '</g>');
+            if (window.LOVE_WORLD_LAB && k < 2.2) {
+                var lb = [];
+                for (var li = 0; li < window.LOVE_WORLD_LAB.length; li++) {
+                    var L2 = window.LOVE_WORLD_LAB[li];
+                    // 贴边的国名不画，免得被裁成半个字
+                    var vx0 = MAP_VIEW.x, vx1 = MAP_VIEW.x + MAP.w / k;
+                    var vy0 = MAP_VIEW.y, vy1 = MAP_VIEW.y + MAP.h / k;
+                    if (L2[1] < vx0 + (vx1 - vx0) * 0.10 || L2[1] > vx0 + (vx1 - vx0) * 0.90) continue;
+                    if (L2[2] < vy0 + (vy1 - vy0) * 0.10 || L2[2] > vy0 + (vy1 - vy0) * 0.90) continue;
+                    lb.push('<text class="mp-nbr-t" x="' + L2[1].toFixed(1) + '" y="' + L2[2].toFixed(1) +
+                        '" text-anchor="middle" style="font-size:' + (13 * u).toFixed(2) + 'px">' +
+                        esc(L2[0]) + '</text>');
+                }
+                parts.push(lb.join(''));
+            }
+        }
         parts.push(mapGeoMarkup(u));
         parts.push(provinceLabels(u, placed, mb));
 
@@ -5878,18 +6133,18 @@ window.LOVE_BOARD_CFG = {
         routeList.forEach(function (r) {
             var g = routeCurve(r);
             var n = Math.max(1, Number(r.n) || 1);
-            var w = (1.15 + 1.75 * Math.log(n + 1) / Math.LN2) * u;
-            var op = Math.min(0.9, 0.24 + 0.12 * n);
+            var w = (1.25 + 1.85 * Math.log(n + 1) / Math.LN2) * u;
+            var op = Math.min(0.95, 0.34 + 0.12 * n);
             var d = 'M' + g.A[0].toFixed(1) + ' ' + g.A[1].toFixed(1) +
                     ' Q' + g.C[0].toFixed(1) + ' ' + g.C[1].toFixed(1) +
                     ' ' + g.B[0].toFixed(1) + ' ' + g.B[1].toFixed(1);
             parts.push('<g class="mp-route" data-route="' + esc(r.id) + '">' +
                 '<path d="' + d + '" fill="none" stroke="#ff9dbb" stroke-width="' + (w * 3.6).toFixed(2) +
                   '" stroke-linecap="round" opacity="' + (op * 0.15).toFixed(2) + '"/>' +
-                '<path d="' + d + '" fill="none" stroke="#dd4b76" stroke-width="' + w.toFixed(2) +
+                '<path d="' + d + '" fill="none" stroke="url(#mpRouteG)" stroke-width="' + w.toFixed(2) +
                   '" stroke-linecap="round" opacity="' + op.toFixed(2) + '"/>' +
-                '<circle cx="' + g.A[0].toFixed(1) + '" cy="' + g.A[1].toFixed(1) + '" r="' + (2.7 * u).toFixed(2) + '" fill="#dd4b76"/>' +
-                '<circle cx="' + g.B[0].toFixed(1) + '" cy="' + g.B[1].toFixed(1) + '" r="' + (2.7 * u).toFixed(2) + '" fill="#dd4b76"/>' +
+                '<circle cx="' + g.A[0].toFixed(1) + '" cy="' + g.A[1].toFixed(1) + '" r="' + (3.1 * u).toFixed(2) + '" fill="#d8325f" stroke="#fff" stroke-width="' + (1.1 * u).toFixed(2) + '"/>' +
+                '<circle cx="' + g.B[0].toFixed(1) + '" cy="' + g.B[1].toFixed(1) + '" r="' + (3.1 * u).toFixed(2) + '" fill="#d8325f" stroke="#fff" stroke-width="' + (1.1 * u).toFixed(2) + '"/>' +
             '</g>');
             var mx = 0.25 * g.A[0] + 0.5 * g.C[0] + 0.25 * g.B[0];
             var my = 0.25 * g.A[1] + 0.5 * g.C[1] + 0.25 * g.B[1];
@@ -5922,8 +6177,8 @@ window.LOVE_BOARD_CFG = {
                 var last = i === stops.length - 1;
                 parts.push('<g class="mp-dot' + (last ? ' mp-dot--last' : '') + '" data-stop="' + esc(s.id) + '" transform="translate(' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ')">' +
                     '<circle class="mp-halo" r="' + (11.5 * u).toFixed(2) + '"/>' +
-                    '<circle class="mp-ring" r="' + (7 * u).toFixed(2) + '"/>' +
-                    '<circle class="mp-core" r="' + (3.4 * u).toFixed(2) + '"/>' +
+                    '<circle class="mp-ring" r="' + (6.4 * u).toFixed(2) + '"/>' +
+                    '<circle class="mp-core" r="' + (3.1 * u).toFixed(2) + '"/>' +
                 '</g>');
 
                 // 名字：五个候选位，挑第一个不压到别的东西的
@@ -5982,7 +6237,9 @@ window.LOVE_BOARD_CFG = {
             var pick = null, fallback = cands[0];
             for (var ci2 = 0; ci2 < cands.length; ci2++) {
                 var cd = cands[ci2];
-                var box = { x: cd.x - 1, y: cd.ay - fs, w: cd.w + 2, h: fs + 2.4 };
+                // 标签不许压出地图边框
+                if (cd.x < 4 || cd.x + cd.w > sw - 4 || cd.ay < fs + 6 || cd.ay > sh - 5) continue;
+                var box = { x: cd.x - 3, y: cd.ay - fs - 1.5, w: cd.w + 6, h: fs + 4.5 };
                 var bad = false;
                 for (var bi = 0; bi < placed.length; bi++) {
                     var b = placed[bi];
@@ -5991,17 +6248,20 @@ window.LOVE_BOARD_CFG = {
                 if (!bad) { pick = cd; placed.push(box); break; }
             }
             var hit = !pick;
-            var r = (c[3] === 1 ? 2.9 : (c[3] === 2 ? 2.3 : 2.0)) * u * mb;
-            var dotFill = c[3] === 1 ? '#cf7d9e' : (c[3] === 2 ? '#e2aabc' : '#efc9d8');
+            var r = (c[3] === 1 ? 3.0 : (c[3] === 2 ? 2.3 : 2.0)) * u * mb;
+            var dotFill = c[3] === 1 ? '#b9758f' : (c[3] === 2 ? '#d3a0b4' : '#e6c2d2');
             var use = pick || fallback;
             var tx = (MAP_VIEW.x + use.ax * u).toFixed(2), ty = (MAP_VIEW.y + use.ay * u).toFixed(2);
             parts.push('<g class="mp-ref lv' + c[3] + '">' +
-                '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + r.toFixed(2) + '" fill="' + dotFill + '"/>' +
-                (hit ? '' : '<text x="' + tx + '" y="' + ty + '" text-anchor="' + use.anchor + '" style="font-size:' + (fs * u).toFixed(2) + 'px" fill="' + (c[3] === 1 ? '#b06f8b' : '#d3a6b8') + '">' + esc(c[0]) + '</text>') +
+                '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + r.toFixed(2) + '" fill="' + dotFill + '" stroke="#fffdf8" stroke-width="' + (0.9 * u).toFixed(2) + '"/>' +
+                (hit ? '' : '<text class="mp-ref-t lv' + c[3] + '" x="' + tx + '" y="' + ty + '" text-anchor="' + use.anchor + '" style="font-size:' + (fs * u).toFixed(2) + 'px">' + esc(c[0]) + '</text>') +
             '</g>');
         });
 
 
+        parts.push('<rect class="mp-grain" width="' + MAP.w + '" height="' + MAP.h +
+            '" filter="url(#mpGrain)" opacity=".055" style="mix-blend-mode:multiply"/>');
+        parts.push('<rect width="' + MAP.w + '" height="' + MAP.h + '" fill="url(#mpVig)" pointer-events="none"/>');
         svg.innerHTML = parts.join('');
         applyViewBox();
 
@@ -6262,10 +6522,85 @@ window.LOVE_BOARD_CFG = {
     });
 
     if ($('mpZoomIn')) {
-        $('mpZoomIn').addEventListener('click', function () { zoomCenter(1.45); });
-        $('mpZoomOut').addEventListener('click', function () { zoomCenter(1 / 1.45); });
+        $('mpZoomIn').addEventListener('click', function () { zoomCenter(1.5); });
+        $('mpZoomOut').addEventListener('click', function () { zoomCenter(1 / 1.5); });
         $('mpZoomFit').addEventListener('click', zoomReset);
+        $('mpZoomFs').addEventListener('click', toggleMapFs);
     }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && $('mpWrap') && $('mpWrap').classList.contains('fs')) toggleMapFs();
+    });
+
+    function toggleMapFs() {
+        var wrap = $('mpWrap'), svg = $('mpSvg');
+        if (!wrap || !svg) return;
+        var on = !wrap.classList.contains('fs');
+        wrap.classList.toggle('fs', on);
+        document.body.classList.toggle('map-fs', on);
+        // 全屏时把地图搬到 body 上：否则祖先若有 transform/contain，
+        // position:fixed 会退化成相对祖先定位（实测会偏到 (13,74)）
+        if (on) {
+            if (!wrap.__home) {
+                wrap.__home = wrap.parentNode;
+                wrap.__next = wrap.nextSibling;
+            }
+            document.body.appendChild(wrap);
+        } else if (wrap.__home) {
+            wrap.__home.insertBefore(wrap, wrap.__next || null);
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        }
+        // 全屏铺满屏幕（slice）；退出恢复 meet，保证整幅可见
+        svg.setAttribute('preserveAspectRatio', on ? 'xMidYMid slice' : 'xMidYMid meet');
+        if ($('mpZoomFs')) {
+            $('mpZoomFs').textContent = on ? '✕' : '⛶';
+            $('mpZoomFs').setAttribute('aria-label', on ? '退出全屏' : '全屏看地图');
+        }
+        // 全屏铺满后尺寸变了，先让浏览器算完布局再定视图
+        setTimeout(function () {
+            var r = svg.getBoundingClientRect();
+            var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+            if (on) {
+                // 优先对准最后一个足迹，没有就对地图中心
+                var st = sortedStops();
+                var target = st.length ? project(st[st.length - 1].lon, st[st.length - 1].lat)
+                                       : project(105.8, 35.4);
+                MAP_VIEW.k = 0.78;
+                MAP_VIEW.x = target[0] - (MAP.w / MAP_VIEW.k) / 2;
+                MAP_VIEW.y = target[1] - (MAP.h / MAP_VIEW.k) / 2;
+                clampView();
+            }
+            applyViewBox();
+            renderMap();
+            syncZoomBtns();
+        }, 60);
+    }
+
+    // 双击（或手机上快速点两下）放大 / 复位
+    var lastTap = 0, lastTapX = 0, lastTapY = 0;
+    $('mpSvg').addEventListener('click', function (e) {
+        if (mpMode) return;
+        var now = Date.now();
+        var near = Math.abs(e.clientX - lastTapX) < 26 && Math.abs(e.clientY - lastTapY) < 26;
+        if (now - lastTap < 320 && near) {
+            var r = $('mpSvg').getBoundingClientRect();
+            var p = svgPoint(e);
+            if (MAP_VIEW.k > 1.35) zoomReset();
+            else setViewAnchored(2.0, p, e.clientX, e.clientY);
+            syncZoomBtns();
+            scheduleRender();
+            lastTap = 0;
+            return;
+        }
+        lastTap = now; lastTapX = e.clientX; lastTapY = e.clientY;
+    });
+
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (evt) {
+        $('mpSvg').addEventListener(evt, function (e) {
+            delete ptrs[e.pointerId];
+            if (Object.keys(ptrs).length < 2) pinchBase = null;
+        });
+    });
 
     $('mpWrap').addEventListener('wheel', function (e) {
         if (e.ctrlKey) return;
