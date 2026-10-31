@@ -2223,9 +2223,9 @@
 <script id="gate-js">
 (function () {
     'use strict';
-    var PASS = '04180539';                   // ← 口令，改这一行即可
-    // 开门时间（测试用：已经改成"昨天"= 2026-10-29；正式上线想改回 11 月 4 日就写 new Date(2026, 10, 4)）
-    var OPEN_AT = new Date(2026, 9, 29, 0, 0, 0).getTime();
+    var PASS = '650100';                     // ← 口令，改这一行即可
+    // 开门时间：11 月 4 日 0 点（月份从 0 数，所以 10 表示 11 月）
+    var OPEN_AT = new Date(2026, 10, 4, 0, 0, 0).getTime();
     var SRC = {
         ok: 'images/gate-ok.webp',
         no: 'images/gate-no.webp',
@@ -2270,7 +2270,7 @@
         var val = (input.value || '').trim();
 
         if (!opened()) {
-            show('wip', 'wip', '还没到日子哦，再等等 🤍');
+            show('wip', 'wip', '还没到日子哦，11 月 4 日再来 🤍');
             input.value = '';
             return;
         }
@@ -2281,7 +2281,7 @@
             setTimeout(unlock, 1000);        // 过一秒再进站
             return;
         }
-        show('no', 'no', '不对哦，再想想');
+        show('no', 'no', '请不要乱试密码窝');
         input.value = '';
         input.focus();
     }
@@ -2297,7 +2297,7 @@
         if (window.innerWidth > 760) input.focus();
     });
 
-    if (!opened()) input.placeholder = '还没到日子';
+    if (!opened()) input.placeholder = '11 月 4 日后开启';
 })();
 </script>
 </body>
