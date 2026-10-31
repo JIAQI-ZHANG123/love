@@ -622,6 +622,13 @@
 
         #cineOverlay.roses #cineGlow { opacity: 1; }
 
+        /* 信封 → 信纸：暖白一闪 */
+        #cineOverlay.envelope {
+            background: radial-gradient(circle at 50% 46%, #fffaf5 0%, #ffeee6 46%, #ffe2ee 100%);
+        }
+
+        #cineOverlay.envelope #cineGlow { opacity: .8; }
+
         /* 回忆之旅：一张张回忆从两侧缓缓升起（左右交替） */
         #cineMemories {
             position: absolute;
@@ -1349,18 +1356,19 @@
         };
 
         if (prefersReducedMotion()) {
-            setTimeout(reveal, 320);
+            setTimeout(reveal, 260);
             return;
         }
 
-        ov.classList.add('on');
-        setTimeout(() => ov.classList.add('roses'), 420);
-        // 玫瑰最亮时把信纸铺到黑幕后面，黑幕淡出时顺势露出
+        // 暖白一闪：信纸在光里浮现，不再有黑屏
+        ov.classList.add('envelope', 'on');
+        setTimeout(reveal, 420);
         setTimeout(() => {
-            reveal();
-            if (ov.dataset.mode !== 'b') ov.classList.remove('on');
-        }, 3320);
-        setTimeout(() => ov.classList.remove('roses'), 3820);
+            if (ov.dataset.mode !== 'b') {
+                ov.classList.remove('on');
+                ov.classList.remove('envelope');
+            }
+        }, 1180);
     }
 
     // ========== 0.2 电影感转场 B：黑屏 → 回忆之旅（烟花 + 逐条升起）→ 主烟花 → 主内容 ==========
@@ -2240,7 +2248,7 @@
 <script id="gate-js">
 (function () {
     'use strict';
-    var PASS = '20251113';                   // ← 口令，改这一行即可
+    var PASS = '04180539';                   // ← 口令，改这一行即可
     // 开门时间（测试用：已经改成"昨天"= 2026-10-29；正式上线想改回 11 月 4 日就写 new Date(2026, 10, 4)）
     var OPEN_AT = new Date(2026, 9, 29, 0, 0, 0).getTime();
     var SRC = {
