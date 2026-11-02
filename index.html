@@ -2654,6 +2654,51 @@ body.map-fs { overflow: hidden; }
   .mp-wrap:not(.fs) .mp-scale { display: none; }
 }
 
+/* ── 相册夹 ── */
+.al-folder {
+    border: 1px solid #ffd9e8; background: #fff7fb; color: #b06787;
+    border-radius: 999px; padding: 5px 11px; font-size: 12.5px; font-weight: 700;
+    margin: 0 6px 7px 0; cursor: pointer; font-family: inherit;
+}
+.al-folder b { margin-left: 5px; font-size: 10.5px; color: #d59ab4; }
+.al-folder.on {
+    background: linear-gradient(135deg, #ffd0e2, #ffe6c8);
+    border-color: #ffb9d5; color: #a8527a;
+}
+.al-folder.on b { color: #b3708f; }
+.al-new {
+    border: 1px dashed #ffc6db; background: #fff; color: #c1799a;
+    border-radius: 999px; padding: 5px 11px; font-size: 12.5px; font-weight: 700;
+    margin: 0 6px 7px 0; cursor: pointer; font-family: inherit;
+}
+.al-new:hover { background: #fff2f8; }
+.al-fmg {
+    border: 1px solid #ffd9e8; background: #fff; color: #c1799a;
+    border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700;
+    margin: 0 0 7px; cursor: pointer; font-family: inherit;
+}
+.al-tools { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; flex-wrap: wrap; }
+.al-up {
+    border: none; border-radius: 999px; padding: 7px 15px; cursor: pointer;
+    background: linear-gradient(135deg, #ffb3d1, #ffd9a8); color: #fff;
+    font-size: 12.5px; font-weight: 700; font-family: inherit;
+    box-shadow: 0 4px 12px rgba(255, 150, 190, .28);
+}
+.al-up:active { transform: translateY(1px); }
+.al-tip { font-size: 11.5px; color: #b39aa6; }
+.al-tag {
+    position: absolute; right: 7px; top: 39px; z-index: 2;
+    background: rgba(255, 255, 255, .94); color: #a8678a;
+    font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 999px;
+    border: 1px solid #ffdcea; pointer-events: none;
+}
+.ph-row select {
+    flex: 1; min-width: 0; border: 1px solid #ffdcea; border-radius: 10px;
+    padding: 8px 10px; font-size: 13px; color: #6b5560; background: #fffafc;
+    font-family: inherit; outline: none;
+}
+.ph-del { color: #cf4f62 !important; border-color: #ffc9d2 !important; }
+
 </style>
 
 </head>
@@ -4202,7 +4247,11 @@ window.LOVE_BOARD_CFG = {
 
     var GB_KEY = 'love.guestbook.v1';
     var CR_KEY = 'love.creations.v1';
-    var PH_KEY = 'love.photos.v1';     // 相册每张照片的日期 / 说明
+    var PH_KEY = 'love.photos.v1';     // 相册每张照片的日期 / 说明 / 相册夹
+    var FLD_KEY = 'love.folders.v1';   // 相册夹
+    var FLD_TABLE = 'love_folders';
+    var alFolder = 'all';              // 当前选中的相册夹，'all' = 全部
+    var folderList = [];               // 相册夹列表
     var MP_KEY = 'love.map.v1';        // 足迹地图上的点
     var RP_KEY = 'love.routes.v1';     // 地名连线（去了几次）
     var PL_KEY = 'love.plans.v1';      // 计划（长期 / 中期 / 短期）
@@ -4303,8 +4352,8 @@ window.LOVE_BOARD_CFG = {
     }
     function toGbRow(m) { return { id: m.id, name: m.name || '', body: m.text || '', emo: m.emo || '', ts: m.ts || Date.now() }; }
     function toCrRow(m) { return { id: m.id, title: m.title || '', date: m.date || '', descr: m.desc || '', place: m.place || '', images: m.images || [], ts: m.ts || Date.now() }; }
-    function fromPhRow(r) { return { id: r.id, src: r.src || '', date: r.date || '', note: r.note || '', ts: Number(r.ts) || Date.now() }; }
-    function toPhRow(p) { return { id: p.id, src: p.src || '', date: p.date || '', note: p.note || '', ts: p.ts || Date.now() }; }
+    function fromPhRow(r) { return { id: r.id, src: r.src || '', date: r.date || '', note: r.note || '', folder: r.folder || '', ts: Number(r.ts) || Date.now() }; }
+    function toPhRow(p) { return { id: p.id, src: p.src || '', date: p.date || '', note: p.note || '', folder: p.folder || '', ts: p.ts || Date.now() }; }
     function fromMpRow(r) {
         return { id: r.id, name: r.name || '', lon: Number(r.lon) || 0, lat: Number(r.lat) || 0,
                  date: r.date || '', note: r.note || '', ord: Number(r.ord) || 0, ts: Number(r.ts) || Date.now() };
@@ -4344,7 +4393,8 @@ window.LOVE_BOARD_CFG = {
             sbReq('love_photos?select=*'),
             sbReq('love_map?select=*&order=ord.asc'),
             sbReq('love_routes?select=*'),
-            sbReq('love_plans?select=*')
+            sbReq('love_plans?select=*'),
+            sbReq('love_folders?select=*&order=ts.asc')
         ]).then(function (res) {
             var rGb = (res[0] || []).map(fromGbRow);
             var rCr = (res[1] || []).map(fromCrRow);
@@ -4429,6 +4479,19 @@ window.LOVE_BOARD_CFG = {
                 localRt.forEach(function (r) { if (!remoteRtIds[r.id]) queueOp({ type: 'upsert', table: 'love_routes', row: toRtRow(r) }); });
                 renderRoutes();
                 renderMap();
+            }
+
+            // 相册夹
+            if (res[8]) {
+                var rFd = (res[8] || []).map(fromFdRow);
+                var localFd = folderList.slice();
+                var remoteFdIds = {};
+                rFd.forEach(function (f) { remoteFdIds[f.id] = 1; });
+                folderList = mergeList(rFd, localFd);
+                folderList.sort(function (a, b) { return (a.ts || 0) - (b.ts || 0); });
+                writeArr(FLD_KEY, folderList);
+                localFd.forEach(function (f) { if (!remoteFdIds[f.id]) queueOp({ type: 'upsert', table: FLD_TABLE, row: toFdRow(f) }); });
+                renderAlbum();
             }
 
             // 计划
@@ -4692,6 +4755,8 @@ window.LOVE_BOARD_CFG = {
         /* 相册 */
         '  <section class="board-panel" id="panelAl">',
         '    <div class="al-bar" id="alBar"></div>',
+        '    <div class="al-tools"><button class="al-up" id="alUp" type="button">＋ 上传照片</button>' +
+        '      <span class="al-tip" id="alTip"></span></div>',
         '    <div class="al-grid" id="alGrid"></div>',
         '  </section>',
 
@@ -5394,6 +5459,8 @@ window.LOVE_BOARD_CFG = {
     });
 
     /* ── 相册 ── */
+    function fromFdRow(r) { return { id: r.id, name: r.name || '', ts: Number(r.ts) || Date.now() }; }
+    function toFdRow(f) { return { id: f.id, name: f.name || '', ts: f.ts || Date.now() }; }
     function photoMetaOf(src) {
         for (var i = 0; i < phList.length; i++) {
             if (phList[i].src === src) return phList[i];
@@ -5424,15 +5491,36 @@ window.LOVE_BOARD_CFG = {
                 out.push({ src: src, title: m.title || '', date: m.date || '', desc: m.desc || '', idx: -1 });
             });
         });
+        var seen = {};
         out.forEach(function (it) {
             var meta = photoMetaOf(it.src);
             it.meta = meta;
+            it.folder = (meta && meta.folder) || '';
+            seen[it.src] = 1;
             if (meta) {
                 if (meta.date) it.date = meta.date;
                 if (meta.note) it.title = meta.note;
             }
         });
+        // 直接上传到相册的照片：只在 love_photos 里存在
+        phList.forEach(function (p) {
+            if (!p.src || seen[p.src]) return;
+            seen[p.src] = 1;
+            out.push({
+                src: p.src, title: p.note || '', date: p.date || '', desc: '',
+                idx: -1, folder: p.folder || '', meta: p, standalone: true
+            });
+        });
         return out;
+    }
+
+    /* ── 相册夹 ── */
+    function folderName(id) {
+        for (var i = 0; i < folderList.length; i++) if (folderList[i].id === id) return folderList[i].name;
+        return '';
+    }
+    function inFolder(it) {
+        return alFolder === 'all' || (it.folder || '') === alFolder;
     }
 
     function yearOf(s) {
@@ -5458,10 +5546,39 @@ window.LOVE_BOARD_CFG = {
     function renderAlbum() {
         var grid = $('alGrid');
         var bar = $('alBar');
-        if (!grid) return;
-        var items = albumItems();
-        var groups = {};
-        var order = [];
+        if (!grid || !bar) return;
+        var all = albumItems();
+        var counts = {};
+        all.forEach(function (it) { var f = it.folder || ''; counts[f] = (counts[f] || 0) + 1; });
+        var items = all.filter(inFolder);
+
+        var chips = ['<button class="al-folder' + (alFolder === 'all' ? ' on' : '') + '" type="button" data-folder="all">全部<b>' + all.length + '</b></button>'];
+        if (counts[''] && (folderList.length || counts[''] < all.length)) {
+            chips.push('<button class="al-folder' + (alFolder === '' ? ' on' : '') + '" type="button" data-folder="">未分类<b>' + counts[''] + '</b></button>');
+        }
+        folderList.forEach(function (f) {
+            chips.push('<button class="al-folder' + (alFolder === f.id ? ' on' : '') + '" type="button" data-folder="' + esc(f.id) + '">' +
+                esc(f.name) + '<b>' + (counts[f.id] || 0) + '</b></button>');
+        });
+        chips.push('<button class="al-new" type="button" data-newfolder="1">＋ 相册夹</button>');
+        if (alFolder !== 'all') {
+            chips.push('<button class="al-fmg" type="button" data-fmg="1" aria-label="管理这个相册夹">✎</button>');
+        }
+        bar.innerHTML = chips.join('');
+        if ($('alTip')) {
+            $('alTip').textContent = alFolder === 'all'
+                ? '点照片看大图 · ✎ 改日期 / 说明 / 相册夹'
+                : '「' + folderName(alFolder) + '」共 ' + items.length + ' 张 · ✎ 改说明 / 移动 / 删除';
+        }
+
+        if (!items.length) {
+            grid.innerHTML = '<div class="board-empty"><span class="big">📷</span><p>' +
+                (alFolder === 'all' ? '还没有照片' : '「' + esc(folderName(alFolder)) + '」还是空的<br>点上面的「上传照片」放几张进来') +
+                '</p></div>';
+            return;
+        }
+
+        var groups = {}, order = [];
         items.forEach(function (it) {
             var y = yearOf(it.date);
             if (!groups[y]) { groups[y] = []; order.push(y); }
@@ -5472,25 +5589,20 @@ window.LOVE_BOARD_CFG = {
             if (b === '未标注') return -1;
             return Number(b) - Number(a);
         });
-        bar.innerHTML = '<span class="al-count">一共 ' + items.length + ' 张照片</span>' +
-            order.map(function (y) {
-                return '<button class="al-year" type="button" data-jump="' + esc(y) + '">' + esc(y) + '</button>';
-            }).join('');
-        if (!items.length) {
-            grid.innerHTML = '<div class="board-empty"><span class="big">📷</span><p>还没有照片</p></div>';
-            return;
-        }
         var n = 0;
         grid.innerHTML = order.map(function (y) {
-            return '<section class="al-group" id="alY_' + esc(y) + '">' +
+            return '<section class="al-group">' +
                 '<h3 class="al-h"><b>' + esc(y) + '</b><span>' + esc(monthSpan(groups[y])) + '</span></h3>' +
                 '<div class="al-cols">' +
                 groups[y].map(function (it) {
                     var i = n++;
                     var cap = it.title || '';
-                    return '<figure class="al-cell" data-i="' + i + '" data-src="' + esc(it.src) + '" data-cap="' + esc(cap + (it.date ? ' · ' + it.date : '')) + '">' +
+                    var fn = it.folder ? folderName(it.folder) : '';
+                    return '<figure class="al-cell' + (it.standalone ? ' own' : '') + '" data-i="' + i + '" data-src="' + esc(it.src) + '"' +
+                        ' data-cap="' + esc(cap + (it.date ? ' · ' + it.date : '')) + '">' +
                         '<img src="' + esc(it.src) + '" alt="' + esc(it.title) + '" loading="lazy" decoding="async">' +
                         '<button class="al-edit" type="button" data-edit="' + i + '" aria-label="编辑这张照片">✎</button>' +
+                        (fn ? '<span class="al-tag">' + esc(fn) + '</span>' : '') +
                         (cap ? '<figcaption>' + esc(cap) + (it.date ? '<em>' + esc(it.date) + '</em>' : '') + '</figcaption>' : '') +
                     '</figure>';
                 }).join('') +
@@ -5499,10 +5611,10 @@ window.LOVE_BOARD_CFG = {
     }
 
     $('alBar').addEventListener('click', function (e) {
-        var btn = e.target.closest('[data-jump]');
-        if (!btn) return;
-        var el = document.getElementById('alY_' + btn.dataset.jump);
-        if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        var f = e.target.closest('[data-folder]');
+        if (f) { alFolder = f.dataset.folder; renderAlbum(); return; }
+        if (e.target.closest('[data-newfolder]')) { openFdEdit(''); return; }
+        if (e.target.closest('[data-fmg]')) { openFdEdit(alFolder); return; }
     });
 
     /* 相册查看器 */
@@ -5538,10 +5650,12 @@ window.LOVE_BOARD_CFG = {
         '  <h4>这张照片</h4>' +
         '  <label class="ph-row"><span>日期</span><input id="phDate" type="text" placeholder="2025.5.20" maxlength="24"></label>' +
         '  <label class="ph-row"><span>说明</span><input id="phNote" type="text" placeholder="那天我们去了…" maxlength="60"></label>' +
+        '  <label class="ph-row"><span>相册夹</span><select id="phFolder"></select></label>' +
         '  <div class="ph-acts">' +
         '    <button class="board-submit" id="phSave" type="button">保存</button>' +
         '    <button class="board-ghost" id="phReset" type="button">恢复默认</button>' +
         '    <button class="board-ghost" id="phCancel" type="button">取消</button>' +
+        '    <button class="board-ghost ph-del" id="phDel" type="button">删除照片</button>' +
         '  </div>' +
         '</div>';
     document.body.appendChild(phEdit);
@@ -5550,8 +5664,15 @@ window.LOVE_BOARD_CFG = {
     function openPhEdit(src) {
         phEditing = src;
         var meta = photoMetaOf(src);
+        var own = !!(meta && isOwnPhoto(src));
         $('phDate').value = meta ? (meta.date || '') : '';
         $('phNote').value = meta ? (meta.note || '') : '';
+        var sel = $('phFolder');
+        sel.innerHTML = '<option value="">未分类</option>' + folderList.map(function (f) {
+            return '<option value="' + esc(f.id) + '">' + esc(f.name) + '</option>';
+        }).join('');
+        sel.value = (meta && meta.folder) || '';
+        $('phDel').style.display = own ? '' : 'none';
         phEdit.classList.add('show');
         document.body.style.overflow = 'hidden';
         setTimeout(function () { $('phDate').focus(); }, 30);
@@ -5561,10 +5682,11 @@ window.LOVE_BOARD_CFG = {
         phEditing = '';
         document.body.style.overflow = page.classList.contains('show') ? 'hidden' : '';
     }
-    function savePhMeta(date, note) {
+    function savePhMeta(date, note, folder) {
         if (!phEditing) return;
         var row = photoMetaOf(phEditing);
-        if (!date && !note) {
+        folder = folder || '';
+        if (!date && !note && !folder) {
             if (row) {
                 phList = phList.filter(function (p) { return p.src !== phEditing; });
                 writeArr(PH_KEY, phList);
@@ -5574,6 +5696,7 @@ window.LOVE_BOARD_CFG = {
             if (!row) { row = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), src: phEditing, ts: Date.now() }; phList.push(row); }
             row.date = date || '';
             row.note = note || '';
+            row.folder = folder;
             row.ts = Date.now();
             writeArr(PH_KEY, phList);
             queueOp({ type: 'upsert', table: 'love_photos', row: toPhRow(row) });
@@ -5581,12 +5704,12 @@ window.LOVE_BOARD_CFG = {
         renderAlbum();
     }
     $('phSave').addEventListener('click', function () {
-        savePhMeta($('phDate').value.trim(), $('phNote').value.trim());
+        savePhMeta($('phDate').value.trim(), $('phNote').value.trim(), $('phFolder').value);
         closePhEdit();
         toast('改好啦 ✓');
     });
     $('phReset').addEventListener('click', function () {
-        savePhMeta('', '');
+        savePhMeta('', '', '');
         $('phDate').value = '';
         $('phNote').value = '';
         toast('恢复成默认了');
@@ -5600,6 +5723,151 @@ window.LOVE_BOARD_CFG = {
         if (!cell) return;
         if (e.target.closest('.al-edit')) { openPhEdit(cell.dataset.src); return; }
         openView(cell.dataset.src, cell.dataset.cap);
+    });
+
+    /* 相册夹新建 / 重命名 / 删除 */
+    var fdEdit = document.createElement('div');
+    fdEdit.className = 'ph-edit';
+    fdEdit.innerHTML =
+        '<div class="ph-box">' +
+        '  <h4 id="fdTitle">新建相册夹</h4>' +
+        '  <label class="ph-row"><span>名字</span><input id="fdName" type="text" placeholder="丑照、旅行、吃的…" maxlength="12"></label>' +
+        '  <div class="ph-acts">' +
+        '    <button class="board-submit" id="fdSave" type="button">保存</button>' +
+        '    <button class="board-ghost" id="fdCancel" type="button">取消</button>' +
+        '    <button class="board-ghost ph-del" id="fdDel" type="button">删除相册夹</button>' +
+        '  </div>' +
+        '</div>';
+    document.body.appendChild(fdEdit);
+
+    var fdEditing = '';
+    function openFdEdit(id) {
+        fdEditing = id || '';
+        $('fdTitle').textContent = id ? '改相册夹名字' : '新建相册夹';
+        $('fdName').value = id ? folderName(id) : '';
+        $('fdDel').style.display = id ? '' : 'none';
+        fdEdit.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        setTimeout(function () { $('fdName').focus(); }, 30);
+    }
+    function closeFdEdit() {
+        fdEdit.classList.remove('show');
+        fdEditing = '';
+        document.body.style.overflow = page.classList.contains('show') ? 'hidden' : '';
+    }
+    $('fdSave').addEventListener('click', function () {
+        var name = $('fdName').value.trim();
+        if (!name) { toast('给相册夹起个名字吧'); return; }
+        if (fdEditing) {
+            folderList.forEach(function (f) {
+                if (f.id === fdEditing) { f.name = name; f.ts = Date.now(); queueOp({ type: 'upsert', table: FLD_TABLE, row: toFdRow(f) }); }
+            });
+            writeArr(FLD_KEY, folderList);
+            toast('名字改好啦 ✓');
+        } else {
+            var f = { id: 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name: name, ts: Date.now() };
+            folderList.push(f);
+            writeArr(FLD_KEY, folderList);
+            queueOp({ type: 'upsert', table: FLD_TABLE, row: toFdRow(f) });
+            alFolder = f.id;
+            toast('建好啦：' + name);
+        }
+        closeFdEdit();
+        renderAlbum();
+    });
+    $('fdDel').addEventListener('click', function () {
+        if (!fdEditing) return;
+        if (this.dataset.arm !== '1') {
+            this.dataset.arm = '1';
+            this.textContent = '真的删除？';
+            var self = this;
+            setTimeout(function () { self.dataset.arm = ''; self.textContent = '删除相册夹'; }, 2600);
+            return;
+        }
+        var id = fdEditing;
+        folderList = folderList.filter(function (f) { return f.id !== id; });
+        writeArr(FLD_KEY, folderList);
+        queueOp({ type: 'delete', table: FLD_TABLE, match: 'id=eq.' + encodeURIComponent(id) });
+        phList.forEach(function (p) {
+            if (p.folder === id) { p.folder = ''; queueOp({ type: 'upsert', table: 'love_photos', row: toPhRow(p) }); }
+        });
+        writeArr(PH_KEY, phList);
+        alFolder = 'all';
+        closeFdEdit();
+        renderAlbum();
+        toast('相册夹删掉了，照片回到「未分类」');
+    });
+    $('fdCancel').addEventListener('click', closeFdEdit);
+    fdEdit.addEventListener('click', function (e) { if (e.target === fdEdit) closeFdEdit(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && fdEdit.classList.contains('show')) closeFdEdit(); });
+
+    /* 上传照片 */
+    var alFile = document.createElement('input');
+    alFile.type = 'file';
+    alFile.accept = 'image/*';
+    alFile.multiple = true;
+    alFile.id = 'alFile';
+    alFile.style.display = 'none';
+    document.body.appendChild(alFile);
+    function isOwnPhoto(src) {
+        var own = false;
+        phList.forEach(function (p) { if (p.src === src && p.folder !== undefined && p.note === '') own = true; });
+        var inTimeline = false;
+        try {
+            eventsData.forEach(function (it) { (it.images || []).forEach(function (s) { if (s === src) inTimeline = true; }); });
+        } catch (e) { /* ignore */ }
+        crList.forEach(function (m) { (m.images || []).forEach(function (s) { if (s === src) inTimeline = true; }); });
+        return !inTimeline;
+    }
+    function dateFromFile(f) {
+        var t = new Date((f && f.lastModified) || Date.now());
+        return t.getFullYear() + '.' + (t.getMonth() + 1) + '.' + t.getDate();
+    }
+    $('alUp').addEventListener('click', function () { alFile.click(); });
+    alFile.addEventListener('change', function () {
+        var files = [].slice.call(this.files || []);
+        this.value = '';
+        if (!files.length) return;
+        var folder = alFolder === 'all' ? '' : alFolder;
+        var left = files.length, okCount = 0, failCount = 0;
+        toast('正在上传 ' + files.length + ' 张…');
+        files.forEach(function (f) {
+            shrink(f).then(function (url) {
+                var row = {
+                    id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+                    src: url, date: dateFromFile(f),
+                    note: '',
+                    folder: folder, ts: Date.now()
+                };
+                phList.push(row);
+                writeArr(PH_KEY, phList);
+                queueOp({ type: 'upsert', table: 'love_photos', row: toPhRow(row) });
+                okCount++;
+            }).catch(function () { failCount++; }).then(function () {
+                left--;
+                if (left === 0) {
+                    renderAlbum();
+                    toast(failCount ? ('传好 ' + okCount + ' 张，' + failCount + ' 张失败') : ('放进去了 ' + okCount + ' 张 📷'));
+                }
+            });
+        });
+    });
+    $('phDel').addEventListener('click', function () {
+        if (!phEditing) return;
+        if (this.dataset.arm !== '1') {
+            this.dataset.arm = '1';
+            this.textContent = '真的删掉？';
+            var self = this;
+            setTimeout(function () { self.dataset.arm = ''; self.textContent = '删除照片'; }, 2600);
+            return;
+        }
+        var src = phEditing, row = photoMetaOf(src);
+        phList = phList.filter(function (p) { return p.src !== src; });
+        writeArr(PH_KEY, phList);
+        if (row) queueOp({ type: 'delete', table: 'love_photos', match: 'id=eq.' + encodeURIComponent(row.id) });
+        closePhEdit();
+        renderAlbum();
+        toast('删掉了');
     });
 
     /* ── 计划：长期 / 中期 / 短期 ── */
@@ -7293,6 +7561,7 @@ window.LOVE_BOARD_CFG = {
 
     cpList = readArr(CP_KEY);
     phList = readArr(PH_KEY);
+    folderList = readArr(FLD_KEY);
     mapStops = readArr(MP_KEY);
     routeList = readArr(RP_KEY);
     planList = readArr(PL_KEY);
