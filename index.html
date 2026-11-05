@@ -4497,7 +4497,7 @@ window.LOVE_BOARD_CFG = {
     var pending = [];          // 没发出去的写操作
     var syncing = false;
     var lastPull = 0;
-    var BUILD_ID = '20261105.1758';   // 构建时替换成时间戳，便于确认页面是不是最新版
+    var BUILD_ID = '20261105.1801';   // 构建时替换成时间戳，便于确认页面是不是最新版
 
     function sbReq(path, opt) {
         opt = opt || {};
@@ -4533,6 +4533,12 @@ window.LOVE_BOARD_CFG = {
         pullAll().then(function () {
             toast('已从云端拉取最新数据 ✓ ' + new Date().toLocaleTimeString('zh-CN', { hour12: false }));
         }).catch(function () { toast('同步失败，检查一下网络'); });
+    });
+
+    // 切回这个标签页时，如果距上次同步超过 8 秒，补一次（手机后台会挂起连接）
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden || !SB) return;
+        if (Date.now() - lastPull > 8000 && !syncing) pullAll();
     });
 
     function setSyncState(s) {
