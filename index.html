@@ -4497,6 +4497,7 @@ window.LOVE_BOARD_CFG = {
     var pending = [];          // 没发出去的写操作
     var syncing = false;
     var lastPull = 0;
+    var BUILD_ID = '20261105.1758';   // 构建时替换成时间戳，便于确认页面是不是最新版
 
     function sbReq(path, opt) {
         opt = opt || {};
@@ -4523,6 +4524,17 @@ window.LOVE_BOARD_CFG = {
         });
     }
 
+    // 点一下胶囊：立刻重新拉取（失败会给出提示）
+    document.addEventListener('click', function (e) {
+        var chip = e.target.closest && e.target.closest('#syncChip');
+        if (!chip) return;
+        if (!SB) { toast('这台设备没连上云端，刷新页面再试'); return; }
+        if (syncing) { toast('正在同步…'); return; }
+        pullAll().then(function () {
+            toast('已从云端拉取最新数据 ✓ ' + new Date().toLocaleTimeString('zh-CN', { hour12: false }));
+        }).catch(function () { toast('同步失败，检查一下网络'); });
+    });
+
     function setSyncState(s) {
         var chip = $('syncChip');
         var note = $('gbNote');
@@ -4535,7 +4547,14 @@ window.LOVE_BOARD_CFG = {
             err: ['连不上云端 · 已存本机', 'chip-err']
         };
         var info = map[s] || map.local;
-        chip.textContent = info[0];
+        var txt = info[0];
+        if (s === 'ok' && lastPull) {
+            var d = new Date(lastPull);
+            txt += ' · ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+        }
+        if (pending.length) txt += ' · ' + pending.length + ' 条待上传';
+        chip.textContent = txt;
+        chip.title = '页面版本 ' + BUILD_ID + '\n点一下立刻从云端重新拉取';
         // 页面太旧（没读到云端配置）时给一句明确提示，别让人以为是网络问题
         if (s === 'local' && !window.LOVE_BOARD_CFG && /^https:/i.test(location.protocol)) {
             chip.textContent = '页面是旧版 · 刷新一下';
