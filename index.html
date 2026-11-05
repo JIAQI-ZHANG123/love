@@ -4536,6 +4536,10 @@ window.LOVE_BOARD_CFG = {
         };
         var info = map[s] || map.local;
         chip.textContent = info[0];
+        // 页面太旧（没读到云端配置）时给一句明确提示，别让人以为是网络问题
+        if (s === 'local' && !window.LOVE_BOARD_CFG && /^https:/i.test(location.protocol)) {
+            chip.textContent = '页面是旧版 · 刷新一下';
+        }
         chip.className = 'sync-chip ' + info[1];
     }
 
@@ -5276,7 +5280,8 @@ window.LOVE_BOARD_CFG = {
         }).join('');
         $('crHint').textContent = pickImgs.length
             ? ('已选 ' + pickImgs.length + ' 张，第一张作封面')
-            : '图片会自动压缩后存在本机';
+            : (SB ? '☁️ 图片会压缩后上传到云端，换设备也看得到'
+                  : '图片只会存在本机（没连上云端，刷新页面再试）');
     }
 
     $('crThumbs').addEventListener('click', function (e) {
