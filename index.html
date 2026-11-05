@@ -3415,6 +3415,23 @@ body.map-fs { overflow: hidden; }
         return card;
     }
 
+    // 刷新后直接回到主页：已经进来过就不再走信封 / 信纸 / 回忆之旅
+    window.__LOVE_RESUME = function () {
+        try {
+            if (localStorage.getItem('love.entered.v1') !== '1') return false;
+        } catch (e) { return false; }
+        envelopePage.classList.add('hide');
+        letterPage.classList.remove('show');
+        mainContent.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'auto' });
+        try {
+            startCounterAnimation();
+            startProgressAnimation();
+            observeEvents();
+        } catch (e) {}
+        return true;
+    };
+
     function playFireworksCinema() {
         const ov = document.getElementById('cineOverlay');
         const canvas = document.getElementById('cineCanvas');
@@ -3422,6 +3439,7 @@ body.map-fs { overflow: hidden; }
         const finish = () => {
             letterPage.classList.remove('show');
             mainContent.style.display = 'block';
+            try { localStorage.setItem('love.entered.v1', '1'); } catch (e) {}
             window.scrollTo({ top: 0, behavior: 'auto' });
             startCounterAnimation();
             startProgressAnimation();
@@ -4320,9 +4338,14 @@ body.map-fs { overflow: hidden; }
         meme.classList.add('on');
     }
 
+    function storedPass() {
+        try { return localStorage.getItem('love.gate.v1') === PASS_HASH; } catch (e) { return false; }
+    }
+
     function unlock() {
         if (done) return;
         done = true;
+        try { localStorage.setItem('love.gate.v1', PASS_HASH); } catch (e) {}
         gate.classList.add('out');
         document.body.classList.remove('gated');
         setTimeout(function () {
@@ -4407,6 +4430,14 @@ body.map-fs { overflow: hidden; }
     });
 
     if (!opened()) input.placeholder = '11 月 4 日后开启';
+
+    // 这台设备开过门：直接跳过门禁；如果再进来过主页，连开场也一起跳过
+    if (opened() && storedPass()) {
+        done = true;
+        document.body.classList.remove('gated');
+        if (gate.parentNode) gate.parentNode.removeChild(gate);
+        if (window.__LOVE_RESUME) window.__LOVE_RESUME();
+    }
 })();
 </script>
 
@@ -4497,7 +4528,7 @@ window.LOVE_BOARD_CFG = {
     var pending = [];          // 没发出去的写操作
     var syncing = false;
     var lastPull = 0;
-    var BUILD_ID = '20261105.1801';   // 构建时替换成时间戳，便于确认页面是不是最新版
+    var BUILD_ID = '20261105.1902';   // 构建时替换成时间戳，便于确认页面是不是最新版
 
     function sbReq(path, opt) {
         opt = opt || {};
