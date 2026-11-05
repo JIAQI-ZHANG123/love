@@ -1,4 +1,4 @@
-﻿/* 离线缓存：让第二次打开几乎立刻出现 */
+/* 离线缓存：让第二次打开几乎立刻出现 */
 const CACHE = 'love-v5';
 const CORE = ['./', './index.html', './map-geo.js', './world-nbr.js'];
 
