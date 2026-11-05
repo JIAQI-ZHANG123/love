@@ -2699,6 +2699,57 @@ body.map-fs { overflow: hidden; }
 }
 .ph-del { color: #cf4f62 !important; border-color: #ffc9d2 !important; }
 
+/* ── 相册批量选择 ── */
+.al-pick {
+    margin-left: 8px; height: 34px; padding: 0 14px;
+    border: 1px solid #ffd0e2; border-radius: 999px; background: #fff;
+    color: #b3617f; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    font-family: inherit;
+}
+.al-pick.on { background: #ff8fb4; border-color: #ff8fb4; color: #fff; }
+.al-batch {
+    display: none; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin: 0 0 12px; padding: 9px 12px; border-radius: 14px;
+    background: #fff6fa; border: 1px solid #ffe0ec;
+}
+.al-batch.on { display: flex; }
+.al-bcount { font-size: 12px; font-weight: 700; color: #b3617f; }
+.al-batch select {
+    height: 30px; max-width: 42%; border: 1px solid #ffd7e6; border-radius: 8px;
+    background: #fff; color: #6d5560; font-size: 12px; padding: 0 6px; font-family: inherit;
+}
+.al-bbtn {
+    height: 30px; padding: 0 11px; border-radius: 8px; cursor: pointer;
+    border: 1px solid #ffd0e2; background: #fff; color: #b3617f;
+    font-size: 12px; font-weight: 700; font-family: inherit;
+}
+.al-bbtn[disabled] { opacity: .45; cursor: not-allowed; }
+.al-bbtn.danger { border-color: #ffc9d2; color: #d2556b; background: #fff7f8; }
+.al-bbtn.danger[data-arm="1"] { background: #e2556b; border-color: #e2556b; color: #fff; }
+.al-bbtn.ghost { margin-left: auto; border-style: dashed; }
+.al-grid.picking .al-cell { cursor: pointer; }
+.al-cell.sel::after {
+    content: ""; position: absolute; inset: 0; border-radius: 12px;
+    background: rgba(255, 255, 255, .28);
+}
+.al-cell.picked::after {
+    background: rgba(255, 143, 180, .22);
+    box-shadow: inset 0 0 0 2px #ff8fb4;
+}
+.al-check {
+    position: absolute; left: 6px; top: 6px; z-index: 3;
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid #fff; background: rgba(255, 255, 255, .55);
+    color: #fff; font-size: 12px; line-height: 18px; text-align: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .18);
+}
+.al-cell.picked .al-check { background: #ff8fb4; border-color: #fff; }
+@media (max-width: 600px) {
+    .al-batch select { max-width: 100%; flex: 1 1 100%; }
+    .al-bbtn.ghost { margin-left: 0; }
+}
+#crThumbs { max-height: 212px; overflow-y: auto; padding-right: 2px; }
+
 </style>
 
 </head>
@@ -4251,12 +4302,14 @@ window.LOVE_BOARD_CFG = {
     var FLD_KEY = 'love.folders.v1';   // 相册夹
     var FLD_TABLE = 'love_folders';
     var alFolder = 'all';              // 当前选中的相册夹，'all' = 全部
-    var folderList = [];               // 相册夹列表
+    var folderList = [];
+    var alMode = false;
+    var alSel = {};               // 相册夹列表
     var MP_KEY = 'love.map.v1';        // 足迹地图上的点
     var RP_KEY = 'love.routes.v1';     // 地名连线（去了几次）
     var PL_KEY = 'love.plans.v1';      // 计划（长期 / 中期 / 短期）
     var EMOJIS = ['💗', '🌸', '✨', '🎀', '🫧', '🐰'];
-    var MAX_IMGS = 3;
+    var MAX_IMGS = 30;
 
     /* ── 云端存储（Supabase）：填了 url/key 就走云端，没填就退回本机 ── */
     var CFG = window.LOVE_BOARD_CFG || {};
@@ -4659,7 +4712,7 @@ window.LOVE_BOARD_CFG = {
         '        <textarea class="board-textarea" id="crDesc" maxlength="300" placeholder="那天的风很轻，你笑起来很好看"></textarea>',
         '      </div>',
         '      <div class="board-field">',
-        '        <span class="board-label">封面图片（最多 3 张，第一张当封面）</span>',
+        '        <span class="board-label">图片（最多 30 张，第一张当封面；其余也会进相册）</span>',
         '        <div class="pick-row">',
         '          <label class="pick-btn" for="crFile">＋ 选择图片</label>',
         '          <input id="crFile" type="file" accept="image/*" multiple hidden>',
@@ -4756,7 +4809,16 @@ window.LOVE_BOARD_CFG = {
         '  <section class="board-panel" id="panelAl">',
         '    <div class="al-bar" id="alBar"></div>',
         '    <div class="al-tools"><button class="al-up" id="alUp" type="button">＋ 上传照片</button>' +
+        '      <button class="al-pick" id="alPick" type="button">选择</button>' +
         '      <span class="al-tip" id="alTip"></span></div>',
+        '    <div class="al-batch" id="alBatch">' +
+        '      <span class="al-bcount" id="alCount">已选 0 张</span>' +
+        '      <select id="alMoveTo" aria-label="移到哪个相册夹"></select>' +
+        '      <button class="al-bbtn" id="alMove" type="button">移动</button>' +
+        '      <button class="al-bbtn danger" id="alDelSel" type="button">删除</button>' +
+        '      <button class="al-bbtn" id="alSelAll" type="button">全选</button>' +
+        '      <button class="al-bbtn ghost" id="alSelDone" type="button">完成</button>' +
+        '    </div>',
         '    <div class="al-grid" id="alGrid"></div>',
         '  </section>',
 
@@ -4965,7 +5027,7 @@ window.LOVE_BOARD_CFG = {
         var files = Array.prototype.slice.call(e.target.files || []);
         if (!files.length) return;
         var room = MAX_IMGS - pickImgs.length;
-        if (room <= 0) { toast('最多 3 张啦'); e.target.value = ''; return; }
+        if (room <= 0) { toast('最多 30 张啦'); e.target.value = ''; return; }
         files = files.slice(0, room);
         Promise.all(files.map(shrink)).then(function (urls) {
             pickImgs = pickImgs.concat(urls);
@@ -5524,8 +5586,12 @@ window.LOVE_BOARD_CFG = {
     }
 
     function yearOf(s) {
-        var m = /(19|20)\d{2}/.exec(String(s || ''));
-        return m ? m[0] : '未标注';
+        var str = String(s || '').trim();
+        var m = /(19|20)\d{2}/.exec(str);
+        if (m) return m[0];
+        // FOREVER 这类手写日期单独成组，别混进「未标注」
+        if (str && !/^\d+\.\d+\.\d+$/.test(str)) return str.toUpperCase();
+        return '未标注';
     }
 
     function monthSpan(list) {
@@ -5587,6 +5653,9 @@ window.LOVE_BOARD_CFG = {
         order.sort(function (a, b) {
             if (a === '未标注') return 1;
             if (b === '未标注') return -1;
+            var ay = /^\d{4}$/.test(a), by = /^\d{4}$/.test(b);
+            if (ay && !by) return -1;
+            if (!ay && by) return 1;
             return Number(b) - Number(a);
         });
         var n = 0;
@@ -5598,10 +5667,12 @@ window.LOVE_BOARD_CFG = {
                     var i = n++;
                     var cap = it.title || '';
                     var fn = it.folder ? folderName(it.folder) : '';
-                    return '<figure class="al-cell' + (it.standalone ? ' own' : '') + '" data-i="' + i + '" data-src="' + esc(it.src) + '"' +
+                    return '<figure class="al-cell' + (it.standalone ? ' own' : '') + (alMode ? ' sel' : '') +
+                        (alMode && alSel[it.src] ? ' picked' : '') + '" data-i="' + i + '" data-src="' + esc(it.src) + '"' +
                         ' data-cap="' + esc(cap + (it.date ? ' · ' + it.date : '')) + '">' +
                         '<img src="' + esc(it.src) + '" alt="' + esc(it.title) + '" loading="lazy" decoding="async">' +
-                        '<button class="al-edit" type="button" data-edit="' + i + '" aria-label="编辑这张照片">✎</button>' +
+                        (alMode ? '<span class="al-check" aria-hidden="true">' + (alSel[it.src] ? '✓' : '') + '</span>'
+                                : '<button class="al-edit" type="button" data-edit="' + i + '" aria-label="编辑这张照片">✎</button>') +
                         (fn ? '<span class="al-tag">' + esc(fn) + '</span>' : '') +
                         (cap ? '<figcaption>' + esc(cap) + (it.date ? '<em>' + esc(it.date) + '</em>' : '') + '</figcaption>' : '') +
                     '</figure>';
@@ -5721,8 +5792,104 @@ window.LOVE_BOARD_CFG = {
     $('alGrid').addEventListener('click', function (e) {
         var cell = e.target.closest('.al-cell');
         if (!cell) return;
+        if (alMode) {
+            alSel[cell.dataset.src] = !alSel[cell.dataset.src];
+            renderAlbum();
+            syncBatchBar();
+            return;
+        }
         if (e.target.closest('.al-edit')) { openPhEdit(cell.dataset.src); return; }
         openView(cell.dataset.src, cell.dataset.cap);
+    });
+
+    /* ── 批量选择 ── */
+    function pickedSrcs() {
+        return Object.keys(alSel).filter(function (k) { return alSel[k]; });
+    }
+    function syncBatchBar() {
+        var n = pickedSrcs().length;
+        if ($('alCount')) $('alCount').textContent = '已选 ' + n + ' 张';
+        if ($('alMove')) $('alMove').disabled = !n;
+        if ($('alDelSel')) $('alDelSel').disabled = !n;
+        var sel = $('alMoveTo');
+        if (sel && sel.dataset.filled !== '1') {
+            sel.dataset.filled = '1';
+            sel.innerHTML = '<option value="">移到：未分类</option>' + folderList.map(function (f) {
+                return '<option value="' + esc(f.id) + '">移到：' + esc(f.name) + '</option>';
+            }).join('');
+        }
+    }
+    function setAlMode(on) {
+        alMode = !!on;
+        if (!alMode) alSel = {};
+        if ($('alBatch')) $('alBatch').classList.toggle('on', alMode);
+        if ($('alPick')) $('alPick').classList.toggle('on', alMode);
+        if ($('alGrid')) $('alGrid').classList.toggle('picking', alMode);
+        if (alMode) syncBatchBar();
+        renderAlbum();
+    }
+    $('alPick').addEventListener('click', function () { setAlMode(!alMode); });
+    $('alSelDone').addEventListener('click', function () { setAlMode(false); });
+    $('alSelAll').addEventListener('click', function () {
+        var all = albumItems();
+        var allOn = pickedSrcs().length >= all.length;
+        alSel = {};
+        if (!allOn) all.forEach(function (it) { alSel[it.src] = true; });
+        renderAlbum();
+        syncBatchBar();
+    });
+    $('alMove').addEventListener('click', function () {
+        var srcs = pickedSrcs();
+        if (!srcs.length) return;
+        var fid = $('alMoveTo').value || '';
+        srcs.forEach(function (src) {
+            var row = photoMetaOf(src);
+            if (!fid) {
+                // 放回未分类 = 不留单独记录（时间线里的照片本来就没有行）
+                if (row) {
+                    phList = phList.filter(function (p) { return p.src !== src; });
+                    queueOp({ type: 'delete', table: 'love_photos', match: 'id=eq.' + encodeURIComponent(row.id) });
+                }
+                return;
+            }
+            if (!row) {
+                row = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), src: src, ts: Date.now() };
+                phList.push(row);
+            }
+            row.folder = fid;
+            row.ts = Date.now();
+            queueOp({ type: 'upsert', table: 'love_photos', row: toPhRow(row) });
+        });
+        writeArr(PH_KEY, phList);
+        toast(fid ? ('把 ' + srcs.length + ' 张移到「' + folderName(fid) + '」了') : ('把 ' + srcs.length + ' 张放回未分类了'));
+        alSel = {};
+        renderAlbum();
+        syncBatchBar();
+    });
+    $('alDelSel').addEventListener('click', function () {
+        var srcs = pickedSrcs();
+        if (!srcs.length) return;
+        if (this.dataset.arm !== '1') {
+            this.dataset.arm = '1';
+            this.textContent = '真的删？';
+            var self = this;
+            setTimeout(function () { self.dataset.arm = ''; self.textContent = '删除'; }, 2600);
+            return;
+        }
+        this.dataset.arm = '';
+        this.textContent = '删除';
+        var own = [], skip = 0;
+        srcs.forEach(function (src) { if (isOwnPhoto(src)) own.push(src); else skip++; });
+        own.forEach(function (src) {
+            var row = photoMetaOf(src);
+            phList = phList.filter(function (p) { return p.src !== src; });
+            if (row) queueOp({ type: 'delete', table: 'love_photos', match: 'id=eq.' + encodeURIComponent(row.id) });
+        });
+        writeArr(PH_KEY, phList);
+        alSel = {};
+        renderAlbum();
+        syncBatchBar();
+        toast(skip ? ('删了 ' + own.length + ' 张；' + skip + ' 张来自回忆之旅，没动') : ('删掉了 ' + own.length + ' 张'));
     });
 
     /* 相册夹新建 / 重命名 / 删除 */
@@ -5820,7 +5987,10 @@ window.LOVE_BOARD_CFG = {
         return !inTimeline;
     }
     function dateFromFile(f) {
-        var t = new Date((f && f.lastModified) || Date.now());
+        var v = f && f.lastModified;
+        var t = new Date(typeof v === 'number' && isFinite(v) ? v : Date.now());
+        // 有些设备/微信传上来 lastModified 是 0 或 1601 元年纪元，退回今天
+        if (!isFinite(t.getTime()) || t.getFullYear() < 2000) t = new Date();
         return t.getFullYear() + '.' + (t.getMonth() + 1) + '.' + t.getDate();
     }
     $('alUp').addEventListener('click', function () { alFile.click(); });
