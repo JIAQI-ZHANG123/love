@@ -4829,7 +4829,7 @@ window.LOVE_BOARD_CFG = {
         '      <span class="mp-tip" id="mpTip">滚轮 / 双指缩放，拖动平移 · 点一下足迹看顺序</span>',
         '    </div>',
         '    <div class="rt-bar">',
-        '      <input class="rt-input" id="rtInput" type="text" placeholder="南京-杭州  ·  也可以写 南京→杭州 3" maxlength="40" autocomplete="off">',
+        '      <input class="rt-input" id="rtInput" type="text" placeholder="长沙-南昌（箭头指向终点）· 也可写 长沙→南昌 3" maxlength="40" autocomplete="off">',
         '      <button class="rt-add" id="rtAdd" type="button">连线</button>',
         '    </div>',
         '    <div class="rt-chips" id="rtChips"></div>',
@@ -6546,18 +6546,18 @@ window.LOVE_BOARD_CFG = {
         return out.join('');
     }
 
-    // 两个足迹之间的弧线（按地名排序，保证同一对城市永远同一条弧）
+    // 两个地名之间的弧线：A 是起点、B 是终点，方向就是当初输入的顺序
     function routeCurve(r) {
-        var swap = (r.a > r.b);
-        var la = swap ? r.blon : r.alon, pa = swap ? r.blat : r.alat;
-        var lb = swap ? r.alon : r.blon, pb = swap ? r.alat : r.blat;
-        var A = project(la, pa), B = project(lb, pb);
+        var A = project(r.alon, r.alat), B = project(r.blon, r.blat);
         var dx = B[0] - A[0], dy = B[1] - A[1];
         var d = Math.sqrt(dx * dx + dy * dy) || 1;
         var bend = Math.min(d * 0.17, 110);
         var nx = -dy / d, ny = dx / d;
         var C = [(A[0] + B[0]) / 2 + nx * bend, (A[1] + B[1]) / 2 + ny * bend];
-        return { A: A, B: B, C: C, d: d };
+        // 终点处切线方向（C -> B），用来摆箭头
+        var tx = B[0] - C[0], ty = B[1] - C[1];
+        var tl = Math.sqrt(tx * tx + ty * ty) || 1;
+        return { A: A, B: B, C: C, d: d, tx: tx / tl, ty: ty / tl };
     }
 
     function sortedStops() {
@@ -6707,16 +6707,22 @@ window.LOVE_BOARD_CFG = {
             var d = 'M' + g.A[0].toFixed(1) + ' ' + g.A[1].toFixed(1) +
                     ' Q' + g.C[0].toFixed(1) + ' ' + g.C[1].toFixed(1) +
                     ' ' + g.B[0].toFixed(1) + ' ' + g.B[1].toFixed(1);
+            var al = 12 * u, aw = 7.4 * u;         // 箭头长度 / 半宽
+            var px2 = -g.ty, py2 = g.tx;            // 垂直方向
+            var tipX = g.B[0], tipY = g.B[1];
+            var b1x = g.B[0] - g.tx * al + px2 * aw, b1y = g.B[1] - g.ty * al + py2 * aw;
+            var b2x = g.B[0] - g.tx * al - px2 * aw, b2y = g.B[1] - g.ty * al - py2 * aw;
             parts.push('<g class="mp-route" data-route="' + esc(r.id) + '">' +
                 '<path d="' + d + '" fill="none" stroke="#ff9dbb" stroke-width="' + (w * 3.6).toFixed(2) +
                   '" stroke-linecap="round" opacity="' + (op * 0.15).toFixed(2) + '"/>' +
                 '<path d="' + d + '" fill="none" stroke="url(#mpRouteG)" stroke-width="' + w.toFixed(2) +
                   '" stroke-linecap="round" opacity="' + op.toFixed(2) + '"/>' +
-                '<circle cx="' + g.A[0].toFixed(1) + '" cy="' + g.A[1].toFixed(1) + '" r="' + (3.1 * u).toFixed(2) + '" fill="#d8325f" stroke="#fff" stroke-width="' + (1.1 * u).toFixed(2) + '"/>' +
-                '<circle cx="' + g.B[0].toFixed(1) + '" cy="' + g.B[1].toFixed(1) + '" r="' + (3.1 * u).toFixed(2) + '" fill="#d8325f" stroke="#fff" stroke-width="' + (1.1 * u).toFixed(2) + '"/>' +
+                '<circle cx="' + g.A[0].toFixed(1) + '" cy="' + g.A[1].toFixed(1) + '" r="' + (3.4 * u).toFixed(2) + '" fill="#fff" stroke="#e0678e" stroke-width="' + (1.5 * u).toFixed(2) + '"/>' +
+                '<polygon points="' + tipX.toFixed(2) + ',' + tipY.toFixed(2) + ' ' + b1x.toFixed(2) + ',' + b1y.toFixed(2) + ' ' + b2x.toFixed(2) + ',' + b2y.toFixed(2) +
+                  '" fill="#c21f52" stroke="#fff" stroke-width="' + (1.1 * u).toFixed(2) + '" stroke-linejoin="round" opacity="' + Math.min(1, op + 0.12).toFixed(2) + '"/>' +
             '</g>');
-            var mx = 0.25 * g.A[0] + 0.5 * g.C[0] + 0.25 * g.B[0];
-            var my = 0.25 * g.A[1] + 0.5 * g.C[1] + 0.25 * g.B[1];
+            var mx = 0.36 * g.A[0] + 0.5 * g.C[0] + 0.14 * g.B[0];
+            var my = 0.36 * g.A[1] + 0.5 * g.C[1] + 0.14 * g.B[1];
             var px = (mx - MAP_VIEW.x) * k * sr, py = (my - MAP_VIEW.y) * k * sr;
             if (px < -30 || px > sw + 30 || py < -20 || py > sh + 20) return;
             if (n < 2 && k < 1.45) return;
@@ -6860,7 +6866,7 @@ window.LOVE_BOARD_CFG = {
         }).join('');
     }
 
-    /* ── 地名连线：南京-杭州 ── */
+    /* ── 地名连线：长沙-南昌（有方向） ── */
     var rtArm = null, rtArmTimer = null;
 
     function parseRouteInput(str) {
@@ -6893,11 +6899,11 @@ window.LOVE_BOARD_CFG = {
         var box = $('rtChips');
         if (!box) return;
         if (!routeList.length) {
-            box.innerHTML = '<span class="rt-empty">还没有连线 —— 写「南京-杭州」，点一下连线</span>';
+            box.innerHTML = '<span class="rt-empty">还没有连线 —— 写「长沙-南昌」，箭头指向终点</span>';
             return;
         }
         box.innerHTML = routeList.map(function (r) {
-            return '<span class="rt-chip">' + esc(r.a) + ' ⇄ ' + esc(r.b) +
+            return '<span class="rt-chip">' + esc(r.a) + ' → ' + esc(r.b) +
                 '<b>×' + (r.n || 1) + '</b>' +
                 '<button type="button" data-rt-del="' + esc(r.id) + '" aria-label="删掉这条线">✕</button></span>';
         }).join('');
@@ -6905,9 +6911,9 @@ window.LOVE_BOARD_CFG = {
 
     function ensureRoute(a, b, n) {
         if (a.name === b.name) { toast('两个地名一样，换一个试试'); return false; }
-        var key = [a.name, b.name].sort().join('|');
+        var key = a.name + '\u2192' + b.name;
         var hit = null;
-        routeList.forEach(function (r) { if ([r.a, r.b].sort().join('|') === key) hit = r; });
+        routeList.forEach(function (r) { if (r.a + '\u2192' + r.b === key) hit = r; });
         if (hit) {
             hit.n = Math.min(99, (hit.n || 1) + n);
             hit.ts = Date.now();
@@ -6921,14 +6927,14 @@ window.LOVE_BOARD_CFG = {
         queueOp({ type: 'upsert', table: 'love_routes', row: toRtRow(hit) });
         renderRoutes();
         renderMap();
-        toast(a.name + ' ⇄ ' + b.name + ' ×' + hit.n);
+        toast(a.name + ' → ' + b.name + ' ×' + hit.n);
         return true;
     }
 
     function addRouteFromInput() {
         var raw = $('rtInput') ? $('rtInput').value : '';
         var o = parseRouteInput(raw);
-        if (!o) { toast('写成「南京-杭州」这样'); return; }
+        if (!o) { toast('写成「长沙-南昌」这样，前面是出发地'); return; }
         var A = findPlace(o.a), B = findPlace(o.b);
         if (!A) { toast('没找到「' + o.a + '」，换个写法或先加个足迹点'); return; }
         if (!B) { toast('没找到「' + o.b + '」，换个写法或先加个足迹点'); return; }
