@@ -1440,11 +1440,31 @@
 
     // 刷新后直接回到主页：已经进来过就不再走信封 / 信纸 / 回忆之旅
     window.__LOVE_RESUME = function () {
-        try {
-            if (localStorage.getItem('love.entered.v1') !== '1') return false;
-        } catch (e) { return false; }
+        function stage() {
+            var v = null;
+            try { v = localStorage.getItem('love.stage.v1'); } catch (e) {}
+            if (!v) {
+                try {
+                    var m = document.cookie.match(/(?:^|; )love\.stage\.v1=(\w+)/);
+                    if (m) v = m[1];
+                } catch (e) {}
+            }
+            if (!v) {
+                // 兼容旧记录：只记过「进过主页」
+                try { if (localStorage.getItem('love.entered.v1') === '1') v = 'main'; } catch (e) {}
+                try { if (!v && /(?:^|; )love\.entered\.v1=1/.test(document.cookie)) v = 'main'; } catch (e) {}
+            }
+            return v || '';
+        }
+        var st = stage();
+        if (st !== 'main' && st !== 'letter') return false;
+
         envelopePage.classList.add('hide');
         letterPage.classList.remove('show');
+        if (st === 'letter') {
+            letterPage.classList.add('show');
+            return true;
+        }
         mainContent.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'auto' });
         try {
@@ -1463,6 +1483,11 @@
             letterPage.classList.remove('show');
             mainContent.style.display = 'block';
             try { localStorage.setItem('love.entered.v1', '1'); } catch (e) {}
+            try {
+                localStorage.setItem('love.stage.v1', 'main');
+                document.cookie = 'love.stage.v1=main;path=/;max-age=31536000;SameSite=Lax';
+            } catch (e) {}
+            try { document.cookie = 'love.entered.v1=1;path=/;max-age=31536000;SameSite=Lax'; } catch (e) {}
             window.scrollTo({ top: 0, behavior: 'auto' });
             startCounterAnimation();
             startProgressAnimation();
@@ -1969,6 +1994,12 @@
 
     envelopeFlap.addEventListener('click', () => {
         if (envelopePage.classList.contains('hide')) return;
+        try {
+            if (localStorage.getItem('love.stage.v1') !== 'main') {
+                localStorage.setItem('love.stage.v1', 'letter');
+                document.cookie = 'love.stage.v1=letter;path=/;max-age=31536000;SameSite=Lax';
+            }
+        } catch (e) {}
         // 信封盖翻转动画
         envelopeFlap.style.transform = 'rotateX(180deg)';
         playEnvelopeCinema();
@@ -2360,14 +2391,26 @@
         meme.classList.add('on');
     }
 
+    function setTok(k, v) {
+        try { localStorage.setItem(k, v); } catch (e) {}
+        try { document.cookie = k + '=' + encodeURIComponent(v) + ';path=/;max-age=31536000;SameSite=Lax'; } catch (e) {}
+    }
+    function getTok(k) {
+        try { var v = localStorage.getItem(k); if (v) return v; } catch (e) {}
+        try {
+            var m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)'));
+            if (m) return decodeURIComponent(m[1]);
+        } catch (e) {}
+        return null;
+    }
     function storedPass() {
-        try { return localStorage.getItem('love.gate.v1') === PASS_HASH; } catch (e) { return false; }
+        return getTok('love.gate.v1') === PASS_HASH;
     }
 
     function unlock() {
         if (done) return;
         done = true;
-        try { localStorage.setItem('love.gate.v1', PASS_HASH); } catch (e) {}
+        setTok('love.gate.v1', PASS_HASH);
         gate.classList.add('out');
         document.body.classList.remove('gated');
         setTimeout(function () {
