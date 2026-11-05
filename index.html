@@ -2750,6 +2750,185 @@ body.map-fs { overflow: hidden; }
 }
 #crThumbs { max-height: 212px; overflow-y: auto; padding-right: 2px; }
 
+/* ── 相册日历视图 ── */
+.cal-years { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+.cal-y {
+    height: 32px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+    border: 1px solid #ffd9e8; background: #fff; color: #a9718a;
+    font-size: 13px; font-weight: 700; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.cal-y span { font-size: 10.5px; font-weight: 600; color: #c9a3b4; }
+.cal-y.on { background: linear-gradient(135deg, #ffb0cd, #ff8fb4); border-color: #ff9dbf; color: #fff; }
+.cal-y.on span { color: rgba(255, 255, 255, .85); }
+
+.cal-grid {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.cal-month {
+    padding: 12px 12px 10px; border-radius: 16px;
+    background: #fffdfc; border: 1px solid #ffe6ef;
+    box-shadow: 0 3px 10px rgba(201, 130, 158, .07);
+}
+.cal-month h4 {
+    margin: 0 0 8px; font-size: 13.5px; color: #7d5b6a; font-weight: 700;
+    display: flex; align-items: baseline; justify-content: space-between;
+}
+.cal-month h4 b { font-size: 10.5px; font-weight: 600; color: #c69cad; }
+.cal-dow, .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-dow span {
+    text-align: center; font-size: 9.5px; color: #c8a7b5; padding-bottom: 4px;
+}
+.cal-d {
+    height: 26px; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #bda6b0; border-radius: 8px; position: relative;
+}
+.cal-d.has {
+    border: none; cursor: pointer; font-family: inherit;
+    color: #7d5b6a; font-weight: 700;
+    background: #fff2f7;
+    transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+}
+.cal-d.has:hover { background: #ffe3ee; transform: translateY(-1px); }
+.cal-d.has:active { transform: scale(.94); }
+.cal-d.has i {
+    position: absolute; top: 2px; right: 3px;
+    font-size: 8px; font-style: normal; font-weight: 700; color: #ff8fb4;
+}
+.cal-d.has.today { box-shadow: 0 0 0 1.5px #ff9dbf inset; }
+.cal-extra { margin-top: 18px; }
+
+/* 当天照片弹层 */
+.al-day {
+    position: fixed; inset: 0; z-index: 4600; display: flex;
+    align-items: center; justify-content: center; padding: 20px;
+    background: rgba(52, 30, 42, .34);
+    backdrop-filter: blur(3px);
+    opacity: 0; visibility: hidden;
+    transition: opacity .22s ease, visibility .22s ease;
+}
+.al-day.show { opacity: 1; visibility: visible; }
+.al-day-card {
+    width: min(760px, 94vw); max-height: 84vh;
+    display: flex; flex-direction: column;
+    background: #fffdfc; border-radius: 22px; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(90, 40, 60, .28), inset 0 0 0 1px #ffe6ef;
+    transform: translateY(20px) scale(.982); opacity: 0;
+    transition: transform .28s cubic-bezier(.22, 1, .36, 1), opacity .24s ease;
+}
+.al-day.show .al-day-card { transform: none; opacity: 1; }
+.al-day-card header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px 12px; border-bottom: 1px solid #ffeeF4;
+}
+.al-day-card header b { font-size: 14.5px; color: #6f5260; }
+.al-day-card header span { font-size: 11.5px; color: #c095a7; }
+.al-day-x {
+    margin-left: auto; width: 30px; height: 30px; border-radius: 50%;
+    border: 1px solid #ffd9e8; background: #fff; color: #b3778d;
+    font-size: 14px; line-height: 1; cursor: pointer;
+}
+.al-day-grid {
+    display: grid; gap: 8px; padding: 14px 16px;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    overflow: auto;
+}
+.al-day-ph {
+    padding: 0; border: none; background: #fdf1f6; border-radius: 12px;
+    overflow: hidden; cursor: zoom-in; aspect-ratio: 1 / 1;
+    animation: alDayIn .34s cubic-bezier(.22, 1, .36, 1) both;
+    transition: transform .18s ease;
+}
+.al-day-ph:hover { transform: translateY(-2px); }
+.al-day-ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes alDayIn {
+    from { opacity: 0; transform: translateY(10px) scale(.96); }
+    to { opacity: 1; transform: none; }
+}
+.al-day-card footer {
+    display: flex; gap: 10px; justify-content: space-between;
+    padding: 10px 16px 14px; border-top: 1px solid #fff0f6;
+}
+.al-day-card footer button {
+    height: 32px; padding: 0 14px; border-radius: 999px; cursor: pointer;
+    border: 1px solid #ffd9e8; background: #fff; color: #a9718a;
+    font-size: 12px; font-weight: 700; font-family: inherit;
+}
+.al-day-card footer button[disabled] { opacity: .38; cursor: default; }
+
+.al-view { z-index: 5200; }
+
+@media (max-width: 900px) {
+    .cal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+}
+@media (max-width: 600px) {
+    .cal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .cal-month { padding: 9px 8px 7px; border-radius: 13px; }
+    .cal-month h4 { font-size: 12px; margin-bottom: 6px; }
+    .cal-d { height: 22px; font-size: 10px; }
+    .cal-dow span { font-size: 8.5px; }
+    .al-day { padding: 12px; }
+    .al-day-card { max-height: 86vh; border-radius: 18px; }
+    .al-day-grid { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; padding: 10px 12px; }
+}
+
+/* 年度总结按钮 + 语音留言样式 */
+.cal-annual {
+    margin-left: auto;
+    padding: 7px 14px;
+    border: 1px solid #ffd3e4;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #fff2f8, #ffe6f0);
+    color: #c2567c;
+    font-family: "YouYuan", "幼圆", "Yuanti SC", "PingFang SC", sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.cal-annual:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(226, 120, 160, 0.18); }
+.cal-annual:active { transform: scale(0.97); }
+
+.gb-recbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0 2px;
+}
+.gb-rec {
+    padding: 7px 14px;
+    border: 1px solid #ffd3e4;
+    border-radius: 999px;
+    background: #fff6fa;
+    color: #c2567c;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.16s ease;
+}
+.gb-rec.on {
+    background: linear-gradient(135deg, #ff8fb2, #ff6a97);
+    border-color: #ff6a97;
+    color: #fff;
+    animation: recPulse 1.2s ease-in-out infinite;
+}
+@keyframes recPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 106, 151, 0.42); }
+    50% { box-shadow: 0 0 0 7px rgba(255, 106, 151, 0); }
+}
+.gb-rectip { font-size: 11.5px; color: #b08b9c; }
+
+.gb-audio-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+.gb-wave { font-size: 15px; }
+.gb-audio { width: 100%; max-width: 300px; height: 34px; }
+
 </style>
 
 </head>
@@ -4304,6 +4483,7 @@ window.LOVE_BOARD_CFG = {
     var alFolder = 'all';              // 当前选中的相册夹，'all' = 全部
     var folderList = [];
     var alMode = false;
+    var calYear = '';      // 日历视图当前年份
     var alSel = {};               // 相册夹列表
     var MP_KEY = 'love.map.v1';        // 足迹地图上的点
     var RP_KEY = 'love.routes.v1';     // 地名连线（去了几次）
@@ -4398,12 +4578,12 @@ window.LOVE_BOARD_CFG = {
     }
 
     /* 读：以云端为准，本机独有的也保留并补传上去 */
-    function fromGbRow(r) { return { id: r.id, name: r.name || '', text: r.body || '', emo: r.emo || '', ts: Number(r.ts) || Date.now() }; }
+    function fromGbRow(r) { return { id: r.id, name: r.name || '', text: r.body || '', emo: r.emo || '', audio: r.audio || '', ts: Number(r.ts) || Date.now() }; }
     function fromCrRow(r) {
         return { id: r.id, ts: Number(r.ts) || Date.now(), title: r.title || '', desc: r.descr || '', date: r.date || '',
                  place: r.place || '', images: Array.isArray(r.images) ? r.images : [] };
     }
-    function toGbRow(m) { return { id: m.id, name: m.name || '', body: m.text || '', emo: m.emo || '', ts: m.ts || Date.now() }; }
+    function toGbRow(m) { return { id: m.id, name: m.name || '', body: m.text || '', emo: m.emo || '', audio: m.audio || '', ts: m.ts || Date.now() }; }
     function toCrRow(m) { return { id: m.id, title: m.title || '', date: m.date || '', descr: m.desc || '', place: m.place || '', images: m.images || [], ts: m.ts || Date.now() }; }
     function fromPhRow(r) { return { id: r.id, src: r.src || '', date: r.date || '', note: r.note || '', folder: r.folder || '', ts: Number(r.ts) || Date.now() }; }
     function toPhRow(p) { return { id: p.id, src: p.src || '', date: p.date || '', note: p.note || '', folder: p.folder || '', ts: p.ts || Date.now() }; }
@@ -4683,6 +4863,10 @@ window.LOVE_BOARD_CFG = {
         '      <div class="board-field">',
         '        <span class="board-label">想说的话</span>',
         '        <textarea class="board-textarea" id="gbText" maxlength="300" placeholder="今天也想你啦……"></textarea>',
+        '        <div class="gb-recbar">',
+        '          <button class="gb-rec" id="gbRec" type="button">🎙 说一句</button>',
+        '          <span class="gb-rectip" id="gbRecTip">最多 60 秒</span>',
+        '        </div>',
         '      </div>',
         '      <div class="board-actions">',
         '        <button class="board-btn" id="gbSubmit" type="button">留下这句 💌</button>',
@@ -4909,18 +5093,95 @@ window.LOVE_BOARD_CFG = {
                     '<span class="gb-name">' + esc(m.name || '匿名') + '</span>' +
                     '<span class="gb-time">' + esc(fmt(m.ts)) + '</span>' +
                 '</div>' +
-                '<div class="gb-text">' + esc(m.text) +
+                '<div class="gb-text">' + (m.text ? esc(m.text) : '') +
                     (m.emo ? '<span class="gb-emo">' + esc(m.emo) + '</span>' : '') + '</div>' +
+                (m.audio ? '<div class="gb-audio-wrap"><span class="gb-wave">🎧</span>' +
+                    '<audio class="gb-audio" controls preload="metadata" src="' + esc(m.audio) + '"></audio></div>' : '') +
                 '<button class="gb-del" type="button" data-id="' + esc(m.id) + '">删除</button>' +
             '</article>';
         }).join('');
     }
 
+    /* 语音留言 */
+    var rec = { mr: null, chunks: [], t0: 0, url: '', timer: null, blob: null };
+
+    function recTip(t) { if ($('gbRecTip')) $('gbRecTip').textContent = t; }
+
+    function uploadBlob(blob) {
+        if (!SB) return Promise.resolve('');
+        var ext = /mp4|m4a/.test(blob.type) ? '.m4a' : '.webm';
+        var name = 'v' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8) + ext;
+        return fetch(SB.url + '/storage/v1/object/' + BUCKET + '/' + name, {
+            method: 'POST',
+            headers: {
+                'apikey': SB.key,
+                'Authorization': 'Bearer ' + SB.key,
+                'Content-Type': blob.type || 'audio/webm',
+                'cache-control': '31536000'
+            },
+            body: blob
+        }).then(function (r) {
+            if (!r.ok) throw new Error('upload ' + r.status);
+            return SB.url + '/storage/v1/object/public/' + BUCKET + '/' + name;
+        });
+    }
+
+    function stopRec() {
+        if (!rec.mr) return;
+        try { rec.mr.stop(); } catch (e) { }
+    }
+
+    $('gbRec').addEventListener('click', function () {
+        var btn = this;
+        if (rec.mr && rec.mr.state === 'recording') { stopRec(); return; }
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+            toast('这个浏览器不支持录音，换一个试试');
+            return;
+        }
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+            var mime = '';
+            ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].some(function (t) {
+                if (window.MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) { mime = t; return true; }
+                return false;
+            });
+            var mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+            rec.mr = mr; rec.chunks = []; rec.t0 = Date.now(); rec.url = ''; rec.blob = null;
+            mr.ondataavailable = function (e) { if (e.data && e.data.size) rec.chunks.push(e.data); };
+            mr.onstop = function () {
+                stream.getTracks().forEach(function (t) { t.stop(); });
+                var blob = new Blob(rec.chunks, { type: mime || 'audio/webm' });
+                rec.mr = null;
+                clearInterval(rec.timer);
+                btn.classList.remove('on');
+                btn.textContent = '🎙 说一句';
+                if (blob.size < 600) { recTip('太短啦，再录一次'); return; }
+                rec.blob = blob;
+                recTip('上传中…');
+                uploadBlob(blob).then(function (url) {
+                    if (!url) { recTip('没网，暂时存不下语音'); return; }
+                    rec.url = url;
+                    recTip('已录 ' + Math.round(blob.size / 1024) + 'KB，随留言一起发出 ✓');
+                })['catch'](function () { recTip('上传失败，再试一次'); });
+            };
+            mr.start();
+            btn.classList.add('on');
+            btn.textContent = '■ 停止';
+            recTip('正在录…');
+            rec.timer = setInterval(function () {
+                var sec = Math.floor((Date.now() - rec.t0) / 1000);
+                recTip('正在录… ' + sec + ' 秒');
+                if (sec >= 60) stopRec();
+            }, 400);
+        })['catch'](function () {
+            toast('没拿到麦克风权限');
+        });
+    });
+
     $('gbSubmit').addEventListener('click', function () {
         var text = $('gbText').value.trim();
-        if (!text) { toast('先写点什么吧～'); $('gbText').focus(); return; }
+        if (!text && !rec.url) { toast('写点什么，或者说一句吧～'); $('gbText').focus(); return; }
         var name = $('gbName').value.trim() || '匿名的小兔子';
-        var msg = { id: uid(), name: name, text: text, emo: activeEmo, ts: Date.now() };
+        var msg = { id: uid(), name: name, text: text, emo: activeEmo, audio: rec.url || '', ts: Date.now() };
         gbList.unshift(msg);
         if (!writeArr(GB_KEY, gbList)) { gbList.shift(); return; }
         queueOp({ type: 'upsert', table: 'love_guestbook', row: toGbRow(msg) });
@@ -4928,6 +5189,8 @@ window.LOVE_BOARD_CFG = {
         activeEmo = '';
         Array.prototype.forEach.call($('gbEmos').children, function (el) { el.classList.remove('on'); });
         renderGb();
+        rec.url = '';
+        recTip('最多 60 秒');
         toast('留言收好啦 💗');
     });
 
@@ -5637,6 +5900,14 @@ window.LOVE_BOARD_CFG = {
                 : '「' + folderName(alFolder) + '」共 ' + items.length + ' 张 · ✎ 改说明 / 移动 / 删除';
         }
 
+        if ($('alPick')) $('alPick').style.display = alFolder === 'all' ? 'none' : '';
+        if (alFolder === 'all' && !alMode) {
+            grid.classList.add('cal');
+            grid.innerHTML = renderCalendar(items);
+            return;
+        }
+        grid.classList.remove('cal');
+
         if (!items.length) {
             grid.innerHTML = '<div class="board-empty"><span class="big">📷</span><p>' +
                 (alFolder === 'all' ? '还没有照片' : '「' + esc(folderName(alFolder)) + '」还是空的<br>点上面的「上传照片」放几张进来') +
@@ -5680,6 +5951,158 @@ window.LOVE_BOARD_CFG = {
                 '</div></section>';
         }).join('');
     }
+
+    /* ── 日历视图 ── */
+    function parseYMD(str) {
+        var t = String(str || '');
+        var m = /((?:19|20)\d{2})\s*[.\-/年]\s*(\d{1,2})\s*[.\-/月]\s*(\d{1,2})/.exec(t);
+        if (m) {
+            var y = +m[1], mo = +m[2], d = +m[3];
+            if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) return { y: y, m: mo, d: d };
+        }
+        m = /((?:19|20)\d{2})\s*[.\-/年]\s*(\d{1,2})/.exec(t);
+        if (m) {
+            var y2 = +m[1], mo2 = +m[2];
+            if (mo2 >= 1 && mo2 <= 12) return { y: y2, m: mo2, d: 1 };
+        }
+        return null;
+    }
+    function dayKey(o) { return o.y + '-' + o.m + '-' + o.d; }
+    function dayMapOf(list) {
+        var map = {}, undated = [];
+        list.forEach(function (it) {
+            var o = parseYMD(it.date);
+            if (!o) { undated.push(it); return; }
+            var k = dayKey(o);
+            if (!map[k]) map[k] = { y: o.y, m: o.m, d: o.d, items: [] };
+            map[k].items.push(it);
+        });
+        return { map: map, undated: undated };
+    }
+    function cellHTML(it, i) {
+        var cap = it.title || '';
+        return '<figure class="al-cell' + (it.standalone ? ' own' : '') + '" data-i="' + i + '" data-src="' + esc(it.src) + '"' +
+            ' data-cap="' + esc(cap + (it.date ? ' · ' + it.date : '')) + '">' +
+            '<img src="' + esc(it.src) + '" alt="' + esc(it.title) + '" loading="lazy" decoding="async">' +
+            '</figure>';
+    }
+    function renderCalendar(items) {
+        var dm = dayMapOf(items);
+        var years = {};
+        Object.keys(dm.map).forEach(function (k) {
+            var o = dm.map[k];
+            (years[o.y] = years[o.y] || []).push(o);
+        });
+        var ys = Object.keys(years).map(Number).sort(function (a, b) { return b - a; });
+        if (!ys.length) {
+            return dm.undated.length
+                ? '<div class="al-group"><h3 class="al-h"><b>无日期</b><span>' + dm.undated.length + ' 张</span></h3>' +
+                  '<div class="al-cols">' + dm.undated.map(cellHTML).join('') + '</div></div>'
+                : '<div class="board-empty"><span class="big">📷</span><p>还没有照片</p></div>';
+        }
+        if (ys.indexOf(Number(calYear)) < 0) calYear = String(ys[0]);
+        var y = Number(calYear);
+        var months = years[y].slice().sort(function (a, b) { return a.m - b.m; });
+        var byMonth = {};
+        months.forEach(function (o) { (byMonth[o.m] = byMonth[o.m] || []).push(o); });
+
+        var tabs = ys.map(function (yy) {
+            var cnt = 0;
+            years[yy].forEach(function (o) { cnt += o.items.length; });
+            return '<button class="cal-y' + (yy === y ? ' on' : '') + '" type="button" data-cal-year="' + yy + '">' +
+                yy + '<span>' + cnt + '</span></button>';
+        }).join('');
+
+        var monthSet = {};
+        months.forEach(function (o) { monthSet[o.m] = 1; });
+        var monthList = Object.keys(monthSet).map(Number).sort(function (a, b) { return a - b; });
+        var cards = monthList.map(function (mm) {
+            var firstDow = new Date(y, mm - 1, 1).getDay();
+            var lastDay = new Date(y, mm, 0).getDate();
+            var byDay = {};
+            byMonth[mm].forEach(function (dd) { byDay[dd.d] = (byDay[dd.d] || 0) + dd.items.length; });
+            var cells = '';
+            for (var i = 0; i < firstDow; i++) cells += '<span class="cal-pad"></span>';
+            for (var d = 1; d <= lastDay; d++) {
+                var n = byDay[d] || 0;
+                var key = y + '-' + mm + '-' + d;
+                cells += n
+                    ? '<button class="cal-d has" type="button" data-day="' + key + '">' + d + '<i>' + n + '</i></button>'
+                    : '<span class="cal-d">' + d + '</span>';
+            }
+            var total = byMonth[mm].reduce(function (s2, dd) { return s2 + dd.items.length; }, 0);
+            return '<section class="cal-month">' +
+                '<h4>' + mm + ' 月<b>' + total + ' 张</b></h4>' +
+                '<div class="cal-dow"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>' +
+                '<div class="cal-days">' + cells + '</div>' +
+            '</section>';
+        }).join('');
+
+        var extra = dm.undated.length
+            ? '<div class="al-group cal-extra"><h3 class="al-h"><b>无日期</b><span>' + dm.undated.length + ' 张</span></h3>' +
+              '<div class="al-cols">' + dm.undated.map(cellHTML).join('') + '</div></div>'
+            : '';
+
+        return '<div class="cal-years">' + tabs +
+            '<button class="cal-annual" id="alAnnual" type="button">✨ ' + esc(calYear) + ' 年度总结</button>' +
+            '</div>' +
+               '<div class="cal-grid">' + cards + '</div>' + extra;
+    }
+
+    /* 某一天的照片弹层 */
+    var daySheet = document.createElement('div');
+    daySheet.className = 'al-day';
+    daySheet.innerHTML = '<div class="al-day-card" role="dialog" aria-label="这一天的照片">' +
+        '<header><b id="alDayT">—</b><span id="alDayN"></span>' +
+        '<button class="al-day-x" type="button" id="alDayX" aria-label="关闭">✕</button></header>' +
+        '<div class="al-day-grid" id="alDayGrid"></div>' +
+        '<footer><button type="button" id="alDayPrev">‹ 前一天</button>' +
+        '<button type="button" id="alDayNext">后一天 ›</button></footer>' +
+        '</div>';
+    document.body.appendChild(daySheet);
+    var dayKeys = [], dayCur = '';
+
+    function closeDay() {
+        daySheet.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+    function openDay(key) {
+        var dm = dayMapOf(albumItems().filter(function (it) { return inFolder(it); }));
+        dayKeys = Object.keys(dm.map).sort(function (a, b) {
+            var A = a.split('-').map(Number), B = b.split('-').map(Number);
+            return (B[0] - A[0]) || (B[1] - A[1]) || (B[2] - A[2]);
+        });
+        dayCur = key;
+        var o = dm.map[key];
+        if (!o) return;
+        $('alDayT').textContent = o.y + ' 年 ' + o.m + ' 月 ' + o.d + ' 日';
+        $('alDayN').textContent = o.items.length + ' 张';
+        $('alDayGrid').innerHTML = o.items.map(function (it, i) {
+            return '<button class="al-day-ph" type="button" data-src="' + esc(it.src) + '"' +
+                ' data-cap="' + esc((it.title || '') + (it.date ? ' · ' + it.date : '')) + '"' +
+                ' style="animation-delay:' + Math.min(i, 14) * 32 + 'ms">' +
+                '<img src="' + esc(it.src) + '" alt="" loading="eager" decoding="async"></button>';
+        }).join('');
+        var idx = dayKeys.indexOf(key);
+        $('alDayPrev').disabled = idx >= dayKeys.length - 1;
+        $('alDayNext').disabled = idx <= 0;
+        daySheet.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        void daySheet.offsetWidth;
+    }
+    function stepDay(dir) {
+        var idx = dayKeys.indexOf(dayCur);
+        var next = dayKeys[idx + dir];
+        if (next) openDay(next);
+    }
+    daySheet.addEventListener('click', function (e) {
+        if (e.target === daySheet) { closeDay(); return; }
+        if (e.target.closest('#alDayX')) { closeDay(); return; }
+        if (e.target.closest('#alDayPrev')) { stepDay(1); return; }
+        if (e.target.closest('#alDayNext')) { stepDay(-1); return; }
+        var ph = e.target.closest('.al-day-ph');
+        if (ph) openView(ph.dataset.src, ph.dataset.cap);
+    });
 
     $('alBar').addEventListener('click', function (e) {
         var f = e.target.closest('[data-folder]');
@@ -5790,6 +6213,10 @@ window.LOVE_BOARD_CFG = {
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && phEdit.classList.contains('show')) closePhEdit(); });
 
     $('alGrid').addEventListener('click', function (e) {
+        var cy = e.target.closest('[data-cal-year]');
+        if (cy) { calYear = cy.getAttribute('data-cal-year'); renderAlbum(); return; }
+        var cdy = e.target.closest('[data-day]');
+        if (cdy) { openDay(cdy.getAttribute('data-day')); return; }
         var cell = e.target.closest('.al-cell');
         if (!cell) return;
         if (alMode) {
@@ -6309,6 +6736,270 @@ window.LOVE_BOARD_CFG = {
             }
         });
     })();
+
+
+    /* ── 年度总结 ── */
+    function annualStats(year) {
+        year = Number(year) || new Date().getFullYear();
+        var items = albumItems().filter(function (it) {
+            var d = parseYMD(it.date);
+            return d && d.y === year;
+        });
+        var months = new Array(12);
+        for (var i = 0; i < 12; i++) months[i] = 0;
+        var days = {};
+        items.forEach(function (it) {
+            var d = parseYMD(it.date);
+            if (!d) return;
+            months[d.m - 1]++;
+            days[d.y + '-' + d.m + '-' + d.d] = 1;
+        });
+        var cities = {};
+        mapStops.forEach(function (st) {
+            var d = parseYMD(st.date);
+            if (d && d.y === year && st.name) cities[st.name] = 1;
+        });
+        var mems = 0;
+        try {
+            eventsData.forEach(function (m) {
+                var d = parseYMD(m.date);
+                if (d && d.y === year) mems++;
+            });
+        } catch (e) { }
+        var seenIdx = {};
+        items.forEach(function (it) { if (it.idx >= 0) seenIdx[it.idx] = 1; });
+        var cues = Object.keys(seenIdx).length;
+        return {
+            year: year, photos: items.length, days: Object.keys(days).length,
+            cities: Object.keys(cities).length, mems: mems || cues, months: months, items: items
+        };
+    }
+
+    function ageOf(year) {
+        return Math.max(0, new Date().getFullYear() - year);
+    }
+
+    function pickSpread(list, n) {
+        if (list.length <= n) return list.slice();
+        var out = [], step = (list.length - 1) / (n - 1);
+        for (var i = 0; i < n; i++) out.push(list[Math.round(i * step)]);
+        return out;
+    }
+
+    function drawStar(ctx, cx, cy, r, color) {
+        ctx.save(); ctx.fillStyle = color; ctx.beginPath();
+        for (var i = 0; i < 10; i++) {
+            var ang = -Math.PI / 2 + i * Math.PI / 5;
+            var rr = i % 2 ? r * 0.44 : r;
+            ctx[i ? 'lineTo' : 'moveTo'](cx + Math.cos(ang) * rr, cy + Math.sin(ang) * rr);
+        }
+        ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+
+    function makeAnnual(year) {
+        year = Number(year) || new Date().getFullYear();
+        var st = annualStats(year);
+        var W = 1080, H = 1680;
+        var c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        var ctx = c.getContext('2d');
+
+        var bg = ctx.createLinearGradient(0, 0, W * 0.3, H);
+        bg.addColorStop(0, '#fffaf4'); bg.addColorStop(0.55, '#fff2f4'); bg.addColorStop(1, '#ffe8ef');
+        ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+        [[180, 210, 430, 'rgba(255,190,214,.30)'], [900, 430, 520, 'rgba(255,226,186,.34)'],
+         [140, 1330, 480, 'rgba(200,238,224,.30)']].forEach(function (b) {
+            var g = ctx.createRadialGradient(b[0], b[1], 0, b[0], b[1], b[2]);
+            g.addColorStop(0, b[3]); g.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+        });
+
+        ctx.textBaseline = 'alphabetic';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#c98ba6';
+        ctx.font = '600 22px "Trebuchet MS","PingFang SC",sans-serif';
+        ctx.fillText('O U R   Y E A R', W / 2, 118);
+
+        ctx.fillStyle = '#7a4a60';
+        ctx.font = '700 150px "YouYuan","幼圆","PingFang SC",sans-serif';
+        ctx.fillText(String(year), W / 2, 268);
+
+        ctx.fillStyle = '#b07c92';
+        ctx.font = '400 30px "YouYuan","幼圆","PingFang SC",sans-serif';
+        ctx.fillText('这一年，我们一起走过', W / 2, 330);
+
+        // 四个数字
+        var stats = [
+            [st.photos, '张照片', '#e8607f'],
+            [st.mems, '段回忆', '#d2799b'],
+            [st.cities, '座城市', '#7fae9a'],
+            [st.days, '天有记录', '#c69a68']
+        ];
+        stats.forEach(function (row, i) {
+            var x = 150 + i * 260;
+            ctx.fillStyle = row[2];
+            ctx.font = '700 66px "YouYuan","幼圆","PingFang SC",sans-serif';
+            ctx.fillText(String(row[0]), x, 470);
+            ctx.fillStyle = '#a08192';
+            ctx.font = '400 25px "PingFang SC","YouYuan",sans-serif';
+            ctx.fillText(row[1], x, 508);
+        });
+
+        // 月份柱
+        var maxM = Math.max.apply(null, st.months.concat([1]));
+        var bx = 96, by = 620, bw = 888, bh = 150, gap = 12;
+        var cell = (bw - gap * 11) / 12;
+        ctx.textAlign = 'center';
+        st.months.forEach(function (n, i) {
+            var h = n ? Math.max(10, bh * n / maxM) : 5;
+            var x = bx + i * (cell + gap);
+            ctx.fillStyle = 'rgba(255,255,255,.72)';
+            ctx.beginPath(); ctx.moveTo(x + 8, by + bh); ctx.lineTo(x + 8, by);
+            ctx.lineTo(x + cell - 8, by); ctx.lineTo(x + cell - 8, by + bh); ctx.closePath(); ctx.fill();
+            var g2 = ctx.createLinearGradient(0, by + bh - h, 0, by + bh);
+            g2.addColorStop(0, n ? '#ff9dbb' : '#f0dfe6');
+            g2.addColorStop(1, n ? '#f26d92' : '#eadde3');
+            ctx.fillStyle = g2;
+            ctx.beginPath();
+            var rx = x + 8, ry = by + bh - h, rw = cell - 16, rh = h;
+            ctx.moveTo(rx, by + bh); ctx.lineTo(rx, ry + 6);
+            ctx.quadraticCurveTo(rx, ry, rx + 6, ry);
+            ctx.lineTo(rx + rw - 6, ry); ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + 6);
+            ctx.lineTo(rx + rw, by + bh); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = n ? '#b06a86' : '#c8b3bd';
+            ctx.font = '700 20px "PingFang SC",sans-serif';
+            if (n) ctx.fillText(String(n), x + cell / 2, ry - 12);
+            ctx.fillStyle = '#a98d9b';
+            ctx.font = '400 19px "PingFang SC",sans-serif';
+            ctx.fillText((i + 1) + '月', x + cell / 2, by + bh + 34);
+        });
+
+        // 照片拼贴
+        var pics = pickSpread(st.items, 6);
+        var px0 = 96, py0 = 830, pw = 288, ph = 214, pgap = 12;
+        pics.forEach(function (it, i) {
+            var col = i % 3, row = Math.floor(i / 3);
+            var x = px0 + col * (pw + pgap), y = py0 + row * (ph + pgap);
+            ctx.save();
+            ctx.shadowColor = 'rgba(150,90,115,.20)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 8;
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.moveTo(x + 10, y); ctx.lineTo(x + pw - 10, y);
+            ctx.quadraticCurveTo(x + pw, y, x + pw, y + 10); ctx.lineTo(x + pw, y + ph - 10);
+            ctx.quadraticCurveTo(x + pw, y + ph, x + pw - 10, y + ph);
+            ctx.lineTo(x + 10, y + ph); ctx.quadraticCurveTo(x, y + ph, x, y + ph - 10);
+            ctx.lineTo(x, y + 10); ctx.quadraticCurveTo(x, y, x + 10, y);
+            ctx.fill(); ctx.restore();
+            it._ph = { x: x, y: y, w: pw, h: ph };
+        });
+
+        // 页脚
+        ctx.textAlign = 'left';
+        var firstD = '', lastD = '';
+        var sorted = st.items.filter(function (it) { return parseYMD(it.date); })
+            .sort(function (a, b) { var A = parseYMD(a.date), B = parseYMD(b.date); return (A.y * 10000 + A.m * 100 + A.d) - (B.y * 10000 + B.m * 100 + B.d); });
+        if (sorted.length) { firstD = sorted[0].date; lastD = sorted[sorted.length - 1].date; }
+        ctx.fillStyle = '#a08192';
+        ctx.font = '400 24px "PingFang SC","YouYuan",sans-serif';
+        if (firstD) ctx.fillText('从 ' + firstD + ' 到 ' + lastD, 96, 1338);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#b8768f';
+        ctx.font = '700 34px "YouYuan","幼圆","PingFang SC",sans-serif';
+        ctx.fillText('这一年，谢谢你一直在', W / 2, 1420);
+        ctx.fillStyle = '#c396a9';
+        ctx.font = '400 22px "PingFang SC",sans-serif';
+        ctx.fillText('— 我们的 ' + year + ' —', W / 2, 1474);
+
+        drawStar(ctx, 150, 1560, 16, 'rgba(232,96,127,.55)');
+        drawStar(ctx, 930, 1560, 16, 'rgba(232,96,127,.55)');
+        drawStar(ctx, W / 2, 1582, 12, 'rgba(232,96,127,.75)');
+
+        function paint(canvas, skip) {
+            var todo = [];
+            pics.forEach(function (it) {
+                if (skip) return;
+                todo.push(it);
+            });
+            function one(it) {
+                return new Promise(function (res) {
+                  function drawAny(img) {
+                        var ph2 = it._ph, sc = Math.max(ph2.w / img.width, ph2.h / img.height);
+                        var sw = ph2.w / sc, sh = ph2.h / sc;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(ph2.x + 10, ph2.y); ctx.lineTo(ph2.x + ph2.w - 10, ph2.y);
+                        ctx.quadraticCurveTo(ph2.x + ph2.w, ph2.y, ph2.x + ph2.w, ph2.y + 10);
+                        ctx.lineTo(ph2.x + ph2.w, ph2.y + ph2.h - 10);
+                        ctx.quadraticCurveTo(ph2.x + ph2.w, ph2.y + ph2.h, ph2.x + ph2.w - 10, ph2.y + ph2.h);
+                        ctx.lineTo(ph2.x + 10, ph2.y + ph2.h);
+                        ctx.quadraticCurveTo(ph2.x, ph2.y + ph2.h, ph2.x, ph2.y + ph2.h - 10);
+                        ctx.lineTo(ph2.x, ph2.y + 10);
+                        ctx.quadraticCurveTo(ph2.x, ph2.y, ph2.x + 10, ph2.y);
+                        ctx.clip();
+                        ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, ph2.x, ph2.y, ph2.w, ph2.h);
+                        ctx.restore();
+                        res(true);
+                  }
+                  // 先走 fetch + createImageBitmap：不会污染画布，file:// 与跨域都能导出
+                  fetch(it.src).then(function (r) { return r.blob(); })
+                    .then(function (b) { return createImageBitmap(b); })
+                    .then(function (bm) { drawAny(bm); })
+                    ['catch'](function () {
+                        var img = new Image();
+                        img.onload = function () { drawAny(img); };
+                        img.onerror = function () { res(false); };
+                        img.src = it.src;
+                    });
+                });
+            }
+            return Promise.all(todo.map(one)).then(function (rs) {
+                if (!rs.length || rs.some(function (x) { return x; })) return true;
+                return false;
+            });
+        }
+
+        paint(c, false).then(function (ok) {
+            if (!ok) {
+                // 有图加载失败（多半是跨域），退回纯文字版
+                picBlank();
+            }
+            download();
+        })['catch'](function () { download(); });
+
+        function picBlank() {
+            pics.forEach(function (it) {
+                var ph2 = it._ph;
+                ctx.save();
+                var g3 = ctx.createLinearGradient(ph2.x, ph2.y, ph2.x + ph2.w, ph2.y + ph2.h);
+                g3.addColorStop(0, '#ffe9f0'); g3.addColorStop(1, '#ffe0d0');
+                ctx.fillStyle = g3; ctx.fillRect(ph2.x, ph2.y, ph2.w, ph2.h);
+                ctx.restore();
+            });
+        }
+
+        function download() {
+            try {
+                c.toBlob(onBlob, 'image/jpeg', 0.92);
+            } catch (e) {
+                toast('这张图浏览器不让导出，换成线上地址再试一次');
+            }
+            function onBlob(blob) {
+                if (!blob) { toast('导出失败了，再点一次试试'); return; }
+                var a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = '我们的' + year + '.jpg';
+                document.body.appendChild(a); a.click();
+                setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+                toast('年度总结已保存 ✨');
+            }
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.id === 'alAnnual') {
+            e.preventDefault();
+            makeAnnual(calYear);
+        }
+    });
 
     /* ── 足迹地图 ── */
     var MAP = window.LOVE_MAP_GEO ||
@@ -7757,7 +8448,81 @@ window.LOVE_BOARD_CFG = {
     mountTools();
     initSW();
     setSyncState(SB ? 'busy' : 'local');
-    if (SB) pullAll();
+
+    /* ── 实时同步：Realtime 推送 + 断线轮询兜底 ── */
+    var RT_TABLES = ['love_guestbook', 'love_creations', 'love_overrides_v2', 'love_photos',
+        'love_map', 'love_routes', 'love_plans', 'love_capsules', 'love_folders'];
+    var rtWs = null, rtTimer = null, rtRef = 0, rtBeat = null, rtTries = 0, rtPullAt = 0, rtPoll = null;
+
+    function rtPull(reason) {
+        // 自己刚写的东西会立刻回推，跳过，免得打架
+        if (pending.length) return;
+        var now = Date.now();
+        if (now - rtPullAt < 400) return;
+        rtPullAt = now;
+        clearTimeout(rtTimer);
+        rtTimer = setTimeout(function () {
+            pullAll().then(function () { setSyncState('ok'); })['catch'](function () { setSyncState('err'); });
+        }, 260);
+    }
+
+    function startPollingFallback() {
+        if (rtPoll) return;
+        rtPoll = setInterval(function () {
+            if (document.visibilityState !== 'visible') return;
+            if (!$('boardPage') || !$('boardPage').classList.contains('show')) return;
+            if (pending.length) return;
+            pullAll().then(function () { setSyncState('ok'); })['catch'](function () { setSyncState('err'); });
+        }, 6000);
+    }
+
+    function startRealtime() {
+        if (!SB || !window.WebSocket) { startPollingFallback(); return; }
+        var url = SB.url.replace(/^https:/i, 'wss:').replace(/^http:/i, 'ws:') +
+            '/realtime/v1/websocket?apikey=' + encodeURIComponent(SB.key) + '&vsn=1.0.0';
+        try { rtWs = new WebSocket(url); } catch (e) { startPollingFallback(); return; }
+        rtWs.onopen = function () {
+            rtTries = 0;
+            rtWs.send(JSON.stringify({
+                topic: 'realtime:public:changes',
+                event: 'phx_join',
+                payload: {
+                    config: {
+                        broadcast: { ack: false, self: false },
+                        presence: { key: '' },
+                        postgres_changes: RT_TABLES.map(function (t) {
+                            return { event: '*', schema: 'public', table: t };
+                        })
+                    }
+                },
+                ref: String(++rtRef)
+            }));
+            rtBeat = setInterval(function () {
+                try { rtWs.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: String(++rtRef) })); } catch (e) { }
+            }, 25000);
+        };
+        rtWs.onmessage = function (ev) {
+            var m;
+            try { m = JSON.parse(ev.data); } catch (e) { return; }
+            if (m.event === 'postgres_changes') rtPull('push');
+        };
+        rtWs.onclose = function () {
+            clearInterval(rtBeat);
+            rtBeat = null;
+            rtTries++;
+            if (rtTries <= 4) setTimeout(startRealtime, 600 * rtTries);
+            else startPollingFallback();
+        };
+        rtWs.onerror = function () { /* onclose 会接手 */ };
+    }
+
+    window.__LOVE_RT = {
+        state: function () { return { open: !!(rtWs && rtWs.readyState === 1), tries: rtTries, poll: !!rtPoll }; },
+        pull: rtPull,
+        stop: function () { try { rtWs.close(); } catch (e) { } clearInterval(rtPoll); rtPoll = null; }
+    };
+
+    if (SB) { pullAll(); startRealtime(); }
 })();
 </script>
 
