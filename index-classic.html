@@ -2278,9 +2278,9 @@
        页面里不存明文口令，只存「盐 + 迭代哈希」，输入时现算再比对。
        要改口令：node _tools/mkpass.js 新口令   （会自动重写本段）
        ─────────────────────────────────────────────────────────────── */
-    var PASS_SALT = '54b91510f1eee883687eecf5';
+    var PASS_SALT = '1b96ea6b2da00c4ac06768af';
     var PASS_ITER = 60000;
-    var PASS_HASH = '87a9277620093a5e8e973b590f81179d50d246076d8950328c24019f0969eaec';
+    var PASS_HASH = '4fc2d97c83c9d687651a270d5cf2ed814b815e150f22463dfcc4e0dcc5dbe84a';
 
     // 开门时间：11 月 4 日 0 点（月份从 0 数，所以 10 表示 11 月）
     var OPEN_AT = new Date(2026, 10, 2, 0, 0, 0).getTime();
@@ -2392,26 +2392,9 @@
         meme.classList.add('on');
     }
 
-    function setTok(k, v) {
-        try { localStorage.setItem(k, v); } catch (e) {}
-        try { document.cookie = k + '=' + encodeURIComponent(v) + ';path=/;max-age=31536000;SameSite=Lax'; } catch (e) {}
-    }
-    function getTok(k) {
-        try { var v = localStorage.getItem(k); if (v) return v; } catch (e) {}
-        try {
-            var m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)'));
-            if (m) return decodeURIComponent(m[1]);
-        } catch (e) {}
-        return null;
-    }
-    function storedPass() {
-        return getTok('love.gate.v1') === PASS_HASH;
-    }
-
     function unlock() {
         if (done) return;
         done = true;
-        setTok('love.gate.v1', PASS_HASH);
         gate.classList.add('out');
         document.body.classList.remove('gated');
         setTimeout(function () {
@@ -2496,14 +2479,6 @@
     });
 
     if (!opened()) input.placeholder = '11 月 4 日后开启';
-
-    // 这台设备开过门：直接跳过门禁；如果再进来过主页，连开场也一起跳过
-    if (opened() && storedPass()) {
-        done = true;
-        document.body.classList.remove('gated');
-        if (gate.parentNode) gate.parentNode.removeChild(gate);
-        if (window.__LOVE_RESUME) window.__LOVE_RESUME();
-    }
 })();
 </script>
 </body>
