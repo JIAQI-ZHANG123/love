@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>一封给你的信 · 520特别版</title>
+    <title>一封给你的信 · 一周年</title>
         <style>
         * {
             margin: 0;
@@ -113,11 +113,11 @@
             z-index: 999;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.6s ease;
-            padding: 20px;
+            padding: 28px 20px 48px;
             overflow-y: auto;
         }
 
@@ -1032,23 +1032,24 @@
 <!-- 信纸页面 -->
 <div class="letter-page" id="letterPage">
     <div class="letter-card">
-        <div class="letter-salute">致 我最亲爱的璐璐：</div>
+        <div class="letter-salute">致 我最最最最爱的小宝宝：</div>
         <div class="letter-body">
-            今天就是520，这是我们在一起后第一个520。<br>
-            从2025年11月13日到现在，每一天都因为有你而变得闪闪发光。<br>
-            你像一束温柔的光，照进了我的世界。<br>
-            谢谢你来到我的生命里，让我知道原来被爱是这样美好的事。
-            <br><br>
-            我想和你一起走过很多很多个春夏秋冬，<br>
-            一起吃很多顿饭，一起许很多次愿，<br>
-            一起去很多很多地方，一起做很多很多梦。<br>
-            一起打很多很多游戏，一起吃很多很多夜宵……<br>
-            亲亲、抱抱、撒娇、贴贴……总之很多很多！<br>
-            <br><br>
-            520快乐，我的小宝宝。<br>
-            我爱你，从过去到现在，到很远很远的未来。
+            展信佳！<br><br>
+
+            嘻嘻，这是第二次用网站的形式给我的小宝宝写信窝，当然，纸质版的信也是有的窝，只不过这次有点不一样而已咯～感觉好久好久都没有给宝宝写信啦！想你想你想你！<br>
+            我是周五才开始写这封信的窝，悄咪咪地准备了一些礼物和精细！嘿嘿，不知道小宝宝晚上回来会是什么反应呢，小狗真是期待之！喜欢你的窝！<br><br>
+
+            这是我们在一起的第一个周年窝。还记得一年前的这个时候，我即将和小宝宝表白！那个……我喜欢你！多么唐突的表白窝，可是小宝宝还是接受了我，在这之后也包容我的种种……<br>
+            回顾我们的一周年，我们走过了好多好多，也经历了好多好多。我们会因为一些事情闹不愉快，因为一些事情有矛盾甚至吵架，但最终我们都一起沟通、一起解决问题，重归于好；<br>
+            我们也去了好多好多地方玩：第一次骑车去西湖，第一次见面，第一次一起去南昌，第一次一起坐火车，第一次亲亲……好多好多呢！（呜呜呜我写到这里都忍不住哭了）<br><br>
+
+            我的好多好多美好的记忆都是和宝宝相关的窝！我一想起小宝宝，就炒鸡炒鸡开心！<br>
+            宝宝温柔体贴，还超级心疼小狗，每次都会给小狗解决问题，给小狗买衣服并且勒令小狗不准再捡破烂了；每次小狗累累的时候宝宝都会给我点好吃的，还天天给我准备惊喜！呜呜呜宝宝最好最好啦！<br>
+            宝宝还超级超级可爱，脸蛋软软之、眼睛大大之、嘴巴嘟嘟之，每次见到宝宝我都想一个劲地贴贴亲亲抱抱！总之总之，最最最最喜欢宝宝啦！<br><br>
+
+            这是我们在一起的第一年！我们还会走过好多好多个第一年呢……我要和小宝宝永远永远走下去！爱你窝！
         </div>
-        <div class="letter-signature">—— 永远爱你的小狗 <svg class="ico ico--fill" aria-hidden="true"><use href="#i-heart"></use></svg></div>
+        <div class="letter-signature">—— 爱你的 小狗 <svg class="ico ico--fill" aria-hidden="true"><use href="#i-heart"></use></svg></div>
         <button class="enter-journey-btn" id="enterJourneyBtn"><svg class="ico ico--fill" aria-hidden="true"><use href="#i-sparkle"></use></svg> 进入我们的时光之旅 <svg class="ico ico--fill" aria-hidden="true"><use href="#i-sparkle"></use></svg></button>
     </div>
 </div>
@@ -1510,7 +1511,7 @@
         const RISE_MS = 2020;                     // 主花从地面升到高点约 2 秒
         const mainAt = Math.max(0.8, (burstAt - 240 - RISE_MS) / 1000);
         const cardDur = 3400;                     // 相片卡展示时长
-        const finalAt = burstAt + cardDur + 150;  // 卡片淡出后，「520 永远爱你」浮现
+        const finalAt = burstAt + cardDur + 150;  // 卡片淡出后，「一周年快乐」浮现
         const finalDur = 2200;
         const finishAt = finalAt + 1600;          // 露出主页
         const endAt = finalAt + finalDur + 700;   // 黑幕彻底退场
@@ -1544,9 +1545,9 @@
             cineInk(ov, ['如果时间可以再慢一点', '我想和你多待一会儿 ⏳'], inkDur);
         }, Math.round(inkAt));
         // 主花炸开时，最后一张回忆带着配文浮上来（onMain 里触发）
-        // 烟花正盛，收一句「520 永远爱你」
+        // 烟花正盛，收一句「一周年快乐」
         setTimeout(() => {
-            cineInk(ov, ['<span class="cine-big">520 永远爱你 ❤️</span>'], finalDur);
+            cineInk(ov, ['<span class="cine-big">一周年快乐 永远爱你 ❤️</span>'], finalDur);
             if (fireworks && fireworks.burst) {
                 fireworks.burst(3);
                 setTimeout(() => { if (fireworks && fireworks.burst) fireworks.burst(2); }, 650);
